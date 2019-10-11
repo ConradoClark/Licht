@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Licht.Interfaces.Time;
 
 namespace Licht.Impl.Orchestration
 {
+    [PublicAPI]
     public static class TimeYields
     {
         public static Action WaitOneFrame => () => { };

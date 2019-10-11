@@ -1,7 +1,9 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Licht.Impl.Globals
 {
+    [PublicAPI]
     public static class NumericGlobals
     {
         public static float FloatTolerance = 0.001f;

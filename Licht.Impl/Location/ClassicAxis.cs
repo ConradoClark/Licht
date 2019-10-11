@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
+using JetBrains.Annotations;
 using Licht.Interfaces.Location;
 
 namespace Licht.Impl.Numbers
 {
+    [PublicAPI]
     public class ClassicAxis : IEquatable<ClassicAxis>, IAxis
     {
         public char AxisLetter { get; protected set; }

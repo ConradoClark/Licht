@@ -2,11 +2,13 @@
 using System.Linq;
 using Licht.Interfaces.Location;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Licht.Impl.Globals;
 using Licht.Interfaces.Movement;
 
 namespace Licht.Impl.Numbers
 {
+    [PublicAPI]
     public struct GenericVector<TAxis> : IDimensionalLocatable<float, TAxis>, ITranslateable<float, TAxis>
         where TAxis : IAxis
     {

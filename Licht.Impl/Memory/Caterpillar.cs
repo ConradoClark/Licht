@@ -2,10 +2,12 @@
 using Licht.Interfaces.Memory;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Licht.Interfaces.Events;
 
 namespace Licht.Impl.Memory
 {
+    [PublicAPI]
     public class Caterpillar<T> : ICaterpillar<T>,
         IEventObservable<CaterpillarEvents, T>
     {

@@ -1,9 +1,11 @@
 ﻿using Licht.Interfaces.Memory;
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Licht.Impl.Memory
 {
+    [PublicAPI]
     public class LoopingList<T> : List<T>, IReversibleCollection<T>
     {
         private int _currentIndex;

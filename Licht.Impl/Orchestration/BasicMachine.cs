@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Licht.Interfaces.Orchestration;
 
 namespace Licht.Impl.Orchestration
 {
+    [PublicAPI]
     public class BasicMachine : MachineBase
     {
         private bool _started;

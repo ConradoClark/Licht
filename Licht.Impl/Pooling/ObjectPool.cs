@@ -1,8 +1,10 @@
 ﻿using Licht.Interfaces.Pooling;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace Licht.Impl.Pooling
 {
+    [PublicAPI]
     public class ObjectPool<T> : IPool<T> where T : IPoolableObject
     {
         private T[] _objectPool;

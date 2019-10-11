@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Licht.Interfaces.Orchestration;
 
 namespace Licht.Impl.Orchestration
 {
+    [PublicAPI]
     public class BasicMachinery : IMachinery
     {
-        public bool IsActive { get; set; }
+        public bool IsActive { get; private set; }
         public IReadOnlyCollection<int> ActiveMachines => _activeMachines;
         private readonly List<int> _activeMachines = new List<int>();
         private readonly List<int> _removeList = new List<int>();
@@ -59,14 +61,14 @@ namespace Licht.Impl.Orchestration
             switch (result)
             {
                 case MachineStepResult.Skip:
-                {
-                    currentQueue.Dequeue();
-                    if (!currentQueue.IsEmpty)
                     {
-                        return RunStep(currentQueue.Peek());
-                    }                
-                    break;
-                }
+                        currentQueue.Dequeue();
+                        if (!currentQueue.IsEmpty)
+                        {
+                            return RunStep(currentQueue.Peek());
+                        }
+                        break;
+                    }
                 case MachineStepResult.Done:
                     currentQueue.Dequeue();
                     break;

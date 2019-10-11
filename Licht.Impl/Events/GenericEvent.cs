@@ -1,7 +1,9 @@
-﻿using Licht.Interfaces.Events;
+﻿using JetBrains.Annotations;
+using Licht.Interfaces.Events;
 
 namespace Licht.Impl.Events
 {
+    [PublicAPI]
     public class GenericEvent<T> : IEvent<T>
     {
         public T Object { get; }

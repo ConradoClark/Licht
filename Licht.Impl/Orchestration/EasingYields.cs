@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Licht.Impl.Globals;
 using Licht.Interfaces.Time;
 
 namespace Licht.Impl.Orchestration
 {
+    [PublicAPI]
     public static class EasingYields
     {
         public static IEnumerable<Action> Lerp(Action<float> setter,
