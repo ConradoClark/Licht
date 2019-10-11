@@ -1,8 +1,5 @@
-﻿using Licht.Impl.Numbers;
-using Licht.Interfaces.Time;
+﻿using Licht.Interfaces.Time;
 using System;
-using Licht.Interfaces.Math;
-using System.Diagnostics;
 using Licht.Impl.Debug;
 using Licht.Impl.Memory;
 

@@ -1,5 +1,4 @@
 ﻿using Licht.Interfaces.Update;
-using System.Collections.Generic;
 
 namespace Licht.Interfaces.Pooling
 {

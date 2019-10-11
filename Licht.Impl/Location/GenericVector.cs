@@ -4,7 +4,6 @@ using Licht.Interfaces.Location;
 using System.Collections.Generic;
 using Licht.Impl.Globals;
 using Licht.Interfaces.Movement;
-using Licht.Interfaces.Math;
 
 namespace Licht.Impl.Numbers
 {

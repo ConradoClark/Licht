@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration.Assemblies;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Licht.Impl.Globals;
 using Licht.Impl.Numbers;
 using NUnit.Framework;

@@ -2,7 +2,6 @@
 using Licht.Interfaces.Memory;
 using System.Collections.Generic;
 using System.Linq;
-using Licht.Impl.Events;
 using Licht.Interfaces.Events;
 
 namespace Licht.Impl.Memory

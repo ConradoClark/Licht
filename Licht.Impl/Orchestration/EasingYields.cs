@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Licht.Interfaces.Math;
+using Licht.Impl.Globals;
 using Licht.Interfaces.Time;
 
 namespace Licht.Impl.Orchestration
 {
-    public class EasingYields
+    public static class EasingYields
     {
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, float target, EasingFunction function, ITime timer)
@@ -48,7 +44,7 @@ namespace Licht.Impl.Orchestration
 
         private static float Clamp(float value, float min, float max)
         {
-            return (value < min) ? min : (value > max) ? max : value;
+            return value < min ? min : value > max ? max : value;
         }
         /// <summary>
         /// Constant Pi.
@@ -101,7 +97,7 @@ namespace Licht.Impl.Orchestration
         /// <summary>
         /// Interpolate using the specified function.
         /// </summary>
-        public static float Interpolate(float p, EasingFunction function)
+        private static float Interpolate(float p, EasingFunction function)
         {
             switch (function)
             {
@@ -143,7 +139,7 @@ namespace Licht.Impl.Orchestration
         /// <summary>
         /// Modeled after the line y = x
         /// </summary>
-        public static float Linear(float p)
+        private static float Linear(float p)
         {
             return p;
         }
@@ -151,7 +147,7 @@ namespace Licht.Impl.Orchestration
         /// <summary>
         /// Modeled after the parabola y = x^2
         /// </summary>
-        public static float QuadraticEaseIn(float p)
+        private static float QuadraticEaseIn(float p)
         {
             return p * p;
         }
@@ -159,7 +155,7 @@ namespace Licht.Impl.Orchestration
         /// <summary>
         /// Modeled after the parabola y = -x^2 + 2x
         /// </summary>
-        public static float QuadraticEaseOut(float p)
+        private static float QuadraticEaseOut(float p)
         {
             return p * (2 - p);
         }
@@ -169,22 +165,20 @@ namespace Licht.Impl.Orchestration
         /// y = (1/2)((2x)^2)             ; [0, 0.5)
         /// y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]
         /// </summary>
-        public static float QuadraticEaseInOut(float p)
+        private static float QuadraticEaseInOut(float p)
         {
             if (p < 0.5f)
             {
                 return 2 * p * p;
             }
-            else
-            {
-                return (-2 * p * p) + (4 * p) - 1;
-            }
+
+            return -2 * p * p + 4 * p - 1;
         }
 
         /// <summary>
         /// Modeled after the cubic y = x^3
         /// </summary>
-        public static float CubicEaseIn(float p)
+        private static float CubicEaseIn(float p)
         {
             return p * p * p;
         }
@@ -192,9 +186,9 @@ namespace Licht.Impl.Orchestration
         /// <summary>
         /// Modeled after the cubic y = (x - 1)^3 + 1
         /// </summary>
-        public static float CubicEaseOut(float p)
+        private static float CubicEaseOut(float p)
         {
-            var f = (p - 1);
+            var f = p - 1;
             return f * f * f + 1;
         }
 
@@ -203,23 +197,21 @@ namespace Licht.Impl.Orchestration
         /// y = (1/2)((2x)^3)       ; [0, 0.5)
         /// y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]
         /// </summary>
-        public static float CubicEaseInOut(float p)
+        private static float CubicEaseInOut(float p)
         {
             if (p < 0.5f)
             {
                 return 4 * p * p * p;
             }
-            else
-            {
-                var f = ((2 * p) - 2);
-                return 0.5f * f * f * f + 1;
-            }
+
+            var f = 2 * p - 2;
+            return 0.5f * f * f * f + 1;
         }
 
         /// <summary>
         /// Modeled after the quartic x^4
         /// </summary>
-        public static float QuarticEaseIn(float p)
+        private static float QuarticEaseIn(float p)
         {
             return p * p * p * p;
         }
@@ -227,34 +219,32 @@ namespace Licht.Impl.Orchestration
         /// <summary>
         /// Modeled after the quartic y = 1 - (x - 1)^4
         /// </summary>
-        public static float QuarticEaseOut(float p)
+        private static float QuarticEaseOut(float p)
         {
-            var f = (p - 1);
+            var f = p - 1;
             return f * f * f * (1 - p) + 1;
         }
 
         /// <summary>
-        // Modeled after the piecewise quartic
-        // y = (1/2)((2x)^4)        ; [0, 0.5)
-        // y = -(1/2)((2x-2)^4 - 2) ; [0.5, 1]
+        /// Modeled after the piecewise quartic
+        /// y = (1/2)((2x)^4)        [0, 0.5]
+        /// y = -(1/2)((2x-2)^4 - 2) [0.5, 1]
         /// </summary>
-        public static float QuarticEaseInOut(float p)
+        private static float QuarticEaseInOut(float p)
         {
             if (p < 0.5f)
             {
                 return 8 * p * p * p * p;
             }
-            else
-            {
-                var f = (p - 1);
-                return -8 * f * f * f * f + 1;
-            }
+
+            var f = p - 1;
+            return -8 * f * f * f * f + 1;
         }
 
         /// <summary>
         /// Modeled after the quintic y = x^5
         /// </summary>
-        public static float QuinticEaseIn(float p)
+        private static float QuinticEaseIn(float p)
         {
             return p * p * p * p * p;
         }
@@ -262,9 +252,9 @@ namespace Licht.Impl.Orchestration
         /// <summary>
         /// Modeled after the quintic y = (x - 1)^5 + 1
         /// </summary>
-        public static float QuinticEaseOut(float p)
+        private static float QuinticEaseOut(float p)
         {
-            var f = (p - 1);
+            var f = p - 1;
             return f * f * f * f * f + 1;
         }
 
@@ -273,23 +263,21 @@ namespace Licht.Impl.Orchestration
         /// y = (1/2)((2x)^5)       ; [0, 0.5)
         /// y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]
         /// </summary>
-        public static float QuinticEaseInOut(float p)
+        private static float QuinticEaseInOut(float p)
         {
             if (p < 0.5f)
             {
                 return 16 * p * p * p * p * p;
             }
-            else
-            {
-                var f = ((2 * p) - 2);
-                return 0.5f * f * f * f * f * f + 1;
-            }
+
+            var f = 2 * p - 2;
+            return 0.5f * f * f * f * f * f + 1;
         }
 
         /// <summary>
         /// Modeled after quarter-cycle of sine wave
         /// </summary>
-        public static float SineEaseIn(float p)
+        private static float SineEaseIn(float p)
         {
             return (float)Math.Sin((p - 1) * HALFPI) + 1;
         }
@@ -297,7 +285,7 @@ namespace Licht.Impl.Orchestration
         /// <summary>
         /// Modeled after quarter-cycle of sine wave (different phase)
         /// </summary>
-        public static float SineEaseOut(float p)
+        private static float SineEaseOut(float p)
         {
             return (float)Math.Sin(p * HALFPI);
         }
@@ -305,7 +293,7 @@ namespace Licht.Impl.Orchestration
         /// <summary>
         /// Modeled after half sine wave
         /// </summary>
-        public static float SineEaseInOut(float p)
+        private static float SineEaseInOut(float p)
         {
             return 0.5f * (1f - (float)Math.Cos(p * PI));
         }
@@ -313,15 +301,15 @@ namespace Licht.Impl.Orchestration
         /// <summary>
         /// Modeled after shifted quadrant IV of unit circle
         /// </summary>
-        public static float CircularEaseIn(float p)
+        private static float CircularEaseIn(float p)
         {
-            return 1f - (float)Math.Sqrt(1 - (p * p));
+            return 1f - (float)Math.Sqrt(1 - p * p);
         }
 
         /// <summary>
         /// Modeled after shifted quadrant II of unit circle
         /// </summary>
-        public static float CircularEaseOut(float p)
+        private static float CircularEaseOut(float p)
         {
             return (float)Math.Sqrt((2 - p) * p);
         }
@@ -331,32 +319,30 @@ namespace Licht.Impl.Orchestration
         /// y = (1/2)(1 - Math.Sqrt(1 - 4x^2))           ; [0, 0.5)
         /// y = (1/2)(Math.Sqrt(-(2x - 3)*(2x - 1)) + 1) ; [0.5, 1]
         /// </summary>
-        public static float CircularEaseInOut(float p)
+        private static float CircularEaseInOut(float p)
         {
             if (p < 0.5f)
             {
                 return 0.5f * (1 - (float)Math.Sqrt(1 - 4 * (p * p)));
             }
-            else
-            {
-                return 0.5f * ((float)Math.Sqrt(-((2 * p) - 3) * ((2 * p) - 1)) + 1);
-            }
+
+            return 0.5f * ((float)Math.Sqrt(-(2 * p - 3) * (2 * p - 1)) + 1);
         }
 
         /// <summary>
         /// Modeled after the exponential function y = 2^(10(x - 1))
         /// </summary>
-        public static float ExponentialEaseIn(float p)
+        private static float ExponentialEaseIn(float p)
         {
-            return (p == 0.0f) ? p : (float)Math.Pow(2, 10 * (p - 1));
+            return Math.Abs(p) < NumericGlobals.FloatTolerance ? p : (float)Math.Pow(2, 10 * (p - 1));
         }
 
         /// <summary>
         /// Modeled after the exponential function y = -2^(-10x) + 1
         /// </summary>
-        public static float ExponentialEaseOut(float p)
+        private static float ExponentialEaseOut(float p)
         {
-            return (p == 1.0f) ? p : 1 - (float)Math.Pow(2, -10 * p);
+            return Math.Abs(p - 1.0f) < NumericGlobals.FloatTolerance ? p : 1 - (float)Math.Pow(2, -10 * p);
         }
 
         /// <summary>
@@ -364,24 +350,22 @@ namespace Licht.Impl.Orchestration
         /// y = (1/2)2^(10(2x - 1))         ; [0,0.5)
         /// y = -(1/2)*2^(-10(2x - 1))) + 1 ; [0.5,1]
         /// </summary>
-        public static float ExponentialEaseInOut(float p)
+        private static float ExponentialEaseInOut(float p)
         {
-            if (p == 0.0 || p == 1.0) return p;
+            if (Math.Abs(p) < NumericGlobals.FloatTolerance || Math.Abs(p - 1.0) < NumericGlobals.FloatTolerance) return p;
 
             if (p < 0.5f)
             {
-                return 0.5f * (float)Math.Pow(2, (20 * p) - 10);
+                return 0.5f * (float)Math.Pow(2, 20 * p - 10);
             }
-            else
-            {
-                return -0.5f * (float)Math.Pow(2, (-20 * p) + 10) + 1;
-            }
+
+            return -0.5f * (float)Math.Pow(2, -20 * p + 10) + 1;
         }
 
         /// <summary>
         /// Modeled after the damped sine wave y = sin(13pi/2*x)*Math.Pow(2, 10 * (x - 1))
         /// </summary>
-        public static float ElasticEaseIn(float p)
+        private static float ElasticEaseIn(float p)
         {
             return (float)Math.Sin(13 * HALFPI * p) * (float)Math.Pow(2, 10 * (p - 1));
         }
@@ -389,7 +373,7 @@ namespace Licht.Impl.Orchestration
         /// <summary>
         /// Modeled after the damped sine wave y = sin(-13pi/2*(x + 1))*Math.Pow(2, -10x) + 1
         /// </summary>
-        public static float ElasticEaseOut(float p)
+        private static float ElasticEaseOut(float p)
         {
             return (float)Math.Sin(-13 * HALFPI * (p + 1)) * (float)Math.Pow(2, -10 * p) + 1;
         }
@@ -399,22 +383,20 @@ namespace Licht.Impl.Orchestration
         /// y = (1/2)*sin(13pi/2*(2*x))*Math.Pow(2, 10 * ((2*x) - 1))      ; [0,0.5)
         /// y = (1/2)*(sin(-13pi/2*((2x-1)+1))*Math.Pow(2,-10(2*x-1)) + 2) ; [0.5, 1]
         /// </summary>
-        public static float ElasticEaseInOut(float p)
+        private static float ElasticEaseInOut(float p)
         {
             if (p < 0.5f)
             {
-                return 0.5f * (float)Math.Sin(13 * HALFPI * (2 * p)) * (float)Math.Pow(2, 10 * ((2 * p) - 1));
+                return 0.5f * (float)Math.Sin(13 * HALFPI * (2 * p)) * (float)Math.Pow(2, 10 * (2 * p - 1));
             }
-            else
-            {
-                return 0.5f * ((float)Math.Sin(-13 * HALFPI * ((2 * p - 1) + 1)) * (float)Math.Pow(2, -10 * (2 * p - 1)) + 2);
-            }
+
+            return 0.5f * ((float)Math.Sin(-13 * HALFPI * (2 * p - 1 + 1)) * (float)Math.Pow(2, -10 * (2 * p - 1)) + 2);
         }
 
         /// <summary>
         /// Modeled after the overshooting cubic y = x^3-x*sin(x*pi)
         /// </summary>
-        public static float BackEaseIn(float p)
+        private static float BackEaseIn(float p)
         {
             return p * p * p - p * (float)Math.Sin(p * PI);
         }
@@ -422,9 +404,9 @@ namespace Licht.Impl.Orchestration
         /// <summary>
         /// Modeled after overshooting cubic y = 1-((1-x)^3-(1-x)*sin((1-x)*pi))
         /// </summary>	
-        public static float BackEaseOut(float p)
+        private static float BackEaseOut(float p)
         {
-            var f = (1 - p);
+            var f = 1 - p;
             return 1f - (f * f * f - f * (float)Math.Sin(f * PI));
         }
 
@@ -433,7 +415,7 @@ namespace Licht.Impl.Orchestration
         /// y = (1/2)*((2x)^3-(2x)*sin(2*x*pi))           ; [0, 0.5)
         /// y = (1/2)*(1-((1-x)^3-(1-x)*sin((1-x)*pi))+1) ; [0.5, 1]
         /// </summary>
-        public static float BackEaseInOut(float p)
+        private static float BackEaseInOut(float p)
         {
             if (p < 0.5f)
             {
@@ -442,52 +424,50 @@ namespace Licht.Impl.Orchestration
             }
             else
             {
-                var f = (1 - (2 * p - 1));
+                var f = 1 - (2 * p - 1);
                 return 0.5f * (1 - (f * f * f - f * (float)Math.Sin(f * PI))) + 0.5f;
             }
         }
 
         /// <summary>
         /// </summary>
-        public static float BounceEaseIn(float p)
+        private static float BounceEaseIn(float p)
         {
             return 1 - BounceEaseOut(1 - p);
         }
 
         /// <summary>
         /// </summary>
-        public static float BounceEaseOut(float p)
+        private static float BounceEaseOut(float p)
         {
             if (p < 4 / 11.0f)
             {
-                return (121 * p * p) / 16.0f;
+                return 121 * p * p / 16.0f;
             }
-            else if (p < 8 / 11.0f)
+
+            if (p < 8 / 11.0f)
             {
-                return (363 / 40.0f * p * p) - (99 / 10.0f * p) + 17 / 5.0f;
+                return 363 / 40.0f * p * p - 99 / 10.0f * p + 17 / 5.0f;
             }
-            else if (p < 9 / 10.0f)
+
+            if (p < 9 / 10.0f)
             {
-                return (4356 / 361.0f * p * p) - (35442 / 1805.0f * p) + 16061 / 1805.0f;
+                return 4356 / 361.0f * p * p - 35442 / 1805.0f * p + 16061 / 1805.0f;
             }
-            else
-            {
-                return (54 / 5.0f * p * p) - (513 / 25.0f * p) + 268 / 25.0f;
-            }
+
+            return 54 / 5.0f * p * p - 513 / 25.0f * p + 268 / 25.0f;
         }
 
         /// <summary>
         /// </summary>
-        public static float BounceEaseInOut(float p)
+        private static float BounceEaseInOut(float p)
         {
             if (p < 0.5f)
             {
                 return 0.5f * BounceEaseIn(p * 2);
             }
-            else
-            {
-                return 0.5f * BounceEaseOut(p * 2 - 1) + 0.5f;
-            }
+
+            return 0.5f * BounceEaseOut(p * 2 - 1) + 0.5f;
         }
     }
 }

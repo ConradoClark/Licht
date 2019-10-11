@@ -1,8 +1,5 @@
 ﻿using System;
 using Licht.Impl.Time;
-using Licht.Impl.Numbers;
-using System.Diagnostics;
-using System.Threading;
 using NUnit.Framework;
 
 namespace Licht.Test
