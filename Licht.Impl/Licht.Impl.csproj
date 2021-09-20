@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{994216F0-B087-4213-938E-009C4D0EDCFB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Licht.Impl</RootNamespace>
+    <AssemblyName>Licht.Impl</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Debug\DebugLicht.cs" />
+    <Compile Include="Events\GenericEvent.cs" />
+    <Compile Include="Globals\NumericGlobals.cs" />
+    <Compile Include="Location\ClassicAxis.cs" />
+    <Compile Include="Location\DirectionVector.cs" />
+    <Compile Include="Location\Point.cs" />
+    <Compile Include="Memory\CaterpillarEvents.cs" />
+    <Compile Include="Memory\ClampingList.cs" />
+    <Compile Include="Memory\CustomSequenceList.cs" />
+    <Compile Include="Location\GenericVector.cs" />
+    <Compile Include="Memory\Caterpillar.cs" />
+    <Compile Include="Memory\LoopingList.cs" />
+    <Compile Include="Orchestration\BasicMachine.cs" />
+    <Compile Include="Orchestration\BasicMachinery.cs" />
+    <Compile Include="Orchestration\EasingYields.cs" />
+    <Compile Include="Orchestration\FIFOQueue.cs" />
+    <Compile Include="Orchestration\MachineBase.cs" />
+    <Compile Include="Orchestration\PriorityQueue.cs" />
+    <Compile Include="Orchestration\TimeYields.cs" />
+    <Compile Include="Orchestration\WaitForConditionMachine.cs" />
+    <Compile Include="Pooling\ObjectPool.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Time\DefaultTimer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Licht.Interfaces\Licht.Interfaces.csproj">
+      <Project>{47d0c3b4-8c8b-4cfe-b376-f0015531ea0f}</Project>
+      <Name>Licht.Interfaces</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
