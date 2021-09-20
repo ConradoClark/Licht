@@ -1,5 +1,4 @@
-﻿using Licht.Interfaces.Math;
-using Licht.Interfaces.Update;
+﻿using Licht.Interfaces.Update;
 
 namespace Licht.Interfaces.Time
 {

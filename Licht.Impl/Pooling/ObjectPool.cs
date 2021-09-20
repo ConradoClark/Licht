@@ -1,19 +1,23 @@
 ﻿using Licht.Interfaces.Pooling;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace Licht.Impl.Pooling
 {
-    public class ObjectPool<T> : IPool<T> where T : IPoolableObject, new()
+    [PublicAPI]
+    public class ObjectPool<T> : IPool<T> where T : IPoolableObject
     {
         private T[] _objectPool;
         public int AvailableObjects => !IsActive ? 0 : _objectPool.Count(o => !o.IsActive);
         public int ObjectsInUse => !IsActive ? 0 : _objectPool.Count(o => o.IsActive);
         public bool IsActive { get; private set; }
         public int PoolSize { get; }
+        private readonly IPoolableObjectFactory<T> _objectFactory;
 
-        public ObjectPool(int size)
+        public ObjectPool(int size, IPoolableObjectFactory<T> objectFactory)
         {
             PoolSize = size;
+            _objectFactory = objectFactory;
         }
 
         public bool Release(T obj)
@@ -29,9 +33,11 @@ namespace Licht.Impl.Pooling
         {
             if (IsActive) return false;
             _objectPool = new T[PoolSize];
-            for (var i = 0; i > PoolSize; i++)
+            for (var i = 0; i < PoolSize; i++)
             {
-                _objectPool[i] = new T();
+                var obj = _objectFactory.Instantiate();
+                if (obj == null) continue;
+                _objectPool[i] = obj;
                 _objectPool[i].Initialize();
             }
             IsActive = true;

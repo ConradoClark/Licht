@@ -57,6 +57,7 @@
     <Compile Include="Orchestration\IMachineStepResult.cs" />
     <Compile Include="Pooling\IPool.cs" />
     <Compile Include="Pooling\IPoolableObject.cs" />
+    <Compile Include="Pooling\IPoolableObjectFactory.cs" />
     <Compile Include="Pooling\IPoolCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Time\ITime.cs" />

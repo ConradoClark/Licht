@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using JetBrains.Annotations;
 using Licht.Interfaces.Events;
 
 namespace Licht.Impl.Events
 {
+    [PublicAPI]
     public class GenericEvent<T> : IEvent<T>
     {
         public T Object { get; }

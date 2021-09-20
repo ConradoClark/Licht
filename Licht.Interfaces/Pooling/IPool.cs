@@ -1,5 +1,4 @@
 ﻿using Licht.Interfaces.Update;
-using System.Collections.Generic;
 
 namespace Licht.Interfaces.Pooling
 {
@@ -10,7 +9,7 @@ namespace Licht.Interfaces.Pooling
         int PoolSize { get; }
     }
 
-    public interface IPool<T> : IPool where T : IPoolableObject, new()
+    public interface IPool<T> : IPool where T : IPoolableObject
     {
         bool TryGetFromPool(out T obj);
         bool GetManyFromPool(int amount, out T[] objects);

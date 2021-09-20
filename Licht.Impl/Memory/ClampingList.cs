@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Licht.Interfaces.Memory;
 
 namespace Licht.Impl.Memory
 {
+    [PublicAPI]
     public class ClampingList<T> : List<T>, IReversibleCollection<T>
     {
         private int _currentIndex;

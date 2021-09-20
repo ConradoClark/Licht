@@ -1,7 +1,9 @@
-﻿using Licht.Interfaces.Math;
+﻿using JetBrains.Annotations;
+using Licht.Interfaces.Math;
 
 namespace Licht.Impl.Numbers
 {
+    [PublicAPI]
     public class Point<T> : IQuantifiable<T>
     {
         public T Value { get; set; }

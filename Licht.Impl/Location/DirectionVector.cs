@@ -1,12 +1,9 @@
-﻿using Licht.Interfaces.Location;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using JetBrains.Annotations;
+using Licht.Interfaces.Location;
 
 namespace Licht.Impl.Numbers
 {
+    [PublicAPI]
     public class DirectionVector<TUnit, TAxis> : IDirectionVector<TUnit, TAxis>
     {
         public TAxis Axis { get; set; }

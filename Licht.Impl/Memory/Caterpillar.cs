@@ -2,11 +2,12 @@
 using Licht.Interfaces.Memory;
 using System.Collections.Generic;
 using System.Linq;
-using Licht.Impl.Events;
+using JetBrains.Annotations;
 using Licht.Interfaces.Events;
 
 namespace Licht.Impl.Memory
 {
+    [PublicAPI]
     public class Caterpillar<T> : ICaterpillar<T>,
         IEventObservable<CaterpillarEvents, T>
     {
@@ -28,6 +29,17 @@ namespace Licht.Impl.Memory
         public T GetTrail(int index)
         {
             return _stack.Count > index-1 ? _stack[_stack.Count - index] : default(T);
+        }
+
+        public bool HasTrail(int index)
+        {
+            return _stack.Count > index - 1;
+        }
+
+        public void Rewind(int steps)
+        {
+            if (_stack.Count < steps || TailSize < steps) return;
+            _stack.RemoveRange(0, steps);
         }
 
         private readonly Action<T> _add;

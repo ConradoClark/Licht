@@ -1,19 +1,18 @@
-﻿using Licht.Impl.Numbers;
-using Licht.Interfaces.Time;
+﻿using Licht.Interfaces.Time;
 using System;
-using Licht.Interfaces.Math;
-using System.Diagnostics;
+using JetBrains.Annotations;
 using Licht.Impl.Debug;
 using Licht.Impl.Memory;
 
 namespace Licht.Impl.Time
 {
+    [PublicAPI]
     public class DefaultTimer : ITime
     {
         private readonly Func<double> _timeStepFn;
         public DefaultTimer(Func<double> timeStepFn, int framesPerSecond = 60)
         {
-            _last = new Caterpillar<double>() { TailSize = 1 };
+            _last = new Caterpillar<double> { TailSize = 1 };
             _timeStepFn = timeStepFn;
             FramesPerSecond = framesPerSecond;
         }
@@ -27,7 +26,7 @@ namespace Licht.Impl.Time
         public double TotalElapsedTimeInMilliseconds => _elapsed + _offset;
         public double UpdatedTimeInMilliseconds => _last.Current;
         public bool IsActive { get; private set; } = true;
-        public bool Debug { get; set; } = false;
+        public bool Debug { get; set; }
 
         public bool Activate()
         {

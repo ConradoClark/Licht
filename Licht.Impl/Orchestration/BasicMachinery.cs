@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Licht.Interfaces.Orchestration;
 
 namespace Licht.Impl.Orchestration
 {
+    [PublicAPI]
     public class BasicMachinery : IMachinery
     {
-        public bool IsActive { get; set; }
+        public bool IsActive { get; private set; }
         public IReadOnlyCollection<int> ActiveMachines => _activeMachines;
         private readonly List<int> _activeMachines = new List<int>();
         private readonly List<int> _removeList = new List<int>();
@@ -31,11 +31,13 @@ namespace Licht.Impl.Orchestration
             if (!IsActive) return;
 
             _queueExhaustion = new Dictionary<IMachineQueue, bool>();
-            _activeMachines.Sort();
+            _activeMachines.Sort((i1, i2) => i2.CompareTo(i1));
             _removeList.Clear();
 
-            foreach (var makineryIndex in _activeMachines)
+            var stack = new Stack<int>(_activeMachines);
+            while (stack.Count > 0)
             {
+                var makineryIndex = stack.Pop();
                 IMachine m = _machinarium[makineryIndex];
                 var result = RunStep(m);
 
@@ -53,20 +55,21 @@ namespace Licht.Impl.Orchestration
             var currentQueue = _queuedMachines.FirstOrDefault(k => k.Key.Equals(m.CurrentQueue)).Key;
             if (currentQueue == null) return m.RunStep();
             if (_queueExhaustion.ContainsKey(currentQueue) && _queueExhaustion[currentQueue]) return MachineStepResult.QueueWaiting;
+            if (currentQueue.IsEmpty) return MachineStepResult.Done;
             if (m != currentQueue.Peek()) return MachineStepResult.QueueWaiting;
 
             var result = m.RunStep();
             switch (result)
             {
                 case MachineStepResult.Skip:
-                {
-                    currentQueue.Dequeue();
-                    if (!currentQueue.IsEmpty)
                     {
-                        return RunStep(currentQueue.Peek());
-                    }                
-                    break;
-                }
+                        currentQueue.Dequeue();
+                        if (!currentQueue.IsEmpty)
+                        {
+                            return RunStep(currentQueue.Peek());
+                        }
+                        break;
+                    }
                 case MachineStepResult.Done:
                     currentQueue.Dequeue();
                     break;

@@ -1,12 +1,11 @@
 ﻿using Licht.Interfaces.Memory;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace Licht.Impl.Memory
 {
+    [PublicAPI]
     public class LoopingList<T> : List<T>, IReversibleCollection<T>
     {
         private int _currentIndex;
@@ -26,7 +25,7 @@ namespace Licht.Impl.Memory
         {
             get
             {
-                _currentIndex = _currentIndex == 0 ? Math.Max(0, Count - 1) : ((_currentIndex - 1) % Count);
+                _currentIndex = _currentIndex == 0 ? Math.Max(0, Count - 1) : (_currentIndex - 1) % Count;
                 return Current;
             }
         }

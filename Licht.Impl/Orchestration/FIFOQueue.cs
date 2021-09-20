@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Licht.Interfaces.Orchestration;
 
 namespace Licht.Impl.Orchestration
 {
+    [PublicAPI]
     public class FIFOQueue : IMachineQueue
     {
         private Queue<IMachine> _queue = new Queue<IMachine>();
