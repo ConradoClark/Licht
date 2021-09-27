@@ -57,6 +57,7 @@
     <Compile Include="Memory\LoopingList.cs" />
     <Compile Include="Orchestration\BasicMachine.cs" />
     <Compile Include="Orchestration\BasicMachinery.cs" />
+    <Compile Include="Orchestration\BasicMachineryExtensions.cs" />
     <Compile Include="Orchestration\EasingYields.cs" />
     <Compile Include="Orchestration\FIFOQueue.cs" />
     <Compile Include="Orchestration\MachineBase.cs" />
