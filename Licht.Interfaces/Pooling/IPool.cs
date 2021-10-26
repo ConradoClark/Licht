@@ -14,5 +14,7 @@ namespace Licht.Interfaces.Pooling
         bool TryGetFromPool(out T obj);
         bool GetManyFromPool(int amount, out T[] objects);
         bool Release(T obj);
+
+        bool ReleaseAll();
     }
 }

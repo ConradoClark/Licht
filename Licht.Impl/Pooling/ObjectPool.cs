@@ -29,6 +29,17 @@ namespace Licht.Impl.Pooling
             return true;
         }
 
+        public bool ReleaseAll()
+        {
+            if (!IsActive) return false;
+            foreach (var obj in _objectPool)
+            {
+                obj.Deactivate();
+            }
+
+            return true;
+        }
+
         public bool Activate()
         {
             if (IsActive) return false;
