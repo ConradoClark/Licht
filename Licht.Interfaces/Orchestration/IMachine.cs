@@ -6,5 +6,6 @@
         int AssignedPriority { get; set; }
         MachineStepResult RunStep();
         object CurrentQueue { get; set; }
+        void Cleanup();
     }
 }

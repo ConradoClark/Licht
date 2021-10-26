@@ -10,7 +10,7 @@ namespace Licht.Impl.Orchestration
     public static class EasingYields
     {
         public static IEnumerable<Action> Lerp(Action<float> setter,
-            Func<float> getter, float seconds, float target, EasingFunction function, ITime timer)
+            Func<float> getter, float seconds, float target, EasingFunction function, ITime timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false)
         {
             var ms = seconds * 1000d;
             var initialTarget = target;
@@ -24,6 +24,11 @@ namespace Licht.Impl.Orchestration
                 var prop = 1 / ms;
                 while (time < ms)
                 {
+                    if (breakCondition != null && breakCondition())
+                    {
+                        if (setTargetOnBreak) setter(target);
+                        yield break;
+                    }
                     time += timer.UpdatedTimeInMilliseconds;
                     var pos = getter();
                     var lastAcc = pos - last;

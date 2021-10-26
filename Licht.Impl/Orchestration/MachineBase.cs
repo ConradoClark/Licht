@@ -15,5 +15,7 @@ namespace Licht.Impl.Orchestration
         {
             Priority = priority;
         }
+
+        public abstract void Cleanup();
     }
 }

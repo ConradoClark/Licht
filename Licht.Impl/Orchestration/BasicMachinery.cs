@@ -71,6 +71,7 @@ namespace Licht.Impl.Orchestration
                         break;
                     }
                 case MachineStepResult.Done:
+                    currentQueue.Peek().Cleanup();
                     currentQueue.Dequeue();
                     break;
             }

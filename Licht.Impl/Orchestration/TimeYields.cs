@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using Licht.Interfaces.Time;
 
@@ -9,6 +10,8 @@ namespace Licht.Impl.Orchestration
     public static class TimeYields
     {
         public static Action WaitOneFrame => () => { };
+
+        public static IEnumerable<Action> WaitOneFrameX => Enumerable.Repeat<Action>(() => { },1);
 
         public static IEnumerable<Action> WaitMilliseconds(ITime timer, double ms)
         {

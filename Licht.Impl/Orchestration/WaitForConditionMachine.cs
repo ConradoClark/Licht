@@ -17,5 +17,9 @@ namespace Licht.Impl.Orchestration
         {
             return (_condition?.Invoke()).GetValueOrDefault() ? MachineStepResult.Skip : MachineStepResult.InternalWaiting;
         }
+
+        public override void Cleanup()
+        {
+        }
     }
 }

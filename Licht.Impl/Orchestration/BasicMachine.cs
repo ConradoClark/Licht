@@ -11,15 +11,24 @@ namespace Licht.Impl.Orchestration
     {
         private bool _started;
         private readonly IEnumerator<Action> _actionEnumerator;
+        private readonly Func<bool> _breakCondition;
 
-        public BasicMachine(int priority, IEnumerable<Action> steps) : base(priority)
+        public BasicMachine(int priority, IEnumerable<Action> steps, Func<bool> breakCondition = null) : base(priority)
         {
             _actionEnumerator = steps.GetEnumerator();
+            _breakCondition = breakCondition;
         }
 
-        public BasicMachine(int priority, Action step) : base(priority)
+        public BasicMachine(int priority, IEnumerable<IEnumerable<Action>> steps, Func<bool> breakCondition = null) : base(priority)
+        {
+            _actionEnumerator = steps.SelectMany(s => s).GetEnumerator();
+            _breakCondition = breakCondition;
+        }
+
+        public BasicMachine(int priority, Action step, Func<bool> breakCondition = null) : base(priority)
         {
             _actionEnumerator = Enumerable.Repeat(step, 1).GetEnumerator();
+            _breakCondition = breakCondition;
         }
 
         public override MachineStepResult RunStep()
@@ -31,8 +40,13 @@ namespace Licht.Impl.Orchestration
             }
 
             _actionEnumerator.Current?.Invoke();
+            if (_breakCondition != null && _breakCondition()) return MachineStepResult.Done;
             return _actionEnumerator.MoveNext() ? MachineStepResult.Processing : MachineStepResult.Done;
         }
 
+        public override void Cleanup()
+        {
+            _actionEnumerator.Dispose();
+        }
     }
 }
