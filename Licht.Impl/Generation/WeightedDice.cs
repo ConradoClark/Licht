@@ -30,9 +30,6 @@ namespace Licht.Impl.Generation
 
             var result = _floatGenerator.Generate();
 
-            DebugLicht.Write("dice result: " + result);
-            DebugLicht.Write("weight tests: " + string.Join(" |", normalizedWeights.Select(v=> "<" + v)));
-
             for (var i = 0; i < normalizedWeights.Length; i++)
             {
                 if (result <= normalizedWeights[i]) return _values[i];
