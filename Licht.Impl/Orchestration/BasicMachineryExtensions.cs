@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Licht.Impl.Orchestration
 {
@@ -23,6 +21,35 @@ namespace Licht.Impl.Orchestration
         public static IEnumerable<Action> AsEnumerable(this Action action)
         {
             return Enumerable.Repeat(action, 1);
+        }
+
+        public static IEnumerable<Action> Combine(this IEnumerable<Action> source, IEnumerable<Action> target)
+        {
+            using (var sourceEnumerator = source.GetEnumerator())
+            using (var targetEnumerator = target.GetEnumerator())
+            {
+                while (sourceEnumerator.MoveNext() | targetEnumerator.MoveNext())
+                {
+                    yield return TimeYields.WaitOneFrame;
+                }
+            }
+        }
+
+        public static IEnumerable<Action> Then(this IEnumerable<Action> source, IEnumerable<Action> target)
+        {
+            using (var sourceEnumerator = source.GetEnumerator())
+            using (var targetEnumerator = target.GetEnumerator())
+            {
+                while (sourceEnumerator.MoveNext())
+                {
+                    yield return TimeYields.WaitOneFrame;
+                }
+
+                while (targetEnumerator.MoveNext())
+                {
+                    yield return TimeYields.WaitOneFrame;
+                }
+            }
         }
     }
 }

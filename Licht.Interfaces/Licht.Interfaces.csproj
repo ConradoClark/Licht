@@ -42,6 +42,9 @@
   <ItemGroup>
     <Compile Include="Events\IEvent.cs" />
     <Compile Include="Events\IEventObservable.cs" />
+    <Compile Include="Generation\IGenerator.cs" />
+    <Compile Include="Generation\ISeedable.cs" />
+    <Compile Include="Generation\IWeighted.cs" />
     <Compile Include="Location\IAxis.cs" />
     <Compile Include="Location\IDimensionalLocatable.cs" />
     <Compile Include="Location\IDirectionVector.cs" />

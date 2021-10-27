@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Debug\DebugLicht.cs" />
     <Compile Include="Events\GenericEvent.cs" />
+    <Compile Include="Generation\WeightedDice.cs" />
     <Compile Include="Globals\NumericGlobals.cs" />
     <Compile Include="Location\ClassicAxis.cs" />
     <Compile Include="Location\DirectionVector.cs" />
@@ -77,5 +78,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
