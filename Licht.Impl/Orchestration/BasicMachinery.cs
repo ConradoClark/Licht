@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using Licht.Impl.Debug;
 using Licht.Interfaces.Orchestration;
 
 namespace Licht.Impl.Orchestration
@@ -37,14 +38,14 @@ namespace Licht.Impl.Orchestration
             var stack = new Stack<int>(_activeMachines);
             while (stack.Count > 0)
             {
-                var makineryIndex = stack.Pop();
-                IMachine m = _machinarium[makineryIndex];
+                var machineryIndex = stack.Pop();
+                IMachine m = _machinarium[machineryIndex];
                 var result = RunStep(m);
 
                 if (result != MachineStepResult.Done) continue;
 
-                _machinarium[makineryIndex] = null;
-                _removeList.Add(makineryIndex);
+                _machinarium[machineryIndex] = null;
+                _removeList.Add(machineryIndex);
             }
 
             _activeMachines.RemoveAll(r => _removeList.Contains(r));
@@ -106,11 +107,15 @@ namespace Licht.Impl.Orchestration
             {
                 if (machine.Priority < 1) continue;
                 machine.AssignedPriority = (_machinarium.Skip(machine.Priority - 1)
-                                               .Select((m, ix) => new { m, ix })
-                                               .FirstOrDefault(r => r.m == null)?.ix).GetValueOrDefault() 
-                                           + machine.Priority - 1;
+                        .Select((m, ix) => new {m, ix})
+                        .FirstOrDefault(r => r.m == null)?.ix).GetValueOrDefault()
+                    + machine.Priority - 1;
 
-                if (_machinarium[machine.AssignedPriority] != null) continue;
+                if (_machinarium[machine.AssignedPriority] != null)
+                {
+                    DebugLicht.Write("impossible to assign priority: " + machine.GetType().FullName);
+                    continue;
+                }
 
                 _machinarium[machine.AssignedPriority] = machine;
                 _activeMachines.Add(machine.AssignedPriority);

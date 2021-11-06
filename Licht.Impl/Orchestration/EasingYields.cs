@@ -10,38 +10,48 @@ namespace Licht.Impl.Orchestration
     public static class EasingYields
     {
         public static IEnumerable<Action> Lerp(Action<float> setter,
-            Func<float> getter, float seconds, float target, EasingFunction function, ITime timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false)
+            Func<float> getter, float seconds, float target, EasingFunction function, ITime timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false, 
+            float initStep = 0f)
+        {
+            return Lerp(setter, getter, seconds, () => target, function, timer, breakCondition, setTargetOnBreak,
+                initStep);
+        }
+
+        public static IEnumerable<Action> Lerp(Action<float> setter,
+            Func<float> getter, float seconds, Func<float> target, EasingFunction function, ITime timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
+            float initStep = 0f)
         {
             var ms = seconds * 1000d;
-            var initialTarget = target;
             var initialStart = getter();
             var start = initialStart;
             var last = start;
 
             if (ms > 0)
             {
-                var time = 0d;
+                var time = initStep * ms;
                 var prop = 1 / ms;
                 while (time < ms)
                 {
+                    var initialTarget = target();
+
                     if (breakCondition != null && breakCondition())
                     {
-                        if (setTargetOnBreak) setter(target);
+                        if (setTargetOnBreak) setter(target());
                         yield break;
                     }
                     time += timer.UpdatedTimeInMilliseconds;
                     var pos = getter();
                     var lastAcc = pos - last;
-                    target = initialTarget + lastAcc;
+                    var lerpTarget = initialTarget + lastAcc;
                     start = initialStart + lastAcc;
                     last = Clamp(Interpolate((float)(time * prop), function), 0, 1);
-                    last = Lerp(start, target, last);
+                    last = Lerp(start, lerpTarget, last);
                     setter(last);
                     yield return TimeYields.WaitOneFrame;
                 }
             }
 
-            setter(target);
+            setter(target());
         }
 
         private static float Lerp(float p1, float p2, float fraction)

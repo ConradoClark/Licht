@@ -51,5 +51,69 @@ namespace Licht.Impl.Orchestration
                 }
             }
         }
+
+        /// <summary>
+        /// Starts a target co-routine when any of the sources are completed.
+        /// Ends when all co-routines are completed
+        /// </summary>
+        /// <param name="onTargetStarted"></param>
+        /// <param name="target"></param>
+        /// <param name="sources"></param>
+        /// <returns></returns>
+        public static IEnumerable<Action> StartWhenAny(Action onTargetStarted, IEnumerable<Action> target, params IEnumerable<Action>[] sources)
+        {
+            var enumerators = sources.Select(s => s.GetEnumerator()).ToArray();
+
+            while (enumerators.All(e => e.MoveNext()))
+            {
+                yield return TimeYields.WaitOneFrame;
+            }
+
+            enumerators = enumerators.Concat(new[] {target.GetEnumerator()}).ToArray();
+            onTargetStarted();
+
+            while (enumerators.Any(e => e.MoveNext()))
+            {
+                yield return TimeYields.WaitOneFrame;
+            }
+
+            foreach (var enumerator in enumerators)
+            {
+                enumerator.Dispose();
+            }
+        }
+
+        public static IEnumerable<Action> StartWhenAny(Action onTargetStarted, Func<IEnumerable<Action>> target, params IEnumerable<Action>[] sources)
+        {
+            var enumerators = sources.Select(s => s.GetEnumerator()).ToArray();
+
+            while (enumerators.All(e => e.MoveNext()))
+            {
+                yield return TimeYields.WaitOneFrame;
+            }
+
+            enumerators = enumerators.Concat(new[] { target().GetEnumerator() }).ToArray();
+            onTargetStarted();
+
+            while (enumerators.Any(e => e.MoveNext()))
+            {
+                yield return TimeYields.WaitOneFrame;
+            }
+
+            foreach (var enumerator in enumerators)
+            {
+                enumerator.Dispose();
+            }
+        }
+
+        public static IEnumerable<Action> StartWhenAny(IEnumerable<Action> target, params IEnumerable<Action>[] sources)
+        {
+            return StartWhenAny(() => { }, target, sources);
+        }
+
+        public static IEnumerable<Action> StartWhenAny(Func<IEnumerable<Action>> target, params IEnumerable<Action>[] sources)
+        {
+            return StartWhenAny(() => { }, target, sources);
+        }
     }
 }
