@@ -6,16 +6,31 @@ namespace Licht.Impl.Orchestration
 {
     public static class BasicMachineryExtensions
     {
-        public static BasicMachinery AddBasicMachine(this BasicMachinery basicMachinery, int priority, IEnumerable<Action> steps, Func<bool> breakCondition = null)
+        public static BasicMachinery<TKey> AddBasicMachine<TKey>(this BasicMachinery<TKey> basicMachinery, TKey layer, IEnumerable<Action> steps, Func<bool> breakCondition = null)
         {
-            basicMachinery.AddMachines(new BasicMachine(priority, steps, breakCondition));
+            basicMachinery.AddMachines(layer, new BasicMachine(steps, breakCondition));
             return basicMachinery;
         }
 
-        public static BasicMachinery AddBasicMachine(this BasicMachinery basicMachinery, int priority, IEnumerable<IEnumerable<Action>> steps, Func<bool> breakCondition = null)
+        public static BasicMachinery<TKey> AddBasicMachine<TKey>(this BasicMachinery<TKey> basicMachinery, TKey layer, IEnumerable<IEnumerable<Action>> steps, Func<bool> breakCondition = null)
         {
-            basicMachinery.AddMachines(new BasicMachine(priority, steps, breakCondition));
+            basicMachinery.AddMachines(layer, new BasicMachine(steps, breakCondition));
             return basicMachinery;
+        }
+
+        public static BasicMachinery<TKey> AddBasicMachine<TKey>(this BasicMachinery<TKey> basicMachinery, IEnumerable<Action> steps, Func<bool> breakCondition = null)
+        {
+            return AddBasicMachine(basicMachinery, default, steps, breakCondition);
+        }
+
+        public static BasicMachinery<TKey> AddBasicMachine<TKey>(this BasicMachinery<TKey> basicMachinery, IEnumerable<IEnumerable<Action>> steps, Func<bool> breakCondition = null)
+        {
+            return AddBasicMachine(basicMachinery, default, steps, breakCondition);
+        }
+
+        public static IEnumerable<Action> AsCoroutine(this IEnumerable<IEnumerable<Action>> routine)
+        {
+            return routine.SelectMany(action => action);
         }
 
         public static IEnumerable<Action> AsEnumerable(this Action action)
@@ -69,7 +84,7 @@ namespace Licht.Impl.Orchestration
                 yield return TimeYields.WaitOneFrame;
             }
 
-            enumerators = enumerators.Concat(new[] {target.GetEnumerator()}).ToArray();
+            enumerators = enumerators.Concat(new[] { target.GetEnumerator() }).ToArray();
             onTargetStarted();
 
             while (enumerators.Any(e => e.MoveNext()))

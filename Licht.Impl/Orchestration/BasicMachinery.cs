@@ -2,29 +2,37 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using Licht.Impl.Debug;
 using Licht.Interfaces.Orchestration;
 
 namespace Licht.Impl.Orchestration
 {
     [PublicAPI]
-    public class BasicMachinery : IMachinery
+    public class BasicMachinery<TKey> : IMachinery<TKey>
     {
         public bool IsActive { get; private set; }
-        public IReadOnlyCollection<int> ActiveMachines => _activeMachines;
-        private readonly List<int> _activeMachines = new List<int>();
-        private readonly List<int> _removeList = new List<int>();
-        private readonly IMachine[] _machinarium;
+        private readonly List<IMachine> _removeList = new List<IMachine>();
         private readonly Dictionary<IMachineQueue, List<IMachine>> _queuedMachines = new
             Dictionary<IMachineQueue, List<IMachine>>();
 
         private Dictionary<IMachineQueue, bool> _queueExhaustion = new 
             Dictionary<IMachineQueue, bool>();
 
-        public BasicMachinery(bool active = true, int machineSize = 5000)
+        private readonly Dictionary<TKey, List<IMachine>> _machinarium;
+        private readonly Dictionary<IMachine, TKey> _machineLayers;
+
+        private TKey[] _layerOrder;
+
+        public BasicMachinery(bool active = true)
         {
             IsActive = active;
-            _machinarium = new IMachine[machineSize];
+            _machinarium = new Dictionary<TKey, List<IMachine>>();
+            _machineLayers = new Dictionary<IMachine, TKey>();
+            _layerOrder = Array.Empty<TKey>();
+        }
+
+        public void SetLayerOrder(params TKey[] keys)
+        {
+            _layerOrder = keys;
         }
 
         public void Update()
@@ -32,23 +40,25 @@ namespace Licht.Impl.Orchestration
             if (!IsActive) return;
 
             _queueExhaustion = new Dictionary<IMachineQueue, bool>();
-            _activeMachines.Sort((i1, i2) => i2.CompareTo(i1));
             _removeList.Clear();
 
-            var stack = new Stack<int>(_activeMachines);
-            while (stack.Count > 0)
+            foreach (var layer in _layerOrder.Union(_machinarium.Keys))
             {
-                var machineryIndex = stack.Pop();
-                IMachine m = _machinarium[machineryIndex];
-                var result = RunStep(m);
+                if (!_machinarium.ContainsKey(layer)) continue;
 
-                if (result != MachineStepResult.Done) continue;
-
-                _machinarium[machineryIndex] = null;
-                _removeList.Add(machineryIndex);
+                foreach (var machine in from machine in _machinarium[layer] 
+                         let result = RunStep(machine)
+                         where result == MachineStepResult.Done select machine)
+                {
+                    _removeList.Add(machine);
+                }
             }
 
-            _activeMachines.RemoveAll(r => _removeList.Contains(r));
+
+            foreach (var machine in _removeList.Where(machine => _machineLayers.ContainsKey(machine)))
+            {
+                _machinarium[_machineLayers[machine]].Remove(machine);
+            }
         }
 
         private MachineStepResult RunStep(IMachine m)
@@ -81,9 +91,9 @@ namespace Licht.Impl.Orchestration
             return result;
         }
 
-        public void AddMachinesWithQueue(IMachineQueue queueReference, params IMachine[] machines)
+        public void AddMachinesWithQueue(TKey layer, IMachineQueue queueReference, params IMachine[] machines)
         {            
-            AddMachines(machines);
+            AddMachines(layer, machines);
 
             if (!_queuedMachines.ContainsKey(queueReference))
             {
@@ -101,39 +111,31 @@ namespace Licht.Impl.Orchestration
             }
         }
 
-        public void AddMachines(params IMachine[] machines)
+        public void AddMachines(TKey layer, params IMachine[] machines)
         {
             foreach (var machine in machines)
             {
-                if (machine.Priority < 1) continue;
-                machine.AssignedPriority = (_machinarium.Skip(machine.Priority - 1)
-                        .Select((m, ix) => new {m, ix})
-                        .FirstOrDefault(r => r.m == null)?.ix).GetValueOrDefault()
-                    + machine.Priority - 1;
-
-                if (_machinarium[machine.AssignedPriority] != null)
+                if (!_machinarium.ContainsKey(layer))
                 {
-                    DebugLicht.Write("impossible to assign priority: " + machine.GetType().FullName);
-                    continue;
+                    _machinarium[layer] = new List<IMachine>();
                 }
 
-                _machinarium[machine.AssignedPriority] = machine;
-                _activeMachines.Add(machine.AssignedPriority);
+                _machinarium[layer].Add(machine);
+                _machineLayers[machine] = layer;
             }
         }
 
         public bool RemoveMachine(IMachine machine)
         {
-            if (_machinarium[machine.AssignedPriority] != machine) return false;
+            if (!_machineLayers.ContainsKey(machine)) return false;
+            if (!_machinarium.ContainsKey(_machineLayers[machine])) return false;
 
-            _machinarium[machine.AssignedPriority] = null;
-            _activeMachines.Remove(machine.AssignedPriority);
+            _machinarium[_machineLayers[machine]].Remove(machine);
 
             var currentQueue = _queuedMachines.FirstOrDefault(k => k.Key.Equals(machine.CurrentQueue)).Key;
             currentQueue?.Cancel(machine);
 
             return true;
-
         }
 
         public bool Deactivate()

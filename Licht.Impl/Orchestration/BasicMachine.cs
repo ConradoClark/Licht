@@ -13,19 +13,19 @@ namespace Licht.Impl.Orchestration
         private readonly IEnumerator<Action> _actionEnumerator;
         private readonly Func<bool> _breakCondition;
 
-        public BasicMachine(int priority, IEnumerable<Action> steps, Func<bool> breakCondition = null) : base(priority)
+        public BasicMachine( IEnumerable<Action> steps, Func<bool> breakCondition = null)
         {
             _actionEnumerator = steps.GetEnumerator();
             _breakCondition = breakCondition;
         }
 
-        public BasicMachine(int priority, IEnumerable<IEnumerable<Action>> steps, Func<bool> breakCondition = null) : base(priority)
+        public BasicMachine(IEnumerable<IEnumerable<Action>> steps, Func<bool> breakCondition = null)
         {
             _actionEnumerator = steps.SelectMany(s => s).GetEnumerator();
             _breakCondition = breakCondition;
         }
 
-        public BasicMachine(int priority, Action step, Func<bool> breakCondition = null) : base(priority)
+        public BasicMachine(Action step, Func<bool> breakCondition = null)
         {
             _actionEnumerator = Enumerable.Repeat(step, 1).GetEnumerator();
             _breakCondition = breakCondition;
