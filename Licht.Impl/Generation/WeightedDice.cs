@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Licht.Impl.Debug;
 using Licht.Interfaces.Generation;
 
 namespace Licht.Impl.Generation
@@ -24,7 +21,7 @@ namespace Licht.Impl.Generation
             if (_values.Count == 0) return default;
 
             var sumOfWeights = _values.Sum(v => v.Weight);
-            var normalizedWeights = _values.Aggregate(new float[0],
+            var normalizedWeights = _values.Aggregate(Array.Empty<float>(),
                 (acc, next) => acc.Length == 0 ? new[] { next.Weight / sumOfWeights }
                     : acc.Concat(new[] { acc.Last() + next.Weight / sumOfWeights }).ToArray());
 
