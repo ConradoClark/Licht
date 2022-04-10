@@ -17,7 +17,7 @@ namespace Licht.Test
             timer.Activate();
 
             var f = new StrongBox<float>(0);
-            var machinery = new BasicMachinery<int>();
+            var machinery = new BasicMachinery<int>(0);
 
             var lerp = EasingYields.Lerp(x => f.Value = x,
                 () => f.Value,

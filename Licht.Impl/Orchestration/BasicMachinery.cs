@@ -20,14 +20,17 @@ namespace Licht.Impl.Orchestration
         private readonly Dictionary<TKey, List<IMachine>> _machinarium;
         private readonly Dictionary<IMachine, TKey> _machineLayers;
 
+        private TKey _defaultLayer;
         private TKey[] _layerOrder;
 
-        public BasicMachinery(bool active = true)
+        public BasicMachinery(TKey defaultValue, bool active = true)
         {
+            if (defaultValue == null) throw new Exception("Machinery layer keys cannot be null.");
             IsActive = active;
             _machinarium = new Dictionary<TKey, List<IMachine>>();
             _machineLayers = new Dictionary<IMachine, TKey>();
             _layerOrder = Array.Empty<TKey>();
+            _defaultLayer = defaultValue;
         }
 
         public void SetLayerOrder(params TKey[] keys)
@@ -113,15 +116,16 @@ namespace Licht.Impl.Orchestration
 
         public void AddMachines(TKey layer, params IMachine[] machines)
         {
+            var key = GetLayerKey(layer);
             foreach (var machine in machines)
             {
-                if (!_machinarium.ContainsKey(layer))
+                if (!_machinarium.ContainsKey(key))
                 {
-                    _machinarium[layer] = new List<IMachine>();
+                    _machinarium[key] = new List<IMachine>();
                 }
 
-                _machinarium[layer].Add(machine);
-                _machineLayers[machine] = layer;
+                _machinarium[key].Add(machine);
+                _machineLayers[machine] = key;
             }
         }
 
@@ -150,6 +154,11 @@ namespace Licht.Impl.Orchestration
             if (IsActive) return false;
             IsActive = true;
             return true;
+        }
+
+        private TKey GetLayerKey(TKey layer)
+        {
+            return layer == null || layer.Equals(default(TKey)) ? _defaultLayer : layer;
         }
     }
 }

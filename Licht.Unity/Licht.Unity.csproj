@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<UnityVersion>2020.3.26f1</UnityVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Unity3D" Version="1.7.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Licht.Impl\Licht.Impl.csproj" />
+	  <ProjectReference Include="..\Licht.Interfaces\Licht.Interfaces.csproj" />
+	</ItemGroup>
+</Project>

@@ -14,7 +14,7 @@ namespace Licht.Test
         public void Machinery_StringBuilder_12345_5Machines()
         {
             var builder = new StringBuilder();
-            var machinery = new BasicMachinery<int>();
+            var machinery = new BasicMachinery<int>(0);
             machinery.AddMachines(1,new BasicMachine(()=> builder.Append("a")),
                 new BasicMachine(() => builder.Append("b")),
                 new BasicMachine(() => builder.Append("c")),
@@ -32,7 +32,7 @@ namespace Licht.Test
         public void Machinery_StringBuilder_12345_1Machine()
         {
             var builder = new StringBuilder();
-            var machinery = new BasicMachinery<int>();
+            var machinery = new BasicMachinery<int>(0);
             machinery.AddMachines(1, new BasicMachine(new Action[]
             {
                 () => builder.Append("a"),
@@ -56,7 +56,7 @@ namespace Licht.Test
         public void Machinery_StringBuilder_13254_5Machines()
         {
             var builder = new StringBuilder();
-            var machinery = new BasicMachinery<int>();
+            var machinery = new BasicMachinery<int>(0);
             machinery.AddMachines(1, new BasicMachine( () => builder.Append("a")));
             machinery.AddMachines(3, new BasicMachine(() => builder.Append("b")));
             machinery.AddMachines(2, new BasicMachine(() => builder.Append("c")));
@@ -76,7 +76,7 @@ namespace Licht.Test
         public void Machinery_StringBuilder_12_2Machines_Queued_FIFO()
         {
             StringBuilder builder = new StringBuilder();
-            var machinery = new BasicMachinery<int>();
+            var machinery = new BasicMachinery<int>(0);
 
             var bq = new FIFOQueue();
             machinery.AddMachinesWithQueue(1, bq, 
