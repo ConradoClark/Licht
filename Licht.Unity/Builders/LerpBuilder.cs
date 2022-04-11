@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
+using Licht.Impl.Debug;
 using Licht.Impl.Orchestration;
 using Licht.Interfaces.Time;
 
@@ -16,7 +16,9 @@ namespace Licht.Unity.Builders
         private EasingYields.EasingFunction _easing;
         private ITime _timer;
         private Func<bool> _breakCondition;
-        private bool _setTargetOnBreak;
+        private bool _setTargetOnBreak = true;
+        private bool _fromOrigin = false;
+        private bool _fixedTarget = false;
 
         public LerpBuilder(Action<float> setter, Func<float> getter)
         {
@@ -24,22 +26,37 @@ namespace Licht.Unity.Builders
             _getter = getter;
         }
 
+        public LerpBuilder FromOrigin()
+        {
+            _fromOrigin = true;
+            return this;
+        }
+
+        public LerpBuilder FromUpdatedValues()
+        {
+            _fromOrigin = false;
+            return this;
+        }
+
         public LerpBuilder Increase(float amount)
         {
-            _target = _getter() + amount;
+            _fixedTarget = false;
+            _target = _fromOrigin ? _getter() + amount : amount;
             _targetFn = null;
             return this;
         }
 
         public LerpBuilder Decrease(float amount)
         {
-            _target = _getter() - amount;
+            _fixedTarget = false;
+            _target = _fromOrigin ? _getter() - amount : -amount;
             _targetFn = null;
             return this;
         }
 
         public LerpBuilder SetTarget(float target)
         {
+            _fixedTarget = true;
             _target = target;
             _targetFn = null;
             return this;
@@ -69,42 +86,78 @@ namespace Licht.Unity.Builders
             return this;
         }
 
+        private LerpBuilder Clone()
+        {
+            return new LerpBuilder(_setter, _getter)
+            {
+                _target = _target,
+                _targetFn = _targetFn,
+                _duration = _duration,
+                _easing = _easing,
+                _timer = _timer,
+                _breakCondition = _breakCondition,
+                _setTargetOnBreak = _setTargetOnBreak,
+                _fromOrigin = _fromOrigin,
+                _fixedTarget = _fixedTarget,
+            };
+        }
+
         public IEnumerable<Action> Build()
         {
+            var clone = Clone();
+            return Build(clone);
+        }
+
+        private IEnumerable<Action> Build(LerpBuilder clone)
+        {
+            yield return TimeYields.WaitOneFrame;
+
             if (_targetFn != null)
             {
-                return EasingYields.Lerp(
-                    _setter,
-                    _getter,
-                    _duration,
-                    _targetFn,
-                    _easing,
-                    _timer ?? BasicToolbox.Instance.MainTimer,
-                    _breakCondition,
-                    _setTargetOnBreak
+                var lerpFn = EasingYields.Lerp(
+                    clone._setter,
+                    clone._getter,
+                    clone._duration,
+                    clone._targetFn,
+                    clone._easing,
+                    clone._timer ?? BasicToolbox.Instance.MainTimer,
+                    clone._breakCondition,
+                    clone._setTargetOnBreak,
+                    immediate: true
                 );
+
+                foreach (var step in lerpFn)
+                {
+                    yield return step;
+                }
             }
-            return EasingYields.Lerp(
-                _setter,
-                _getter,
-                _duration,
-                _target,
-                _easing,
-                _timer ?? BasicToolbox.Instance.MainTimer,
-                _breakCondition,
-                _setTargetOnBreak
+
+            if (!clone._fixedTarget && !clone._fromOrigin)
+            {
+                clone._target += clone._getter();
+            }
+
+            var lerp = EasingYields.Lerp(
+                clone._setter,
+                clone._getter,
+                clone._duration,
+                clone._target,
+                clone._easing,
+                clone._timer ?? BasicToolbox.Instance.MainTimer,
+                clone._breakCondition,
+                clone._setTargetOnBreak,
+                immediate: true
             );
+
+            foreach (var step in lerp)
+            {
+                yield return step;
+            }
         }
 
         public LerpBuilder BreakIf(Func<bool> predicate)
         {
             _breakCondition = predicate;
-            return this;
-        }
-
-        public LerpBuilder EnsureTarget()
-        {
-            _setTargetOnBreak = true;
             return this;
         }
     }

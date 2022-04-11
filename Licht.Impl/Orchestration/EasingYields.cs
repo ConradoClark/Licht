@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using Licht.Impl.Events;
 using Licht.Impl.Globals;
 using Licht.Interfaces.Time;
 
@@ -11,7 +12,7 @@ namespace Licht.Impl.Orchestration
     {
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, float target, EasingFunction function, ITime timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false, 
-            float initStep = 0f)
+            float initStep = 0f, bool immediate = false)
         {
             return Lerp(setter, getter, seconds, () => target, function, timer, breakCondition, setTargetOnBreak,
                 initStep);
@@ -19,9 +20,11 @@ namespace Licht.Impl.Orchestration
 
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, Func<float> target, EasingFunction function, ITime timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
-            float initStep = 0f)
+            float initStep = 0f, bool immediate = false)
         {
-            var ms = seconds * 1000d;
+            if (!immediate) yield return TimeYields.WaitOneFrame;
+
+            var ms = seconds * 1000d;   
             var initialStart = getter();
             var start = initialStart;
             var last = start;
