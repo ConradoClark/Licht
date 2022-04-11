@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 
 namespace Licht.Impl.Pooling
 {
+
     [PublicAPI]
     public class ObjectPool<T> : IPool<T> where T : IPoolableObject
     {

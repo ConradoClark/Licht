@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<UnityVersion>2020.3.26f1</UnityVersion>
@@ -12,5 +12,9 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\Licht.Impl\Licht.Impl.csproj" />
 	  <ProjectReference Include="..\Licht.Interfaces\Licht.Interfaces.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Objects\" />
 	</ItemGroup>
 </Project>
