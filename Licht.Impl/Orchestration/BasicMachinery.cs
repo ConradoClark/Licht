@@ -49,12 +49,12 @@ namespace Licht.Impl.Orchestration
             {
                 if (!_machinarium.ContainsKey(layer)) continue;
 
-                foreach (var machine in from machine in _machinarium[layer] 
-                         let result = RunStep(machine)
-                         where result == MachineStepResult.Done select machine)
+                foreach (var machine in _machinarium[layer].ToArray())
                 {
-                    _removeList.Add(machine);
+                    var result = RunStep(machine);
+                    if (result == MachineStepResult.Done) _removeList.Add(machine);
                 }
+
             }
 
 

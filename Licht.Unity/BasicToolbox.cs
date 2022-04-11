@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Licht.Impl.Orchestration;
 using Licht.Impl.Time;
 using Licht.Interfaces.Update;
@@ -46,7 +47,7 @@ namespace Licht.Unity
         protected virtual void Update()
         {
             MainTimer.Update();
-            foreach (var machinery in _machineryObjects.Values)
+            foreach (var machinery in _machineryObjects.Values.ToArray())
             {
                 machinery.Update();
             }
