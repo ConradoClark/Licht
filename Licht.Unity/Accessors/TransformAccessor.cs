@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Licht.Unity.Builders;
 using Licht.Unity.Extensions;
 using UnityEngine;
 
@@ -25,5 +26,16 @@ namespace Licht.Unity.Accessors
         }
 
         public AxisAccessor Position => new AxisAccessor(this);
+
+        public CustomAxisAccessor LocalScale => new CustomAxisAccessor(
+            value => _transform.localScale = new Vector3(value, _transform.localScale.y, _transform.localScale.z),
+            value => _transform.localScale = new Vector3(_transform.localScale.x, value, _transform.localScale.z),
+            value => _transform.localScale = new Vector3(_transform.localScale.x, _transform.localScale.y, value),
+            () => _transform.localScale.x, () => _transform.localScale.y, () => _transform.localScale.z);
+
+        public LerpBuilder UniformScale(bool includeZAxis=false) => new LerpBuilder(
+            value => _transform.localScale = new Vector3(value, value, includeZAxis ? value : _transform.localScale.z),
+            () => _transform.localScale.x);
+
     }
 }
