@@ -64,12 +64,11 @@ namespace Licht.Impl.Pooling
                 return false;
             }
 
-            var available = _objectPool.Where(o => !o.IsActive);
-            var enumerable = available as T[] ?? available.ToArray();
+            var available = _objectPool.FirstOrDefault(o => !o.IsActive);
 
-            if (enumerable.Any())
+            if (available!=null)
             {
-                obj = enumerable.First();
+                obj = available;
                 obj.Activate();
                 return true;
             }

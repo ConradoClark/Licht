@@ -15,11 +15,12 @@ namespace Licht.Unity.Pooling
             if (ActiveOnInitialization) Activate();
         }
 
-        public bool IsActive => gameObject.activeSelf;
+        public bool IsActive { get; set; }
         public bool Deactivate()
         {
             IsEffectOver = true;
             gameObject.SetActive(false);
+            IsActive = false;
             return true;
         }
 
@@ -29,6 +30,7 @@ namespace Licht.Unity.Pooling
 
             BasicToolbox.Instance.Machinery().AddBasicMachine(HandleEffectOver());
             gameObject.SetActive(true);
+            IsActive = true;
 
             OnActivation();
 

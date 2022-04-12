@@ -54,9 +54,7 @@ namespace Licht.Impl.Orchestration
                     var result = RunStep(machine);
                     if (result == MachineStepResult.Done) _removeList.Add(machine);
                 }
-
             }
-
 
             foreach (var machine in _removeList.Where(machine => _machineLayers.ContainsKey(machine)))
             {

@@ -27,5 +27,15 @@ namespace Licht.Unity.Pooling
             var obj = Instantiate(Prefab, transform);
             return obj.GetComponent<IPoolableObject>();
         }
+
+        public bool TryGetFromPool(out IPoolableObject obj)
+        {
+            return _objectPool.TryGetFromPool(out obj);
+        }
+
+        public bool TryGetManyFromPool(int amount, out IPoolableObject[] objects)
+        {
+            return _objectPool.GetManyFromPool(amount, out objects);
+        }
     }
 }
