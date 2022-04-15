@@ -1,55 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Licht.Impl.Orchestration;
-using Licht.Impl.Time;
 using Licht.Interfaces.Update;
+using Licht.Unity.Objects;
 using UnityEngine;
 
 namespace Licht.Unity
 {
     public class BasicToolbox : MonoBehaviour
     {
-        private Dictionary<Type, IUpdateable> _machineryObjects;
+        public List<ScriptableValue> ScriptableObjects;
+        private IUpdateable[] _updateableScriptableObjects;
 
-        public BasicMachinery<object> Machinery()
+        protected void Awake()
         {
-            if (!_machineryObjects.ContainsKey(typeof(object)))
-            {
-                _machineryObjects[typeof(object)] = new BasicMachinery<object>(0);
-            }
-
-            return _machineryObjects[typeof(object)] as BasicMachinery<object>;
+            _updateableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IUpdateable>().ToArray();
         }
 
-        public BasicMachinery<TMachineryKey> Machinery<TMachineryKey>() where TMachineryKey: struct
+        protected void Update()
         {
-            if (!_machineryObjects.ContainsKey(typeof(TMachineryKey)))
+            foreach (var scriptableObject in _updateableScriptableObjects)
             {
-                _machineryObjects[typeof(TMachineryKey)] = new BasicMachinery<TMachineryKey>(default);
-            }
-
-            return _machineryObjects[typeof(TMachineryKey)] as BasicMachinery<TMachineryKey>;
-        }
-
-        public DefaultTimer MainTimer;
-
-        public static BasicToolbox Instance { get; private set; }
-
-        protected virtual void Awake()
-        {
-            if (Instance != null) return;
-            Instance = this;
-            _machineryObjects = new Dictionary<Type, IUpdateable>();
-            MainTimer = new DefaultTimer(() => Time.deltaTime * 1000);
-        }
-
-        protected virtual void Update()
-        {
-            MainTimer.Update();
-            foreach (var machinery in _machineryObjects.Values.ToArray())
-            {
-                machinery.Update();
+                scriptableObject.Update();
             }
         }
     }

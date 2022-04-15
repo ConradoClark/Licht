@@ -13,8 +13,4 @@
 	  <ProjectReference Include="..\Licht.Impl\Licht.Impl.csproj" />
 	  <ProjectReference Include="..\Licht.Interfaces\Licht.Interfaces.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Objects\" />
-	</ItemGroup>
 </Project>
