@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using Licht.Impl.Orchestration;
 using Licht.Interfaces.Pooling;
+using Licht.Unity.Objects;
 using UnityEngine;
 
 namespace Licht.Unity.Pooling
 {
     public abstract class EffectPoolable : MonoBehaviour, IPoolableObject
     {
+        public BasicMachineryScriptable BasicMachineryObject;
         public bool ActiveOnInitialization;
         public void Initialize()
         {
@@ -28,7 +30,7 @@ namespace Licht.Unity.Pooling
         {
             IsEffectOver = false;
 
-            BasicToolbox.Instance.Machinery().AddBasicMachine(HandleEffectOver());
+            BasicMachineryObject.Machinery.AddBasicMachine(HandleEffectOver());
             gameObject.SetActive(true);
             IsActive = true;
 

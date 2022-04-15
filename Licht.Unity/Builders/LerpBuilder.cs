@@ -8,6 +8,7 @@ namespace Licht.Unity.Builders
 {
     public class LerpBuilder
     {
+        public static ITime DefaultTimer;
         private readonly Action<float> _setter;
         private readonly Func<float> _getter;
         private float _target;
@@ -120,7 +121,7 @@ namespace Licht.Unity.Builders
                     clone._duration,
                     clone._targetFn,
                     clone._easing,
-                    clone._timer ?? BasicToolbox.Instance.MainTimer,
+                    clone._timer ?? DefaultTimer,
                     clone._breakCondition,
                     clone._setTargetOnBreak,
                     immediate: true
@@ -143,7 +144,7 @@ namespace Licht.Unity.Builders
                 clone._duration,
                 clone._target,
                 clone._easing,
-                clone._timer ?? BasicToolbox.Instance.MainTimer,
+                clone._timer ?? DefaultTimer,
                 clone._breakCondition,
                 clone._setTargetOnBreak,
                 immediate: true

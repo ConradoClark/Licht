@@ -6,15 +6,17 @@ using Licht.Impl.Orchestration;
 using Licht.Impl.Pooling;
 using Licht.Interfaces.Pooling;
 using Licht.Interfaces.Time;
+using Licht.Unity.Objects;
 using UnityEngine;
 
 namespace Licht.Unity.Pooling
 {
     public class DurationPoolable: MonoBehaviour, IPoolableObject
     {
+        public BasicMachineryScriptable BasicMachineryObject;
+        public TimerScriptable TimerObject;
         public bool ActiveOnInitialization;
         public int DurationInSeconds;
-        public ITime Timer;
 
         public void Initialize()
         {
@@ -31,15 +33,14 @@ namespace Licht.Unity.Pooling
 
         public bool Activate()
         {
-            BasicToolbox.Instance.Machinery().AddBasicMachine(Expire());
+            BasicMachineryObject.Machinery.AddBasicMachine(Expire());
             gameObject.SetActive(true);
             return true;
         }
 
         private IEnumerable<IEnumerable<Action>> Expire()
         {
-            yield return TimeYields.WaitSeconds(Timer ?? BasicToolbox.Instance.MainTimer, DurationInSeconds);
-            DebugLicht.Write("deactivating...");
+            yield return TimeYields.WaitSeconds(TimerObject.Timer, DurationInSeconds);
             Deactivate();
         }
     }
