@@ -62,12 +62,12 @@ namespace Licht.Impl.Time
         {
             if (!IsActive) return;
 
-            var latest = _timeStepFn() * Multiplier;
+            var latest = _timeStepFn();
             var frameDuration = 1d / FramesPerSecond * 1000d;
 
             var difference = frameDuration - latest;
 
-            latest = Math.Min(frameDuration, latest - latest * difference / frameDuration);
+            latest = Math.Min(frameDuration, latest - latest * difference / frameDuration) * Multiplier;
 
             _elapsed += latest;
             _last.Current = latest;

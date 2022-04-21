@@ -7,6 +7,26 @@ namespace Licht.Impl.Events
 {
     public static class EventExtensions
     {
+
+        private static readonly Dictionary<object, object> EventFn = new Dictionary<object, object>();
+        public static void ObserveEvent<TEventType>(this object obj, TEventType @event,
+            Action onEvent)
+        {
+            var fn = new Action<object>(_ => onEvent());
+            EventFn[onEvent] = fn;
+
+            EventBroadcaster<TEventType, object>.Instance<TEventType, object>()
+                .ObserveEvent(@event, _ => onEvent());
+        }
+
+        public static void StopObservingEvent<TEventType>(this object obj, TEventType @event,
+            Action onEvent)
+        {
+            EventBroadcaster<TEventType, object>.Instance<TEventType, object>()
+                .StopObservingEvent(@event, EventFn.ContainsKey(onEvent) ?
+                    EventFn[onEvent] as Action<object> : _ => onEvent());
+        }
+
         public static void ObserveEvent<TEventType, TEventObject>(this object obj, TEventType @event,
             Action<TEventObject> onEvent)
         {
@@ -21,6 +41,12 @@ namespace Licht.Impl.Events
                 .StopObservingEvent(@event, onEvent);
         }
 
+        public static IEventPublisher<TEventType> RegisterAsEventPublisher<TEventType>(this object publisher)
+        {
+            return EventBroadcaster<TEventType, object>.Instance<TEventType, object>()
+                .RegisterVoidPublisher(publisher);
+        }
+
         public static IEventPublisher<TEventType, TEventObject> RegisterAsEventPublisher<TEventType, TEventObject>(this object publisher)
         {
             return EventBroadcaster<TEventType, TEventObject>.Instance<TEventType, TEventObject>()
@@ -29,8 +55,8 @@ namespace Licht.Impl.Events
 
         public static void UnregisterAsEventPublisher<TEventType, TEventObject>(this object publisher)
         {
-           EventBroadcaster<TEventType, TEventObject>.Instance<TEventType, TEventObject>()
-                .UnregisterPublisher(publisher);
+            EventBroadcaster<TEventType, TEventObject>.Instance<TEventType, TEventObject>()
+                 .UnregisterPublisher(publisher);
         }
     }
 
@@ -67,7 +93,7 @@ namespace Licht.Impl.Events
                 Broadcasters.Add(register);
             }
 
-            return register.Broadcaster as EventBroadcaster<T1,T2>;
+            return register.Broadcaster as EventBroadcaster<T1, T2>;
         }
 
         private readonly List<IEventPublisher<TEventType, TEventObject>> _publishers =
@@ -114,7 +140,15 @@ namespace Licht.Impl.Events
 
         public IEventPublisher<TEventType, TEventObject> RegisterPublisher(object publisher)
         {
-            var eventPublisher = new EventPublisher<TEventType, TEventObject>(publisher, 
+            var eventPublisher = new EventPublisher<TEventType, TEventObject>(publisher,
+                (@event, @object) => ObjectEvent?.Invoke(@event, @object));
+            _publishers.Add(eventPublisher);
+            return eventPublisher;
+        }
+
+        public IEventPublisher<TEventType> RegisterVoidPublisher(object publisher)
+        {
+            var eventPublisher = new VoidEventPublisher<TEventType, TEventObject>(publisher,
                 (@event, @object) => ObjectEvent?.Invoke(@event, @object));
             _publishers.Add(eventPublisher);
             return eventPublisher;

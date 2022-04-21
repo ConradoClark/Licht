@@ -23,6 +23,8 @@ namespace Licht.Impl.Orchestration
         private TKey _defaultLayer;
         private TKey[] _layerOrder;
 
+        private Action _finalizeAction;
+
         public BasicMachinery(TKey defaultValue, bool active = true)
         {
             if (defaultValue == null) throw new Exception("Machinery layer keys cannot be null.");
@@ -41,6 +43,17 @@ namespace Licht.Impl.Orchestration
         public void Update()
         {
             if (!IsActive) return;
+
+            if (_finalizeAction != null)
+            {
+                foreach (var machine in _machineLayers)
+                {
+                    _machinarium[_machineLayers[machine.Key]].Remove(machine.Key);
+                }
+
+                _finalizeAction();
+                _finalizeAction = null;
+            }
 
             _queueExhaustion = new Dictionary<IMachineQueue, bool>();
             _removeList.Clear();
@@ -157,6 +170,11 @@ namespace Licht.Impl.Orchestration
         private TKey GetLayerKey(TKey layer)
         {
             return layer == null || layer.Equals(default(TKey)) ? _defaultLayer : layer;
+        }
+
+        public void FinalizeWith(Action action)
+        {
+            _finalizeAction = action;
         }
     }
 }

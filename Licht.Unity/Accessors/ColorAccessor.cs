@@ -17,6 +17,18 @@ namespace Licht.Unity.Accessors
             _getter = getter;
         }
 
+        public LerpBuilder ToColor(Color color)
+        {
+            var current = _getter();
+            var @ref = 0f;
+                return new LerpBuilder(value =>
+                    {
+                        _setter(Color.Lerp(current, color, value));
+                        @ref = value;
+                    },
+                    () => @ref);
+        }
+
         public LerpBuilder R
         {
             get

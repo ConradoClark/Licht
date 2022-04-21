@@ -31,6 +31,17 @@ namespace Licht.Impl.Memory
             return _stack.Count > index-1 ? _stack[_stack.Count - index] : default(T);
         }
 
+        public IEnumerable<T> GetTail(int count)
+        {
+            if (_stack.Count == 0) yield break;
+            for (var i = _stack.Count-1; i >= 0; i--)
+            {
+                yield return _stack[i];
+                count--;
+                if (count == 0) break;
+            }
+        }
+
         public bool HasTrail(int index)
         {
             return _stack.Count > index - 1;
