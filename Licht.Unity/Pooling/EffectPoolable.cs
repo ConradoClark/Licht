@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Pooling
 {
-    public abstract class EffectPoolable : MonoBehaviour, IPoolableObject
+    public abstract class EffectPoolable : MonoBehaviour, IPoolableComponent
     {
         public BasicMachineryScriptable BasicMachineryObject;
         public bool ActiveOnInitialization;
@@ -55,5 +55,7 @@ namespace Licht.Unity.Pooling
                 yield return TimeYields.WaitOneFrame;
             }
         }
+
+        public MonoBehaviour Component => this;
     }
 }

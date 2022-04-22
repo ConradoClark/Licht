@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Pooling
 {
-    public class DurationPoolable: MonoBehaviour, IPoolableObject
+    public class DurationPoolable: MonoBehaviour, IPoolableComponent
     {
         public BasicMachineryScriptable BasicMachineryObject;
         public TimerScriptable TimerObject;
@@ -43,5 +43,7 @@ namespace Licht.Unity.Pooling
             yield return TimeYields.WaitSeconds(TimerObject.Timer, DurationInSeconds);
             Deactivate();
         }
+
+        public MonoBehaviour Component => this;
     }
 }
