@@ -37,5 +37,17 @@ namespace Licht.Unity.Accessors
             value => _transform.localScale = new Vector3(value, value, includeZAxis ? value : _transform.localScale.z),
             () => _transform.localScale.x);
 
+        public LerpBuilder Towards(Vector3 target)
+        {
+            var current = new Vector3(Getter(TransformExtensions.Axis.X)(),
+                Getter(TransformExtensions.Axis.Y)(), Getter(TransformExtensions.Axis.Z)());
+            var @ref = 0f;
+            return new LerpBuilder(value =>
+            {
+                _transform.position = Vector3.Lerp(current, target, value);
+                @ref = value;
+            }, () => @ref);
+        }
+
     }
 }
