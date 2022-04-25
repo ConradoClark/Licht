@@ -37,5 +37,10 @@ namespace Licht.Unity.Pooling
         {
             return _objectPool.GetManyFromPool(amount, out objects);
         }
+
+        public bool Release(IPoolableComponent obj)
+        {
+            return _objectPool.Release(obj);
+        }
     }
 }
