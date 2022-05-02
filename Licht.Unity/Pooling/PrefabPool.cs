@@ -42,5 +42,10 @@ namespace Licht.Unity.Pooling
         {
             return _objectPool.Release(obj);
         }
+
+        public bool ReleaseAll()
+        {
+            return _objectPool.ReleaseAll();
+        }
     }
 }

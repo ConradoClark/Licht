@@ -25,6 +25,7 @@ namespace Licht.Impl.Pooling
         {
             if (!IsActive) return false;
             if (!_objectPool.Contains(obj)) return false;
+            if (obj == null) return false;
 
             obj.Deactivate();
             return true;
@@ -35,6 +36,7 @@ namespace Licht.Impl.Pooling
             if (!IsActive) return false;
             foreach (var obj in _objectPool)
             {
+                if (obj == null) continue;
                 obj.Deactivate();
             }
 

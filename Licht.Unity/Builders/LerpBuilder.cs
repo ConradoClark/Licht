@@ -156,9 +156,10 @@ namespace Licht.Unity.Builders
             }
         }
 
-        public LerpBuilder BreakIf(Func<bool> predicate)
+        public LerpBuilder BreakIf(Func<bool> predicate, bool setTargetOnBreak = true)
         {
             _breakCondition = predicate;
+            _setTargetOnBreak = setTargetOnBreak;
             return this;
         }
     }

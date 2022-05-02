@@ -18,7 +18,7 @@ namespace Licht.Unity.Objects
         {
             get
             {
-                var timer = _timer ?? (_timer = new DefaultTimer(() => Time.deltaTime * 1000)
+                var timer = _timer ?? (_timer = new DefaultTimer(() => Time.deltaTime * 1000f)
                 {
                     Multiplier = Multiplier
                 });
