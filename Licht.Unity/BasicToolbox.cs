@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Licht.Unity
 {
+    [DefaultExecutionOrder(-2000)]
     public class BasicToolbox : MonoBehaviour
     {
         public List<ScriptableValue> ScriptableObjects;

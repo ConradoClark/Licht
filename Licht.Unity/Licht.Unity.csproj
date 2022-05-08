@@ -6,11 +6,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Unity3D" Version="1.7.0" />
+	  <ProjectReference Include="..\Licht.Impl\Licht.Impl.csproj" />
+	  <ProjectReference Include="..\Licht.Interfaces\Licht.Interfaces.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Licht.Impl\Licht.Impl.csproj" />
-	  <ProjectReference Include="..\Licht.Interfaces\Licht.Interfaces.csproj" />
+	  <Reference Include="Unity.InputSystem">
+	    <HintPath>UnityPackages\Unity.InputSystem.dll</HintPath>
+	  </Reference>
+	  <Reference Include="UnityEngine.CoreModule">
+	    <HintPath>UnityPackages\UnityEngine.CoreModule.dll</HintPath>
+	  </Reference>
+	  <Reference Include="UnityEngine.Physics2DModule">
+	    <HintPath>UnityPackages\UnityEngine.Physics2DModule.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 </Project>
