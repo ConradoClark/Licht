@@ -10,10 +10,17 @@ namespace Licht.Unity
     {
         public List<ScriptableValue> ScriptableObjects;
         private IUpdateable[] _updateableScriptableObjects;
+        private IInitializable[] _initializableScriptableObjects;
 
         protected void Awake()
         {
             _updateableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IUpdateable>().ToArray();
+            _initializableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IInitializable>().ToArray();
+
+            foreach (var obj in _initializableScriptableObjects)
+            {
+                obj.Initialize();
+            }
         }
 
         protected void Update()

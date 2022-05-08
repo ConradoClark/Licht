@@ -13,13 +13,19 @@ namespace Licht.Unity.Pooling
         public int Size;
         private ObjectPool<IPoolableComponent> _objectPool;
 
-        void OnEnable()
+        private void OnEnable()
         {
             var prefabComponent = Prefab.GetComponent<IPoolableComponent>();
             if (prefabComponent == null) throw new Exception($"Prefab selected for pool {gameObject.name} is not poolable");
 
             _objectPool = new ObjectPool<IPoolableComponent>(Size, this);
             _objectPool.Activate();
+        }
+
+        private void OnDisable()
+        {
+            _objectPool.ReleaseAll();
+            _objectPool = null;
         }
 
         public IPoolableComponent Instantiate()
