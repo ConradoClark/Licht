@@ -119,6 +119,8 @@ namespace Licht.Unity.Physics
             if (closestHit == default) return stats;
 
             var boxCollider = closestHit.collider as BoxCollider2D;
+            if (!boxCollider?.enabled ?? false) return stats;
+
             var clampPoint = closestHit.collider.transform.position.y + closestHit.collider.offset.y
                              - dir.y * ((boxCollider == null ? 0 : boxCollider.bounds.extents.y) + obj.VerticalColliderSize.y);
 
@@ -166,6 +168,7 @@ namespace Licht.Unity.Physics
             if (closestHit == default) return stats;
 
             var boxCollider = closestHit.collider as BoxCollider2D;
+            if (!boxCollider?.enabled ?? false) return stats;
             var clampPoint = closestHit.collider.transform.position.x + closestHit.collider.offset.x -
                              dir.x * ((boxCollider == null ? 0 : boxCollider.bounds.extents.x) +
                                       obj.HorizontalColliderSize.x);

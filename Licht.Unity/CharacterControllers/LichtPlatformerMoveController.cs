@@ -24,6 +24,7 @@ namespace Licht.Unity.CharacterControllers
         {
             OnStartMoving,
             OnStopMoving,
+            OnTopSpeed,
             OnStartSkidding,
             OnStopSkidding,
             OnTurn
@@ -32,6 +33,7 @@ namespace Licht.Unity.CharacterControllers
         public struct LichtPlatformerMoveEventArgs
         {
             public LichtPlatformerMoveController Source;
+            public float Direction;
         }
 
         public float SpeedMultiplier = 1;
@@ -112,23 +114,29 @@ namespace Licht.Unity.CharacterControllers
                     return axis != 0f && !sign.FloatEq(axisSign);
                 });
 
+                eventObj.Direction = axisSign;
                 _eventPublisher.PublishEvent(LichtPlatformerMoveEvents.OnStartMoving, eventObj);
 
                 yield return StartMovement(axisInput, axisSign, changedAxis).AsCoroutine();
 
                 if (changedAxis())
                 {
+                    eventObj.Direction = -axisSign;
                     _eventPublisher.PublishEvent(LichtPlatformerMoveEvents.OnTurn, eventObj);
+                }
+
+                if (axisInput.IsPressed() && !IsBlocked && !changedAxis())
+                {
+                    _eventPublisher.PublishEvent(LichtPlatformerMoveEvents.OnTopSpeed, eventObj);
                 }
 
                 while (axisInput.IsPressed() && !IsBlocked && !changedAxis())
                 {
                     Target.ApplySpeed(new Vector2(MaxSpeed * axisSign * SpeedMultiplier, 0));
                     yield return TimeYields.WaitOneFrameX;
-                } 
+                }
 
                 if (!changedAxis()) _eventPublisher.PublishEvent(LichtPlatformerMoveEvents.OnStopMoving, eventObj);
-
 
                 yield return EndMovement(axisInput, changedAxis).AsCoroutine();
             }

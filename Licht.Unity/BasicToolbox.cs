@@ -9,12 +9,18 @@ namespace Licht.Unity
     [DefaultExecutionOrder(-2000)]
     public class BasicToolbox : MonoBehaviour
     {
+        public int TargetFrameRate;
         public List<ScriptableValue> ScriptableObjects;
         private IUpdateable[] _updateableScriptableObjects;
         private IInitializable[] _initializableScriptableObjects;
 
         protected void Awake()
         {
+            if (TargetFrameRate > 0)
+            {
+                Application.targetFrameRate = TargetFrameRate;
+            }
+            
             _updateableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IUpdateable>().ToArray();
             _initializableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IInitializable>().ToArray();
 

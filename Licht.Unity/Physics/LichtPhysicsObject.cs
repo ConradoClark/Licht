@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Licht.Impl.Memory;
 using Licht.Unity.Extensions;
@@ -70,6 +71,18 @@ namespace Licht.Unity.Physics
 
             var colliderToUse = Mathf.Abs(direction.y) > 0 ? VerticalCollider : HorizontalCollider;
 
+            if (!colliderToUse.enabled)
+            {
+                return new CollisionResult
+                {
+                    Orientation = Mathf.Abs(direction.y) > 0
+                        ? CollisionOrientation.Vertical
+                        : CollisionOrientation.Horizontal,
+                    Hits = Array.Empty<RaycastHit2D>(),
+                    TriggeredHit = false
+                };
+            }
+            
             Physics2D.BoxCastNonAlloc((Vector2)transform.position + colliderToUse.offset, colliderToUse.size, 0, direction, _collisionResults,
                 Speed.magnitude, layerMask);
 
