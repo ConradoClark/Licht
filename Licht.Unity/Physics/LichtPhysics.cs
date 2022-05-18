@@ -176,7 +176,7 @@ namespace Licht.Unity.Physics
             if (dir == Vector2.left && !Mathf.Sign(closestHit.normal.x).FloatEq(dir.x))
             {
                 var stopped = obj.transform.position.x + obj.Speed.x < clampPoint;
-                obj.Speed = new Vector2(stopped ? 0 : obj.transform.position.x - clampPoint, obj.Speed.y);
+                obj.Speed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.Speed.y);
 
                 if (stopped)
                 {

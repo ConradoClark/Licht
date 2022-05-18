@@ -103,6 +103,7 @@ namespace Licht.Unity.CharacterControllers
             while (isActiveAndEnabled)
             {
                 var collisionState = _physics.GetCollisionState(Target);
+                var jumped = false;
                 while (!collisionState.Vertical.HitNegative)
                 {
                     if (IsBlocked)
@@ -111,7 +112,7 @@ namespace Licht.Unity.CharacterControllers
                         continue;
                     }
 
-                    var jumped = false;
+                    
                     if (InputBufferTime > 0 && jumpInput.WasPerformedThisFrame())
                     {
                         foreach (var _ in TimeYields.WaitSeconds(_physics.TimerRef.Timer, InputBufferTime))
@@ -128,14 +129,17 @@ namespace Licht.Unity.CharacterControllers
                             break;
                         }
                     }
+                    else
+                    {
+                        yield return TimeYields.WaitOneFrameX;
+                    }
 
                     if (jumped) continue;
 
-                    yield return TimeYields.WaitOneFrameX;
                     collisionState = _physics.GetCollisionState(Target);
                 }
 
-                if (CoyoteJumpTime > 0)
+                if (CoyoteJumpTime > 0 && !jumped)
                 {
                     foreach (var _ in TimeYields.WaitSeconds(_physics.TimerRef.Timer, CoyoteJumpTime))
                     {
