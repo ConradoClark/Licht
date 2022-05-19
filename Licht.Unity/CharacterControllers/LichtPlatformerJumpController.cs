@@ -112,7 +112,6 @@ namespace Licht.Unity.CharacterControllers
                         continue;
                     }
 
-                    
                     if (InputBufferTime > 0 && jumpInput.WasPerformedThisFrame())
                     {
                         foreach (var _ in TimeYields.WaitSeconds(_physics.TimerRef.Timer, InputBufferTime))
@@ -149,11 +148,13 @@ namespace Licht.Unity.CharacterControllers
                             continue;
                         }
 
+                        jumped = true;
                         yield return ExecuteJump().AsCoroutine();
                         break;
                     }
                 }
-                else if (jumpInput.WasPerformedThisFrame() && !IsBlocked)
+
+                if (jumpInput.WasPerformedThisFrame() && !IsBlocked && !jumped)
                 {
                     yield return ExecuteJump().AsCoroutine();
                     continue;
