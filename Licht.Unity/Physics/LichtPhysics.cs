@@ -212,6 +212,8 @@ namespace Licht.Unity.Physics
                     Horizontal = horizontal,
                     Vertical = vertical
                 };
+
+                obj.ImplyDirection(obj.Speed.normalized);
                 obj.transform.position += (Vector3)obj.Speed;
             }
         }

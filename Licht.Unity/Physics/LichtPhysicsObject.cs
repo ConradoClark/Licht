@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using Licht.Impl.Memory;
 using Licht.Unity.Extensions;
@@ -38,6 +39,9 @@ namespace Licht.Unity.Physics
         private Caterpillar<Vector2> _latestSpeed;
         public Vector2 LatestSpeed => _latestSpeed.Current;
 
+        private Caterpillar<Vector2> _latestDirection;
+        public Vector2 LatestDirection => _latestDirection.Current;
+
         private void Awake()
         {
             _physics = this.GetLichtPhysics();
@@ -45,6 +49,17 @@ namespace Licht.Unity.Physics
             {
                 TailSize = 1
             };
+
+            _latestDirection = new Caterpillar<Vector2>
+            {
+                TailSize = 1
+            };
+        }
+
+        public void ImplyDirection(Vector2 direction)
+        {
+            _latestDirection.Current = new Vector2(Mathf.Abs(direction.x) > 0 ? direction.x : _latestDirection.Current.x,
+                Mathf.Abs(direction.y) > 0 ? direction.y : _latestDirection.Current.y);
         }
 
         public void ApplySpeed(Vector2 speed)
