@@ -23,6 +23,7 @@ namespace Licht.Unity.Physics
         private List<LichtPhysicsForce> _physicsForces;
         private Dictionary<string, LichtCustomPhysicsForce> _customPhysicsForces;
         private Dictionary<LichtPhysicsObject, Caterpillar<CollisionState>> _collisionStats;
+        private Dictionary<string, CollisionTrigger> _collisionTriggers;
 
         public FrameVariables GetFrameVariables()
         {
@@ -151,6 +152,23 @@ namespace Licht.Unity.Physics
             return stats;
         }
 
+        private static string GetCollisionTriggerName(Object collider)
+        {
+            return $"Collider_{collider.GetInstanceID()}";
+        }
+
+        public bool CheckCollision(Collider2D collider, out CollisionTrigger trigger)
+        {
+            if (!_collisionTriggers.ContainsKey(GetCollisionTriggerName(collider)))
+            {
+                trigger = default;
+                return false;
+            }
+
+            trigger = _collisionTriggers[GetCollisionTriggerName(collider)];
+            return true;
+        }
+
         private CollisionResult CheckHorizontals(LichtPhysicsObject obj)
         {
             // Horizontal check
@@ -166,6 +184,12 @@ namespace Licht.Unity.Physics
                 .Min().hit;
 
             if (closestHit == default) return stats;
+
+            _collisionTriggers[GetCollisionTriggerName(closestHit.collider)] = new CollisionTrigger
+            {
+                Actor = obj,
+                Target = closestHit.collider
+            };
 
             var boxCollider = closestHit.collider as BoxCollider2D;
             if (!boxCollider?.enabled ?? false) return stats;
@@ -202,6 +226,7 @@ namespace Licht.Unity.Physics
 
         public void UpdatePositions()
         {
+            _collisionTriggers.Clear();
             foreach (var obj in _physicsWorld)
             {
                 var vertical = CheckVerticals(obj);
@@ -228,6 +253,7 @@ namespace Licht.Unity.Physics
             _physicsForces = new List<LichtPhysicsForce>();
             _customPhysicsForces = new Dictionary<string, LichtCustomPhysicsForce>();
             _collisionStats = new Dictionary<LichtPhysicsObject, Caterpillar<CollisionState>>();
+            _collisionTriggers = new Dictionary<string, CollisionTrigger>();
         }
 
         public CollisionState GetCollisionState(LichtPhysicsObject obj)

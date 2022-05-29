@@ -45,6 +45,7 @@ namespace Licht.Unity.CharacterControllers
         public EasingYields.EasingFunction MovementStartEasing;
         public EasingYields.EasingFunction MovementEndEasing;
         public LichtPhysicsObject Target;
+        public float LatestDirection { get; private set; } = 1f;
 
         public ScriptableInputAction AxisInput;
 
@@ -107,6 +108,7 @@ namespace Licht.Unity.CharacterControllers
                 while (IsBlocked || !axisInput.IsPressed()) yield return TimeYields.WaitOneFrameX;
 
                 var axisSign = Mathf.Sign(axisInput.ReadValue<float>());
+                LatestDirection = axisSign;
                 var changedAxis = new Func<bool>(() =>
                 {
                     var axis = axisInput.ReadValue<float>();

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Licht.Impl.Memory;
@@ -16,11 +17,29 @@ namespace Licht.Unity.Physics
 
         public BoxCollider2D HorizontalCollider;
         public BoxCollider2D VerticalCollider;
+
         private LichtPhysics _physics;
-
         private string PhysicsFrameVar => $"LichtPhysicsObject_{gameObject.name}";
-
         private readonly RaycastHit2D[] _collisionResults = new RaycastHit2D[10];
+
+        private Dictionary<Type, object> _customObjects;
+
+        public void AddCustomObject<T>(T obj) where T:class
+        {
+            _customObjects[typeof(T)] = obj;
+        }
+
+        public bool TryGetCustomObject<T>(out T obj) where T:class
+        {
+            if (!_customObjects.ContainsKey(typeof(T)))
+            {
+                obj = default;
+                return false;
+            }
+
+            obj = _customObjects[typeof(T)] as T;
+            return true;
+        }
 
         public Vector2 Speed
         {
@@ -44,6 +63,7 @@ namespace Licht.Unity.Physics
 
         private void Awake()
         {
+            _customObjects = new Dictionary<Type, object>();
             _physics = this.GetLichtPhysics();
             _latestSpeed = new Caterpillar<Vector2>
             {
