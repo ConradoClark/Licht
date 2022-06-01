@@ -8,7 +8,7 @@ namespace Licht.Unity.Extensions
     {
         public static LichtPhysics GetLichtPhysics(this Object _)
         {
-            return Object.FindObjectOfType<BasicToolbox>().ScriptableObjects.OfType<LichtPhysics>().FirstOrDefault();
+            return BasicToolbox.Instance().ScriptableObjects.OfType<LichtPhysics>().FirstOrDefault();
         }
 
     }

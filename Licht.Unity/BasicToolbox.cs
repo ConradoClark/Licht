@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Licht.Unity
 {
     [DefaultExecutionOrder(-2000)]
-    public class BasicToolbox : MonoBehaviour
+    public class BasicToolbox : SceneObject<BasicToolbox>
     {
         public int TargetFrameRate;
         public List<ScriptableValue> ScriptableObjects;
