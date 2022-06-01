@@ -40,7 +40,7 @@ namespace Licht.Impl.Time
             return true;
         }
 
-        public bool Reset()
+        public bool PerformReset()
         {
             if (!IsActive) return true;
 

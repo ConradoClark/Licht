@@ -2,6 +2,6 @@
 {
     public interface IResettable
     {
-        bool Reset();
+        bool PerformReset();
     }
 }

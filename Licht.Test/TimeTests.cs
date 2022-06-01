@@ -36,7 +36,7 @@ namespace Licht.Test
             DefaultTimer timer = new DefaultTimer(() => 1000d, 1);
             timer.Activate();
             timer.Update();
-            timer.Reset();
+            timer.PerformReset();
             timer.Update();
             Assert.IsTrue(Math.Abs(timer.TotalElapsedTimeInMilliseconds - 1000d) < Margin);
         }
