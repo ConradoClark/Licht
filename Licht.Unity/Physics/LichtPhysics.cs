@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Licht.Impl.Globals;
 using Licht.Impl.Memory;
 using Licht.Interfaces.Update;
@@ -169,6 +170,30 @@ namespace Licht.Unity.Physics
             return true;
         }
 
+        private CollisionResult[] CheckCustom(LichtPhysicsObject obj)
+        {
+            var results = new List<CollisionResult>();
+            foreach (var check in obj.CustomCollisionChecks)
+            {
+                var result = obj.CustomCast(check, obj.Speed);
+                if (!result.TriggeredHit) continue;
+
+                foreach (var hit in result.Hits)
+                {
+                    _collisionTriggers[GetCollisionTriggerName(hit.collider)] = new CollisionTrigger
+                    {
+                        Actor = obj,
+                        Target = hit.collider,
+                        Type = CollisionTrigger.TriggerType.Custom
+                    };
+                }
+
+                results.Add(result);
+            }
+
+            return results.ToArray();
+        }
+
         private CollisionResult CheckHorizontals(LichtPhysicsObject obj)
         {
             // Horizontal check
@@ -188,7 +213,8 @@ namespace Licht.Unity.Physics
             _collisionTriggers[GetCollisionTriggerName(closestHit.collider)] = new CollisionTrigger
             {
                 Actor = obj,
-                Target = closestHit.collider
+                Target = closestHit.collider,
+                Type = CollisionTrigger.TriggerType.Obstacle
             };
 
             var boxCollider = closestHit.collider as BoxCollider2D;
@@ -231,11 +257,13 @@ namespace Licht.Unity.Physics
             {
                 var vertical = CheckVerticals(obj);
                 var horizontal = CheckHorizontals(obj);
+                var custom = CheckCustom(obj);
 
                 _collisionStats[obj].Current = new CollisionState
                 {
                     Horizontal = horizontal,
-                    Vertical = vertical
+                    Vertical = vertical,
+                    Custom = custom
                 };
 
                 obj.ImplyDirection(obj.Speed.normalized);

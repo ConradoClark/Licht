@@ -7,8 +7,15 @@ namespace Licht.Unity.Physics
 {
     public struct CollisionTrigger
     {
+        public enum TriggerType
+        {
+            Obstacle,
+            Custom
+        }
+
         public LichtPhysicsObject Actor;
         public Collider2D Target;
+        public TriggerType Type;
 
         public override bool Equals(object obj)
         {

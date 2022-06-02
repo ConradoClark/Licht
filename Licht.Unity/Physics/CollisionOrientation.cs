@@ -3,7 +3,8 @@
     public enum CollisionOrientation
     {
         Horizontal,
-        Vertical
+        Vertical,
+        Undefined
     }
 }
 

@@ -4,5 +4,6 @@
     {
         public CollisionResult Horizontal;
         public CollisionResult Vertical;
+        public CollisionResult[] Custom;
     }
 }

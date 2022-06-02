@@ -18,6 +18,16 @@ namespace Licht.Unity.Physics
         public BoxCollider2D HorizontalCollider;
         public BoxCollider2D VerticalCollider;
 
+        [Serializable]
+        public struct CustomCollision
+        {
+            public LayerMask CollisionLayerMask;
+            public string CollisionName;
+            public BoxCollider2D ColliderToUse;
+        }
+
+        public CustomCollision[] CustomCollisionChecks;
+
         private LichtPhysics _physics;
         private string PhysicsFrameVar => $"LichtPhysicsObject_{gameObject.name}";
         private readonly RaycastHit2D[] _collisionResults = new RaycastHit2D[10];
@@ -95,6 +105,29 @@ namespace Licht.Unity.Physics
         private void OnDisable()
         {
             _physics.RemovePhysicsObject(this);
+        }
+
+        public CollisionResult CustomCast(CustomCollision customCollision, Vector2 direction)
+        {
+            for (var index = 0; index < _collisionResults.Length; index++)
+            {
+                _collisionResults[index] = default;
+            }
+
+            Physics2D.BoxCastNonAlloc((Vector2)transform.position + customCollision.ColliderToUse.offset, customCollision.ColliderToUse.size,
+                0, direction, _collisionResults,
+                Speed.magnitude, customCollision.CollisionLayerMask);
+
+            var hits = _collisionResults.Where(c => c.collider != HorizontalCollider && c.collider != VerticalCollider
+                    && c != default)
+                .ToArray();
+
+            return new CollisionResult
+            {
+                Orientation = CollisionOrientation.Undefined,
+                Hits = hits,
+                TriggeredHit = hits.Length > 0
+            };
         }
 
         public CollisionResult Cast(LayerMask layerMask, Vector2 direction)
