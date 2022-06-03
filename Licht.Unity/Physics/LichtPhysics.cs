@@ -113,7 +113,7 @@ namespace Licht.Unity.Physics
 
             if (!stats.TriggeredHit) return stats;
 
-            var closestHit = stats.Hits.Where(hit => hit != default && Mathf.Abs(hit.normal.y) > 0)
+            var closestHit = stats.Hits.Where(hit => hit != default && Mathf.Abs(hit.normal.y) > 0 && !Mathf.Sign(hit.normal.y).FloatEq(dir.y))
                 .Select((hit, idx) => (hit.distance, idx, hit))
                 .DefaultIfEmpty()
                 .Min().hit;
@@ -123,29 +123,30 @@ namespace Licht.Unity.Physics
             var boxCollider = closestHit.collider as BoxCollider2D;
             if (!boxCollider?.enabled ?? false) return stats;
 
-            var clampPoint = closestHit.collider.transform.position.y + closestHit.collider.offset.y
-                             - dir.y * ((boxCollider == null ? 0 : boxCollider.bounds.extents.y) + obj.VerticalColliderSize.y);
+            var clampFix = boxCollider == null ? (0.01f - obj.VerticalCollider.offset.y) * dir.y : 0; 
+            var clampPoint = boxCollider == null ? closestHit.point.y - dir.y * obj.VerticalColliderSize.y - clampFix 
+                : closestHit.collider.transform.position.y + closestHit.collider.offset.y - dir.y * (boxCollider.bounds.extents.y + obj.VerticalColliderSize.y);
 
-            if (dir == Vector2.down && !Mathf.Sign(closestHit.normal.y).FloatEq(dir.y))
+            if (dir == Vector2.down)
             {
                 var stopped = obj.transform.position.y + obj.Speed.y <= clampPoint;
                 obj.Speed = new Vector2(obj.Speed.x, stopped ? 0 : Mathf.Min(0, obj.transform.position.y - clampPoint));
 
                 if (stopped)
                 {
-                    obj.transform.position = new Vector2(obj.transform.position.x, clampPoint);
+                    obj.transform.position = new Vector2(obj.transform.position.x, clampPoint + clampFix);
                     stats.HitNegative = true;
                 }
             }
 
-            if (dir == Vector2.up && !Mathf.Sign(closestHit.normal.y).FloatEq(dir.y))
+            if (dir == Vector2.up)
             {
                 var stopped = obj.transform.position.y + obj.Speed.y > clampPoint;
                 obj.Speed = new Vector2(obj.Speed.x, stopped ? 0 : clampPoint - obj.transform.position.y);
 
                 if (stopped)
                 {
-                    obj.transform.position = new Vector2(obj.transform.position.x, clampPoint);
+                    obj.transform.position = new Vector2(obj.transform.position.x, clampPoint + clampFix);
                     stats.HitPositive = true;
                 }
             }
@@ -203,7 +204,7 @@ namespace Licht.Unity.Physics
             if (!stats.TriggeredHit) return stats;
 
             // fix closestHit
-            var closestHit = stats.Hits.Where(hit => hit != default && Mathf.Abs(hit.normal.x) > 0)
+            var closestHit = stats.Hits.Where(hit => hit != default && Mathf.Abs(hit.normal.x) > 0 && !Mathf.Sign(hit.normal.x).FloatEq(dir.x))
                 .Select((hit, idx) => (hit.distance, idx, hit))
                 .DefaultIfEmpty()
                 .Min().hit;
@@ -219,30 +220,31 @@ namespace Licht.Unity.Physics
 
             var boxCollider = closestHit.collider as BoxCollider2D;
             if (!boxCollider?.enabled ?? false) return stats;
-            var clampPoint = closestHit.collider.transform.position.x + closestHit.collider.offset.x -
-                             dir.x * ((boxCollider == null ? 0 : boxCollider.bounds.extents.x) +
-                                      obj.HorizontalColliderSize.x);
 
-            if (dir == Vector2.left && !Mathf.Sign(closestHit.normal.x).FloatEq(dir.x))
+            var clampFix = boxCollider == null ? 0.01f * dir.x : 0;
+            var clampPoint = boxCollider == null ? closestHit.point.x - dir.x * obj.HorizontalColliderSize.x - clampFix :
+                closestHit.collider.transform.position.x + closestHit.collider.offset.x - dir.x * (boxCollider.bounds.extents.x + obj.HorizontalColliderSize.x);
+
+            if (dir == Vector2.left)
             {
                 var stopped = obj.transform.position.x + obj.Speed.x < clampPoint;
                 obj.Speed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.Speed.y);
 
                 if (stopped)
                 {
-                    obj.transform.position = new Vector2(clampPoint, obj.transform.position.y);
+                    obj.transform.position = new Vector2(clampPoint + clampFix, obj.transform.position.y);
                     stats.HitNegative = true;
                 }
             }
 
-            if (dir == Vector2.right && !Mathf.Sign(closestHit.normal.x).FloatEq(dir.x))
+            if (dir == Vector2.right)
             {
                 var stopped = obj.transform.position.x + obj.Speed.x > clampPoint;
                 obj.Speed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.Speed.y);
 
                 if (stopped)
                 {
-                    obj.transform.position = new Vector2(clampPoint, obj.transform.position.y);
+                    obj.transform.position = new Vector2(clampPoint + clampFix, obj.transform.position.y);
                     stats.HitPositive = true;
                 }
             }
