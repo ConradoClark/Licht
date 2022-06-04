@@ -25,6 +25,7 @@ namespace Licht.Unity.Physics
         private Dictionary<string, LichtCustomPhysicsForce> _customPhysicsForces;
         private Dictionary<LichtPhysicsObject, Caterpillar<CollisionState>> _collisionStats;
         private Dictionary<string, CollisionTrigger> _collisionTriggers;
+        private HashSet<Collider2D> _semiSolids;
 
         public FrameVariables GetFrameVariables()
         {
@@ -69,6 +70,16 @@ namespace Licht.Unity.Physics
         public void RemovePhysicsForce(LichtPhysicsForce obj)
         {
             _physicsForces.Remove(obj);
+        }
+
+        public void AddSemiSolid(Collider2D semiSolid)
+        {
+            _semiSolids.Add(semiSolid);
+        }
+
+        public void RemoveSemiSolid(Collider2D semiSolid)
+        {
+            _semiSolids.Remove(semiSolid);
         }
 
         public void AddPhysicsForce(LichtCustomPhysicsForce obj)
@@ -129,6 +140,12 @@ namespace Licht.Unity.Physics
 
             if (dir == Vector2.down)
             {
+                if (_semiSolids.Contains(closestHit.collider))
+                {
+                    var semiSolidTolerance = obj.VerticalColliderSize.y * 0.75f;
+                    if (obj.transform.position.y + obj.Speed.y + semiSolidTolerance <= clampPoint) return stats;
+                }
+
                 var stopped = obj.transform.position.y + obj.Speed.y <= clampPoint;
                 obj.Speed = new Vector2(obj.Speed.x, stopped ? 0 : Mathf.Min(0, obj.transform.position.y - clampPoint));
 
@@ -139,7 +156,7 @@ namespace Licht.Unity.Physics
                 }
             }
 
-            if (dir == Vector2.up)
+            if (dir == Vector2.up && !_semiSolids.Contains(closestHit.collider))
             {
                 var stopped = obj.transform.position.y + obj.Speed.y > clampPoint;
                 obj.Speed = new Vector2(obj.Speed.x, stopped ? 0 : clampPoint - obj.transform.position.y);
@@ -225,7 +242,7 @@ namespace Licht.Unity.Physics
             var clampPoint = boxCollider == null ? closestHit.point.x - dir.x * obj.HorizontalColliderSize.x - clampFix :
                 closestHit.collider.transform.position.x + closestHit.collider.offset.x - dir.x * (boxCollider.bounds.extents.x + obj.HorizontalColliderSize.x);
 
-            if (dir == Vector2.left)
+            if (dir == Vector2.left && !_semiSolids.Contains(closestHit.collider))
             {
                 var stopped = obj.transform.position.x + obj.Speed.x < clampPoint;
                 obj.Speed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.Speed.y);
@@ -237,7 +254,7 @@ namespace Licht.Unity.Physics
                 }
             }
 
-            if (dir == Vector2.right)
+            if (dir == Vector2.right && !_semiSolids.Contains(closestHit.collider))
             {
                 var stopped = obj.transform.position.x + obj.Speed.x > clampPoint;
                 obj.Speed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.Speed.y);
@@ -284,6 +301,7 @@ namespace Licht.Unity.Physics
             _customPhysicsForces = new Dictionary<string, LichtCustomPhysicsForce>();
             _collisionStats = new Dictionary<LichtPhysicsObject, Caterpillar<CollisionState>>();
             _collisionTriggers = new Dictionary<string, CollisionTrigger>();
+            _semiSolids = new HashSet<Collider2D>();
         }
 
         public CollisionState GetCollisionState(LichtPhysicsObject obj)
