@@ -14,6 +14,7 @@ namespace Licht.Unity.Physics.Forces
         public LayerMask Affects;
         public Vector2 Direction;
         public float Speed;
+        public float TimeInSecondsUntilFullEffect;
 
         public override bool IsActive { get; set; } = true;
         public override string Key => Identifier.Name;
@@ -39,19 +40,19 @@ namespace Licht.Unity.Physics.Forces
                 var speed = 0f;
                 foreach (var _ in new LerpBuilder(v => speed = v, () => speed)
                              .SetTarget(Speed)
-                             .Over(2f)
+                             .Over(TimeInSecondsUntilFullEffect)
                              .Easing(EasingYields.EasingFunction.QuadraticEaseIn)
                              .BreakIf(() => !ActivationFlags[physicsObject] || IsBlocked(physicsObject) || Physics.GetCollisionState(physicsObject).Vertical.HitNegative)
                              .UsingTimer(Physics.TimerRef.Timer)
                              .Build())
                 {
-                    physicsObject.ApplySpeed(Direction * speed);
+                    physicsObject.ApplySpeed(Direction * speed * Physics.FrameMultiplier * (float) Physics.TimerRef.Timer.UpdatedTimeInMilliseconds);
                     yield return TimeYields.WaitOneFrameX;
                 }
 
                 while (IsActive && ActivationFlags[physicsObject] && !IsBlocked(physicsObject) && !Physics.GetCollisionState(physicsObject).Vertical.HitNegative)
                 {   
-                    physicsObject.ApplySpeed(Direction * Speed);
+                    physicsObject.ApplySpeed(Direction * Speed * Physics.FrameMultiplier * (float)Physics.TimerRef.Timer.UpdatedTimeInMilliseconds);
                     yield return TimeYields.WaitOneFrameX;
                 }
             }

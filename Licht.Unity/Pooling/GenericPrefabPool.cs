@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Pooling
 {
+    [DefaultExecutionOrder(-1000)]
     public class GenericPrefabPool<T> : MonoBehaviour, IPoolableObjectFactory<T> where T: IPoolableComponent
     {
         public GameObject Prefab;
@@ -26,7 +27,7 @@ namespace Licht.Unity.Pooling
         private void OnDisable()
         {
             _objectPool.ReleaseAll();
-            _objectPool = null;
+            _objectPool = null; 
         }
         
         public T Instantiate()
