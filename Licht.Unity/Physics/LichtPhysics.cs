@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -8,6 +9,7 @@ using Licht.Unity.Extensions;
 using Licht.Unity.Memory;
 using Licht.Unity.Objects;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Licht.Unity.Physics
 {
@@ -27,6 +29,9 @@ namespace Licht.Unity.Physics
         private Dictionary<string, CollisionTrigger> _collisionTriggers;
         private HashSet<Collider2D> _semiSolids;
 
+        public event Action<LichtPhysicsObject> OnAddPhysicsObject;
+        public event Action<LichtPhysicsObject> OnRemovePhysicsObject;
+
         public FrameVariables GetFrameVariables()
         {
             if (_frameVariables != null) return _frameVariables;
@@ -45,6 +50,7 @@ namespace Licht.Unity.Physics
 
         public void AddPhysicsObject(LichtPhysicsObject obj)
         {
+            OnAddPhysicsObject?.Invoke(obj);
             if (obj.Static) _physicsStaticWorld.Add(obj);
             else _physicsWorld.Add(obj);
 
@@ -56,6 +62,7 @@ namespace Licht.Unity.Physics
 
         public void RemovePhysicsObject(LichtPhysicsObject obj)
         {
+            OnRemovePhysicsObject?.Invoke(obj);
             if (obj.Static) _physicsStaticWorld.Remove(obj);
             else _physicsWorld.Remove(obj);
 
@@ -151,7 +158,7 @@ namespace Licht.Unity.Physics
 
                 if (stopped)
                 {
-                    obj.transform.position = new Vector2(obj.transform.position.x, clampPoint + clampFix);
+                    if (!obj.Static) obj.transform.position = new Vector2(obj.transform.position.x, clampPoint + clampFix);
                     stats.HitNegative = true;
                 }
             }
@@ -163,7 +170,7 @@ namespace Licht.Unity.Physics
 
                 if (stopped)
                 {
-                    obj.transform.position = new Vector2(obj.transform.position.x, clampPoint + clampFix);
+                    if (!obj.Static) obj.transform.position = new Vector2(obj.transform.position.x, clampPoint + clampFix);
                     stats.HitPositive = true;
                 }
             }
@@ -220,20 +227,26 @@ namespace Licht.Unity.Physics
 
             if (!stats.TriggeredHit) return stats;
 
-            // fix closestHit
-            var closestHit = stats.Hits.Where(hit => hit != default && Mathf.Abs(hit.normal.x) > 0 && !Mathf.Sign(hit.normal.x).FloatEq(dir.x))
-                .Select((hit, idx) => (hit.distance, idx, hit))
+
+            var validHits = stats.Hits.Where(hit =>
+                    hit != default && Mathf.Abs(hit.normal.x) > 0 && !Mathf.Sign(hit.normal.x).FloatEq(dir.x))
+                .ToArray();
+
+            var closestHit = validHits.Select((hit, idx) => (hit.distance, idx, hit))
                 .DefaultIfEmpty()
                 .Min().hit;
 
-            if (closestHit == default) return stats;
-
-            _collisionTriggers[GetCollisionTriggerName(closestHit.collider)] = new CollisionTrigger
+            foreach (var hit in validHits)
             {
-                Actor = obj,
-                Target = closestHit.collider,
-                Type = CollisionTrigger.TriggerType.Obstacle
-            };
+                _collisionTriggers[GetCollisionTriggerName(hit.collider)] = new CollisionTrigger
+                {
+                    Actor = obj,
+                    Target = hit.collider,
+                    Type = CollisionTrigger.TriggerType.Obstacle
+                };
+            }
+
+            if (closestHit == default) return stats;
 
             var boxCollider = closestHit.collider as BoxCollider2D;
             if (!boxCollider?.enabled ?? false) return stats;
@@ -249,7 +262,7 @@ namespace Licht.Unity.Physics
 
                 if (stopped)
                 {
-                    obj.transform.position = new Vector2(clampPoint + clampFix, obj.transform.position.y);
+                    if (!obj.Static) obj.transform.position = new Vector2(clampPoint + clampFix, obj.transform.position.y);
                     stats.HitNegative = true;
                 }
             }
@@ -261,7 +274,7 @@ namespace Licht.Unity.Physics
 
                 if (stopped)
                 {
-                    obj.transform.position = new Vector2(clampPoint + clampFix, obj.transform.position.y);
+                    if (!obj.Static) obj.transform.position = new Vector2(clampPoint + clampFix, obj.transform.position.y);
                     stats.HitPositive = true;
                 }
             }
@@ -287,6 +300,20 @@ namespace Licht.Unity.Physics
 
                 obj.ImplyDirection(obj.Speed.normalized);
                 obj.transform.position += (Vector3)obj.Speed;
+            }
+
+            foreach (var obj in _physicsStaticWorld)
+            {
+                var vertical = CheckVerticals(obj);
+                var horizontal = CheckHorizontals(obj);
+                var custom = CheckCustom(obj);
+
+                _collisionStats[obj].Current = new CollisionState
+                {
+                    Horizontal = horizontal,
+                    Vertical = vertical,
+                    Custom = custom
+                };
             }
         }
 

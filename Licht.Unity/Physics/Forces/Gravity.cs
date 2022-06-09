@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Licht.Impl.Orchestration;
 using Licht.Unity.Builders;
+using Licht.Unity.Extensions;
 using Licht.Unity.Objects;
 using UnityEngine;
 
@@ -25,17 +26,40 @@ namespace Licht.Unity.Physics.Forces
             Physics.LichtPhysicsMachinery.Machinery.AddBasicMachine(StartGravity());
         }
 
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            Physics.OnAddPhysicsObject -= Physics_OnAddPhysicsObject;
+            Physics.OnRemovePhysicsObject -= Physics_OnRemovePhysicsObject;
+        }
+
         private IEnumerable<Action> StartGravity()
         {
             yield return TimeYields.WaitOneFrame;
             Activate();
+
+            Physics.OnAddPhysicsObject += Physics_OnAddPhysicsObject;
+            Physics.OnRemovePhysicsObject += Physics_OnRemovePhysicsObject;
+        }
+
+        private void Physics_OnRemovePhysicsObject(LichtPhysicsObject obj)
+        {
+            if (!Affects.Contains(obj.gameObject.layer)) return;
+            ActivationFlags[obj] = false;
+        }
+
+        private void Physics_OnAddPhysicsObject(LichtPhysicsObject obj)
+        {
+            if (!Affects.Contains(obj.gameObject.layer)) return;
+            ActivationFlags[obj] = true;
+            Physics.LichtPhysicsMachinery.Machinery.AddBasicMachine(UseGravity(obj));
         }
 
         private IEnumerable<IEnumerable<Action>> UseGravity(LichtPhysicsObject physicsObject)
         {
-            while (IsActive)
+            while (IsActive && ActivationFlags[physicsObject])
             {
-                while (!ActivationFlags[physicsObject] || IsBlocked(physicsObject) || Physics.GetCollisionState(physicsObject).Vertical.HitNegative) yield return TimeYields.WaitOneFrameX;
+                while (IsBlocked(physicsObject) || Physics.GetCollisionState(physicsObject).Vertical.HitNegative) yield return TimeYields.WaitOneFrameX;
 
                 var speed = 0f;
                 foreach (var _ in new LerpBuilder(v => speed = v, () => speed)

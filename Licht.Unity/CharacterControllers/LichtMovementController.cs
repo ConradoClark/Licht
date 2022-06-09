@@ -6,20 +6,20 @@ namespace Licht.Unity.CharacterControllers
 {
     public abstract class LichtMovementController : MonoBehaviour
     {
-        private HashSet<MonoBehaviour> _movementBlockers;
+        private HashSet<Object> _movementBlockers;
 
         protected virtual void Awake()
         {
-            _movementBlockers = new HashSet<MonoBehaviour>();
+            _movementBlockers = new HashSet<Object>();
         }
 
-        public void BlockMovement(MonoBehaviour source)
+        public void BlockMovement(Object source)
         {
             if (_movementBlockers.Contains(source)) return;
             _movementBlockers.Add(source);
         }
 
-        public void UnblockMovement(MonoBehaviour source)
+        public void UnblockMovement(Object source)
         {
             _movementBlockers.Remove(source);
         }
