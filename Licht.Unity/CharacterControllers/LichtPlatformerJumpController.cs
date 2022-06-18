@@ -24,8 +24,8 @@ namespace Licht.Unity.CharacterControllers
             public LichtPlatformerJumpController Source;
         }
 
-        public ScriptableLichtForceIdentifier GravityIdentifier;
-        public ScriptableInputAction JumpInput;
+        public ScriptLichtForceIdentifier GravityIdentifier;
+        public ScriptInput JumpInput;
         public float JumpSpeed;
         public float AccelerationTime;
         public float DecelerationTime;
@@ -81,7 +81,7 @@ namespace Licht.Unity.CharacterControllers
                 .Over(AccelerationTime)
                 .Easing(MovementStartEasing)
                 .BreakIf(() => _physics.GetCollisionState(Target).Vertical.HitPositive || IsBlocked || Interrupted, false)
-                .UsingTimer(_physics.TimerRef.Timer)
+                .UsingTimer(_physics.ScriptTimerRef.Timer)
                 .Build();
 
             yield return Target.GetSpeedAccessor(new Vector2(0, Target.LatestSpeed.y))
@@ -90,7 +90,7 @@ namespace Licht.Unity.CharacterControllers
                 .Over(DecelerationTime)
                 .Easing(MovementEndEasing)
                 .BreakIf(() => _physics.GetCollisionState(Target).Vertical.HitPositive || IsBlocked || Interrupted, false)
-                .UsingTimer(_physics.TimerRef.Timer)
+                .UsingTimer(_physics.ScriptTimerRef.Timer)
                 .Build();
 
             yield return TimeYields.WaitOneFrameX;
@@ -121,7 +121,7 @@ namespace Licht.Unity.CharacterControllers
 
                     if (InputBufferTime > 0 && jumpInput.WasPerformedThisFrame())
                     {
-                        foreach (var _ in TimeYields.WaitSeconds(_physics.TimerRef.Timer, InputBufferTime))
+                        foreach (var _ in TimeYields.WaitSeconds(_physics.ScriptTimerRef.Timer, InputBufferTime))
                         {
                             collisionState = _physics.GetCollisionState(Target);
                             if (!collisionState.Vertical.HitNegative || IsBlocked)
@@ -147,7 +147,7 @@ namespace Licht.Unity.CharacterControllers
 
                 if (CoyoteJumpTime > 0 && !jumped)
                 {
-                    foreach (var _ in TimeYields.WaitSeconds(_physics.TimerRef.Timer, CoyoteJumpTime))
+                    foreach (var _ in TimeYields.WaitSeconds(_physics.ScriptTimerRef.Timer, CoyoteJumpTime))
                     {
                         if (!jumpInput.WasPerformedThisFrame() || IsBlocked)
                         {

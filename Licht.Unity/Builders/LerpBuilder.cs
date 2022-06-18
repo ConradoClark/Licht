@@ -8,14 +8,14 @@ namespace Licht.Unity.Builders
 {
     public class LerpBuilder
     {
-        public static ITime DefaultTimer;
+        public static ITimer DefaultTimer;
         private readonly Action<float> _setter;
         private readonly Func<float> _getter;
         private float _target;
         private Func<float> _targetFn;
         private float _duration;
         private EasingYields.EasingFunction _easing;
-        private ITime _timer;
+        private ITimer _timer;
         private Func<bool> _breakCondition;
         private bool _setTargetOnBreak = true;
         private bool _fromOrigin = false;
@@ -81,7 +81,7 @@ namespace Licht.Unity.Builders
             return this;
         }
 
-        public LerpBuilder UsingTimer(ITime timer)
+        public LerpBuilder UsingTimer(ITimer timer)
         {
             _timer = timer;
             return this;

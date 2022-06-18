@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Licht.Unity.Physics
 {
     [CreateAssetMenu(fileName = "LichtPhysicsUpdater", menuName = "Licht/Physics/LichtPhysicsUpdater", order = 1)]
-    public class LichtPhysicsUpdater : ScriptableValue, IInitializable, IUpdateable
+    public class LichtPhysicsUpdater : ScriptValue, IInitializable, IUpdateable
     {
         private FrameVariables _frameVariables;
         private LichtPhysics _physics;

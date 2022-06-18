@@ -14,12 +14,12 @@ using Object = UnityEngine.Object;
 namespace Licht.Unity.Physics
 {
     [CreateAssetMenu(fileName = "LichtPhysics", menuName = "Licht/Physics/LichtPhysics", order = 1)]
-    public class LichtPhysics : ScriptableValue, IInitializable, IUpdateable
+    public class LichtPhysics : ScriptValue, IInitializable, IUpdateable
     {
         public float FrameMultiplier = 0.001f;
         public LayerMask ObstacleLayerMask;
-        public BasicMachineryScriptable LichtPhysicsMachinery;
-        public TimerScriptable TimerRef;
+        public ScriptBasicMachinery LichtPhysicsMachinery;
+        public ScriptTimer ScriptTimerRef;
         private FrameVariables _frameVariables;
         private List<LichtPhysicsObject> _physicsWorld;
         private List<LichtPhysicsObject> _physicsStaticWorld;
@@ -118,7 +118,7 @@ namespace Licht.Unity.Physics
                              f.AffectsObjectsByLayer.Contains(obj.gameObject.layer) ||
                              (f.AffectsObjects?.Contains(obj) ?? false)))
                 {
-                    obj.ApplySpeed(force.Speed * FrameMultiplier * (float)TimerRef.Timer.UpdatedTimeInMilliseconds);
+                    obj.ApplySpeed(force.Speed * FrameMultiplier * (float)ScriptTimerRef.Timer.UpdatedTimeInMilliseconds);
                 }
             }
 

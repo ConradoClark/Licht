@@ -2,7 +2,7 @@
 
 namespace Licht.Unity.Objects
 {
-    public abstract class ScriptableValue : ScriptableObject
+    public abstract class ScriptValue : ScriptableObject
     {
         public abstract object Value { get; }
     }

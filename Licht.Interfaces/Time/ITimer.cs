@@ -2,7 +2,7 @@
 
 namespace Licht.Interfaces.Time
 {
-    public interface ITime: IUpdateable, IResettable, IActivable, IDeactivable
+    public interface ITimer: IUpdateable, IResettable, IActivable, IDeactivable
     {
         double Multiplier { get; set; }
         double TotalElapsedTimeInMilliseconds { get; }

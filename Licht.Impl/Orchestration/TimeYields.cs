@@ -13,7 +13,7 @@ namespace Licht.Impl.Orchestration
 
         public static IEnumerable<Action> WaitOneFrameX => Enumerable.Repeat<Action>(() => { }, 1);
 
-        public static IEnumerable<Action> WaitMilliseconds(ITime timer, double ms, Action<double> step = null, Func<bool> breakCondition = null)
+        public static IEnumerable<Action> WaitMilliseconds(ITimer timer, double ms, Action<double> step = null, Func<bool> breakCondition = null)
         {
             var time = 0d;
             while (time < ms)
@@ -25,7 +25,7 @@ namespace Licht.Impl.Orchestration
             }
         }
 
-        public static IEnumerable<Action> WaitSeconds(ITime timer, double seconds, Action<double> step = null, Func<bool> breakCondition = null)
+        public static IEnumerable<Action> WaitSeconds(ITimer timer, double seconds, Action<double> step = null, Func<bool> breakCondition = null)
         {
             return WaitMilliseconds(timer, seconds * 1000d, step, breakCondition);
         }

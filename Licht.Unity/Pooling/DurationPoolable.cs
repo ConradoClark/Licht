@@ -13,8 +13,8 @@ namespace Licht.Unity.Pooling
 {
     public class DurationPoolable: MonoBehaviour, IPoolableComponent
     {
-        public BasicMachineryScriptable BasicMachineryObject;
-        public TimerScriptable TimerObject;
+        public ScriptBasicMachinery ScriptBasicMachineryObject;
+        public ScriptTimer ScriptTimerObject;
         public bool ActiveOnInitialization;
         public int DurationInSeconds;
 
@@ -33,14 +33,14 @@ namespace Licht.Unity.Pooling
 
         public bool Activate()
         {
-            BasicMachineryObject.Machinery.AddBasicMachine(Expire());
+            ScriptBasicMachineryObject.Machinery.AddBasicMachine(Expire());
             gameObject.SetActive(true);
             return true;
         }
 
         private IEnumerable<IEnumerable<Action>> Expire()
         {
-            yield return TimeYields.WaitSeconds(TimerObject.Timer, DurationInSeconds);
+            yield return TimeYields.WaitSeconds(ScriptTimerObject.Timer, DurationInSeconds);
             Deactivate();
         }
 

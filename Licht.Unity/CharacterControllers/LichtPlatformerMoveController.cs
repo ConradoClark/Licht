@@ -47,7 +47,7 @@ namespace Licht.Unity.CharacterControllers
         public LichtPhysicsObject Target;
         public float LatestDirection { get; private set; } = 1f;
 
-        public ScriptableInputAction AxisInput;
+        public ScriptInput AxisInput;
 
         private LichtPhysics _physics;
         private PlayerInput _input;
@@ -79,7 +79,7 @@ namespace Licht.Unity.CharacterControllers
                 .Over(AccelerationTime)
                 .Easing(MovementStartEasing)
                 .BreakIf(() => IsBlocked || !moveAction.IsPressed() || changedAxis(), false)
-                .UsingTimer(_physics.TimerRef.Timer)
+                .UsingTimer(_physics.ScriptTimerRef.Timer)
                 .Build();
         }
 
@@ -91,7 +91,7 @@ namespace Licht.Unity.CharacterControllers
                 .Over(DecelerationTime)
                 .Easing(MovementEndEasing)
                 .BreakIf(() => IsBlocked || moveAction.IsPressed() || changedAxis(), false)
-                .UsingTimer(_physics.TimerRef.Timer)
+                .UsingTimer(_physics.ScriptTimerRef.Timer)
                 .Build();
         }
 

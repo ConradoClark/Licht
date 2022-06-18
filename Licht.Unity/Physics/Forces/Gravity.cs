@@ -11,7 +11,7 @@ namespace Licht.Unity.Physics.Forces
 {
     public class Gravity : LichtCustomPhysicsForce
     {
-        public ScriptableLichtForceIdentifier Identifier;
+        public ScriptLichtForceIdentifier Identifier;
         public LayerMask Affects;
         public Vector2 Direction;
         public float Speed;
@@ -67,16 +67,16 @@ namespace Licht.Unity.Physics.Forces
                              .Over(TimeInSecondsUntilFullEffect)
                              .Easing(EasingYields.EasingFunction.QuadraticEaseIn)
                              .BreakIf(() => !ActivationFlags[physicsObject] || IsBlocked(physicsObject) || Physics.GetCollisionState(physicsObject).Vertical.HitNegative)
-                             .UsingTimer(Physics.TimerRef.Timer)
+                             .UsingTimer(Physics.ScriptTimerRef.Timer)
                              .Build())
                 {
-                    physicsObject.ApplySpeed(Direction * speed * Physics.FrameMultiplier * (float) Physics.TimerRef.Timer.UpdatedTimeInMilliseconds);
+                    physicsObject.ApplySpeed(Direction * speed * Physics.FrameMultiplier * (float) Physics.ScriptTimerRef.Timer.UpdatedTimeInMilliseconds);
                     yield return TimeYields.WaitOneFrameX;
                 }
 
                 while (IsActive && ActivationFlags[physicsObject] && !IsBlocked(physicsObject) && !Physics.GetCollisionState(physicsObject).Vertical.HitNegative)
                 {   
-                    physicsObject.ApplySpeed(Direction * Speed * Physics.FrameMultiplier * (float)Physics.TimerRef.Timer.UpdatedTimeInMilliseconds);
+                    physicsObject.ApplySpeed(Direction * Speed * Physics.FrameMultiplier * (float)Physics.ScriptTimerRef.Timer.UpdatedTimeInMilliseconds);
                     yield return TimeYields.WaitOneFrameX;
                 }
             }

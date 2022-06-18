@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Licht.Unity.Builders;
 using Licht.Unity.Extensions;
 using UnityEngine;

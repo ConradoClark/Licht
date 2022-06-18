@@ -11,7 +11,7 @@ namespace Licht.Impl.Orchestration
     public static class EasingYields
     {
         public static IEnumerable<Action> Lerp(Action<float> setter,
-            Func<float> getter, float seconds, float target, EasingFunction function, ITime timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false, 
+            Func<float> getter, float seconds, float target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false, 
             float initStep = 0f, bool immediate = false)
         {
             return Lerp(setter, getter, seconds, () => target, function, timer, breakCondition, setTargetOnBreak,
@@ -19,7 +19,7 @@ namespace Licht.Impl.Orchestration
         }
 
         public static IEnumerable<Action> Lerp(Action<float> setter,
-            Func<float> getter, float seconds, Func<float> target, EasingFunction function, ITime timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
+            Func<float> getter, float seconds, Func<float> target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
             float initStep = 0f, bool immediate = false)
         {
             if (!immediate) yield return TimeYields.WaitOneFrame;

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Licht.Unity.Builders;
-using Licht.Unity.Extensions;
 
 namespace Licht.Unity.Accessors
 {

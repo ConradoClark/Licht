@@ -7,7 +7,7 @@ using Licht.Impl.Memory;
 namespace Licht.Impl.Time
 {
     [PublicAPI]
-    public class DefaultTimer : ITime
+    public class DefaultTimer : ITimer
     {
         private readonly Func<double> _timeStepFn;
         public DefaultTimer(Func<double> timeStepFn, int framesPerSecond = 60)

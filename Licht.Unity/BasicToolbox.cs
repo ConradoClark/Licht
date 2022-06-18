@@ -10,7 +10,7 @@ namespace Licht.Unity
     public class BasicToolbox : SceneObject<BasicToolbox>
     {
         public int TargetFrameRate;
-        public List<ScriptableValue> ScriptableObjects;
+        public List<ScriptValue> ScriptableObjects;
         private IUpdateable[] _updateableScriptableObjects;
         private IInitializable[] _initializableScriptableObjects;
 

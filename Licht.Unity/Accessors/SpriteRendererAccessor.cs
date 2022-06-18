@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Licht.Unity.Builders;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Licht.Unity.Accessors
 {
@@ -17,5 +13,10 @@ namespace Licht.Unity.Accessors
 
         public ColorAccessor Color => new ColorAccessor(value => _spriteRenderer.color = value,
             () => _spriteRenderer.color);
+
+        public MaterialAccessor Material(string property)
+        {
+            return new MaterialAccessor(property, _spriteRenderer);
+        }
     }
 }

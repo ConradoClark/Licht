@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Licht.Unity.Builders;
 using UnityEngine;
 
@@ -26,7 +24,8 @@ namespace Licht.Unity.Accessors
                         _setter(Color.Lerp(current, color, value));
                         @ref = value;
                     },
-                    () => @ref);
+                    () => @ref)
+                    .SetTarget(1f);
         }
 
         public LerpBuilder R
