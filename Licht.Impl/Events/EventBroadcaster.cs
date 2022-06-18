@@ -16,7 +16,7 @@ namespace Licht.Impl.Events
             EventFn[onEvent] = fn;
 
             EventBroadcaster<TEventType, object>.Instance<TEventType, object>()
-                .ObserveEvent(@event, _ => onEvent());
+                .ObserveEvent(@event, fn);
         }
 
         public static void StopObservingEvent<TEventType>(this object obj, TEventType @event,

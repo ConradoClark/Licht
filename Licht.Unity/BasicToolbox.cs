@@ -19,6 +19,7 @@ namespace Licht.Unity
             if (TargetFrameRate > 0)
             {
                 Application.targetFrameRate = TargetFrameRate;
+                QualitySettings.vSyncCount = 0;
             }
             
             _updateableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IUpdateable>().ToArray();

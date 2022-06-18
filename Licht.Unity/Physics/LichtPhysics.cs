@@ -89,6 +89,11 @@ namespace Licht.Unity.Physics
             _semiSolids.Remove(semiSolid);
         }
 
+        public bool IsSemiSolid(Collider2D obj)
+        {
+            return _semiSolids.Contains(obj);
+        }
+
         public void AddPhysicsForce(LichtCustomPhysicsForce obj)
         {
             _customPhysicsForces[obj.Key] = obj;
@@ -154,11 +159,11 @@ namespace Licht.Unity.Physics
                 }
 
                 var stopped = obj.transform.position.y + obj.Speed.y <= clampPoint;
-                obj.Speed = new Vector2(obj.Speed.x, stopped ? 0 : Mathf.Min(0, obj.transform.position.y - clampPoint));
+                if (!obj.Ghost) obj.Speed = new Vector2(obj.Speed.x, stopped ? 0 : Mathf.Min(0, obj.transform.position.y - clampPoint));
 
                 if (stopped)
                 {
-                    if (!obj.Static) obj.transform.position = new Vector2(obj.transform.position.x, clampPoint + clampFix);
+                    if (!obj.Static && !obj.Ghost) obj.transform.position = new Vector2(obj.transform.position.x, clampPoint + clampFix);
                     stats.HitNegative = true;
                 }
             }
@@ -166,11 +171,11 @@ namespace Licht.Unity.Physics
             if (dir == Vector2.up && !_semiSolids.Contains(closestHit.collider))
             {
                 var stopped = obj.transform.position.y + obj.Speed.y > clampPoint;
-                obj.Speed = new Vector2(obj.Speed.x, stopped ? 0 : clampPoint - obj.transform.position.y);
+                if (!obj.Ghost) obj.Speed = new Vector2(obj.Speed.x, stopped ? 0 : clampPoint - obj.transform.position.y);
 
                 if (stopped)
                 {
-                    if (!obj.Static) obj.transform.position = new Vector2(obj.transform.position.x, clampPoint + clampFix);
+                    if (!obj.Static && !obj.Ghost) obj.transform.position = new Vector2(obj.transform.position.x, clampPoint + clampFix);
                     stats.HitPositive = true;
                 }
             }
@@ -258,11 +263,11 @@ namespace Licht.Unity.Physics
             if (dir == Vector2.left && !_semiSolids.Contains(closestHit.collider))
             {
                 var stopped = obj.transform.position.x + obj.Speed.x < clampPoint;
-                obj.Speed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.Speed.y);
+                if (!obj.Ghost) obj.Speed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.Speed.y);
 
                 if (stopped)
                 {
-                    if (!obj.Static) obj.transform.position = new Vector2(clampPoint + clampFix, obj.transform.position.y);
+                    if (!obj.Static && !obj.Ghost) obj.transform.position = new Vector2(clampPoint + clampFix, obj.transform.position.y);
                     stats.HitNegative = true;
                 }
             }
@@ -270,11 +275,11 @@ namespace Licht.Unity.Physics
             if (dir == Vector2.right && !_semiSolids.Contains(closestHit.collider))
             {
                 var stopped = obj.transform.position.x + obj.Speed.x > clampPoint;
-                obj.Speed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.Speed.y);
+                if (!obj.Ghost) obj.Speed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.Speed.y);
 
                 if (stopped)
                 {
-                    if (!obj.Static) obj.transform.position = new Vector2(clampPoint + clampFix, obj.transform.position.y);
+                    if (!obj.Static && !obj.Ghost) obj.transform.position = new Vector2(clampPoint + clampFix, obj.transform.position.y);
                     stats.HitPositive = true;
                 }
             }

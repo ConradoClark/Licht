@@ -12,6 +12,7 @@ namespace Licht.Unity.Physics
     public class LichtPhysicsObject : MonoBehaviour
     {
         public bool Static;
+        public bool Ghost;
         public Vector2 VerticalColliderSize => VerticalCollider.bounds.extents;
         public Vector2 HorizontalColliderSize => HorizontalCollider.bounds.extents;
 

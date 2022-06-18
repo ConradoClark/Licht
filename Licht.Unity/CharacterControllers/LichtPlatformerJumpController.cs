@@ -36,6 +36,7 @@ namespace Licht.Unity.CharacterControllers
         public float CoyoteJumpTime;
 
         public bool IsJumping { get; protected set; }
+        public bool Interrupted { get; protected set; }
 
         private LichtPhysics _physics;
         private PlayerInput _input;
@@ -59,6 +60,11 @@ namespace Licht.Unity.CharacterControllers
             this.UnregisterAsEventPublisher<LichtPlatformerJumpEvents, LichtPlatformerJumpEventArgs>();
         }
 
+        public void Interrupt()
+        {
+            if (IsJumping) Interrupted = true;
+        }
+
         private IEnumerable<IEnumerable<Action>> ExecuteJump()
         {
             IsJumping = true;
@@ -74,7 +80,7 @@ namespace Licht.Unity.CharacterControllers
                 .SetTarget(JumpSpeed)
                 .Over(AccelerationTime)
                 .Easing(MovementStartEasing)
-                .BreakIf(() => _physics.GetCollisionState(Target).Vertical.HitPositive || IsBlocked, false)
+                .BreakIf(() => _physics.GetCollisionState(Target).Vertical.HitPositive || IsBlocked || Interrupted, false)
                 .UsingTimer(_physics.TimerRef.Timer)
                 .Build();
 
@@ -83,12 +89,13 @@ namespace Licht.Unity.CharacterControllers
                 .SetTarget(0)
                 .Over(DecelerationTime)
                 .Easing(MovementEndEasing)
-                .BreakIf(() => _physics.GetCollisionState(Target).Vertical.HitPositive || IsBlocked, false)
+                .BreakIf(() => _physics.GetCollisionState(Target).Vertical.HitPositive || IsBlocked || Interrupted, false)
                 .UsingTimer(_physics.TimerRef.Timer)
                 .Build();
 
             yield return TimeYields.WaitOneFrameX;
 
+            Interrupted = false;
             IsJumping = false;
             _physics.UnblockCustomPhysicsForceForObject(this, Target, GravityIdentifier.Name);
             _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpEnd, new LichtPlatformerJumpEventArgs

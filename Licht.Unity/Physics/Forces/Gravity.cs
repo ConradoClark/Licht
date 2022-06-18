@@ -57,7 +57,7 @@ namespace Licht.Unity.Physics.Forces
 
         private IEnumerable<IEnumerable<Action>> UseGravity(LichtPhysicsObject physicsObject)
         {
-            while (IsActive && ActivationFlags[physicsObject])
+            while (physicsObject != null && IsActive && ActivationFlags[physicsObject])
             {
                 while (IsBlocked(physicsObject) || Physics.GetCollisionState(physicsObject).Vertical.HitNegative) yield return TimeYields.WaitOneFrameX;
 
