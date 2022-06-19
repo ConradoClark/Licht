@@ -7,9 +7,8 @@ using UnityEngine;
 
 namespace Licht.Unity.Pooling
 {
-    public abstract class EffectPoolable : MonoBehaviour, IPoolableComponent
+    public abstract class EffectPoolable : BaseGameObject, IPoolableComponent
     {
-        public ScriptBasicMachinery ScriptBasicMachineryObject;
         public bool ActiveOnInitialization;
         public void Initialize()
         {
@@ -30,7 +29,7 @@ namespace Licht.Unity.Pooling
         {
             IsEffectOver = false;
 
-            ScriptBasicMachineryObject.Machinery.AddBasicMachine(HandleEffectOver());
+            DefaultMachinery.AddBasicMachine(HandleEffectOver());
             gameObject.SetActive(true);
             IsActive = true;
 

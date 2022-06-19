@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Licht.Impl.Orchestration;
+﻿using Licht.Impl.Orchestration;
 using Licht.Interfaces.Time;
 using UnityEngine;
 
@@ -14,9 +11,9 @@ namespace Licht.Unity.Objects
 
         private void Awake()
         {
-            OnAwake();
             UITimer = SceneObject<DefaultUITimer>.Instance().TimerRef.Timer;
-            DefaultMachinery = SceneObject<DefaultMachinery>.Instance().MachineryRef;
+            DefaultMachinery = SceneObject<DefaultMachinery>.Instance().MachineryRef.Machinery;
+            OnAwake();
         }
 
         protected virtual void OnAwake()
