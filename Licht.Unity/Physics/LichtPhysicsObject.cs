@@ -66,6 +66,8 @@ namespace Licht.Unity.Physics
             }
         }
 
+        public Vector2 CalculatedSpeed;
+
         private Caterpillar<Vector2> _latestSpeed;
         public Vector2 LatestSpeed => _latestSpeed.Current;
 

@@ -118,7 +118,7 @@ namespace Licht.Unity.Physics
                              f.AffectsObjectsByLayer.Contains(obj.gameObject.layer) ||
                              (f.AffectsObjects?.Contains(obj) ?? false)))
                 {
-                    obj.ApplySpeed(force.Speed * FrameMultiplier * (float)ScriptTimerRef.Timer.UpdatedTimeInMilliseconds);
+                    obj.ApplySpeed(force.Speed);
                 }
             }
 
@@ -131,7 +131,7 @@ namespace Licht.Unity.Physics
         private CollisionResult CheckVerticals(LichtPhysicsObject obj)
         {
             // Vertical check
-            var dir = obj.Speed.y > 0 ? Vector2.up : Vector2.down;
+            var dir = obj.CalculatedSpeed.y > 0 ? Vector2.up : Vector2.down;
             var stats = obj.Cast(ObstacleLayerMask, dir);
 
             if (!stats.TriggeredHit) return stats;
@@ -155,11 +155,11 @@ namespace Licht.Unity.Physics
                 if (_semiSolids.Contains(closestHit.collider))
                 {
                     var semiSolidTolerance = obj.VerticalColliderSize.y * 0.75f;
-                    if (obj.transform.position.y + obj.Speed.y + semiSolidTolerance <= clampPoint) return stats;
+                    if (obj.transform.position.y + obj.CalculatedSpeed.y + semiSolidTolerance <= clampPoint) return stats;
                 }
 
-                var stopped = obj.transform.position.y + obj.Speed.y <= clampPoint;
-                if (!obj.Ghost) obj.Speed = new Vector2(obj.Speed.x, stopped ? 0 : Mathf.Min(0, obj.transform.position.y - clampPoint));
+                var stopped = obj.transform.position.y + obj.CalculatedSpeed.y <= clampPoint;
+                if (!obj.Ghost) obj.CalculatedSpeed = new Vector2(obj.CalculatedSpeed.x, stopped ? 0 : Mathf.Min(0, obj.transform.position.y - clampPoint));
 
                 if (stopped)
                 {
@@ -170,8 +170,8 @@ namespace Licht.Unity.Physics
 
             if (dir == Vector2.up && !_semiSolids.Contains(closestHit.collider))
             {
-                var stopped = obj.transform.position.y + obj.Speed.y > clampPoint;
-                if (!obj.Ghost) obj.Speed = new Vector2(obj.Speed.x, stopped ? 0 : clampPoint - obj.transform.position.y);
+                var stopped = obj.transform.position.y + obj.CalculatedSpeed.y > clampPoint;
+                if (!obj.Ghost) obj.CalculatedSpeed = new Vector2(obj.CalculatedSpeed.x, stopped ? 0 : clampPoint - obj.transform.position.y);
 
                 if (stopped)
                 {
@@ -205,7 +205,7 @@ namespace Licht.Unity.Physics
             var results = new List<CollisionResult>();
             foreach (var check in obj.CustomCollisionChecks)
             {
-                var result = obj.CustomCast(check, obj.Speed);
+                var result = obj.CustomCast(check, obj.CalculatedSpeed);
                 if (!result.TriggeredHit) continue;
 
                 foreach (var hit in result.Hits)
@@ -227,7 +227,7 @@ namespace Licht.Unity.Physics
         private CollisionResult CheckHorizontals(LichtPhysicsObject obj)
         {
             // Horizontal check
-            var dir = obj.Speed.x > 0 ? Vector2.right : Vector2.left;
+            var dir = obj.CalculatedSpeed.x > 0 ? Vector2.right : Vector2.left;
             var stats = obj.Cast(ObstacleLayerMask, dir);
 
             if (!stats.TriggeredHit) return stats;
@@ -262,8 +262,8 @@ namespace Licht.Unity.Physics
 
             if (dir == Vector2.left && !_semiSolids.Contains(closestHit.collider))
             {
-                var stopped = obj.transform.position.x + obj.Speed.x < clampPoint;
-                if (!obj.Ghost) obj.Speed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.Speed.y);
+                var stopped = obj.transform.position.x + obj.CalculatedSpeed.x < clampPoint;
+                if (!obj.Ghost) obj.CalculatedSpeed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.CalculatedSpeed.y);
 
                 if (stopped)
                 {
@@ -274,8 +274,8 @@ namespace Licht.Unity.Physics
 
             if (dir == Vector2.right && !_semiSolids.Contains(closestHit.collider))
             {
-                var stopped = obj.transform.position.x + obj.Speed.x > clampPoint;
-                if (!obj.Ghost) obj.Speed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.Speed.y);
+                var stopped = obj.transform.position.x + obj.CalculatedSpeed.x > clampPoint;
+                if (!obj.Ghost) obj.CalculatedSpeed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.CalculatedSpeed.y);
 
                 if (stopped)
                 {
@@ -292,6 +292,7 @@ namespace Licht.Unity.Physics
             _collisionTriggers.Clear();
             foreach (var obj in _physicsWorld)
             {
+                obj.CalculatedSpeed =  obj.Speed * FrameMultiplier * (float)ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
                 var vertical = CheckVerticals(obj);
                 var horizontal = CheckHorizontals(obj);
                 var custom = CheckCustom(obj);
@@ -303,8 +304,8 @@ namespace Licht.Unity.Physics
                     Custom = custom
                 };
 
-                obj.ImplyDirection(obj.Speed.normalized);
-                obj.transform.position += (Vector3)obj.Speed;
+                obj.ImplyDirection(obj.CalculatedSpeed.normalized);
+                obj.transform.position += (Vector3)obj.CalculatedSpeed;
             }
 
             foreach (var obj in _physicsStaticWorld)
