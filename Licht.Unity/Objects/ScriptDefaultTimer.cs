@@ -1,6 +1,6 @@
 ﻿using System;
-using Licht.Impl.Time;
 using Licht.Interfaces.Time;
+using Licht.Unity.Time;
 using UnityEngine;
 
 namespace Licht.Unity.Objects
@@ -18,7 +18,7 @@ namespace Licht.Unity.Objects
         {
             get
             {
-                var timer = _timer ??= new DefaultTimer(() => Time.deltaTime * 1000f)
+                var timer = _timer ??= new UnityTimer()
                 {
                     Multiplier = Multiplier
                 };
