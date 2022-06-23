@@ -153,9 +153,21 @@ namespace Licht.Unity.Physics
                     TriggeredHit = false
                 };
             }
-            
-            Physics2D.BoxCastNonAlloc((Vector2)transform.position + colliderToUse.offset, colliderToUse.size, 0, direction, _collisionResults,
-                Speed.magnitude, layerMask);
+
+            var origin = (Vector2)transform.position
+                         + new Vector2(colliderToUse.offset.x, colliderToUse.offset.y)
+                         + new Vector2(_physics.CollisionOffset * -direction.x,
+                             _physics.CollisionOffset * -direction.y);
+
+            var size = colliderToUse.size - new Vector2(Mathf.Abs(direction.y) * 0.1f, Mathf.Abs(direction.x) * 0.1f);
+
+            Physics2D.BoxCastNonAlloc(origin, size, 0, direction, _collisionResults,
+                CalculatedSpeed.magnitude + _physics.CollisionOffset, layerMask);
+
+            if (_physics.Debug)
+            {
+                DebugDraw(origin, size, 0, direction, CalculatedSpeed.magnitude + _physics.CollisionOffset, _collisionResults[0]);
+            }
 
             var hits = _collisionResults.Where(c => c.collider != HorizontalCollider && c.collider != VerticalCollider
                     && c != default)
@@ -167,6 +179,56 @@ namespace Licht.Unity.Physics
                 Hits = hits,
                 TriggeredHit = hits.Length > 0
             };
+        }
+
+        private void DebugDraw(Vector2 origin, Vector2 size, float angle, Vector2 direction, float distance,
+            RaycastHit2D hit)
+        {
+            var w = size.x * 0.5f;
+            var h = size.y * 0.5f;
+            var p1 = new Vector2(-w, h);
+            var p2 = new Vector2(w, h);
+            var p3 = new Vector2(w, -h);
+            var p4 = new Vector2(-w, -h);
+
+            var q = Quaternion.AngleAxis(angle, new Vector3(0, 0, 1));
+            p1 = q * p1;
+            p2 = q * p2;
+            p3 = q * p3;
+            p4 = q * p4;
+
+            p1 += origin;
+            p2 += origin;
+            p3 += origin;
+            p4 += origin;
+
+            var realDistance = direction.normalized * distance;
+            var p5 = p1 + realDistance;
+            var p6 = p2 + realDistance;
+            var p7 = p3 + realDistance;
+            var p8 = p4 + realDistance;
+
+
+            //Drawing the cast
+            var castColor = hit ? Color.red : Color.green;
+            Debug.DrawLine(p1, p2, castColor);
+            Debug.DrawLine(p2, p3, castColor);
+            Debug.DrawLine(p3, p4, castColor);
+            Debug.DrawLine(p4, p1, castColor);
+
+            Debug.DrawLine(p5, p6, castColor);
+            Debug.DrawLine(p6, p7, castColor);
+            Debug.DrawLine(p7, p8, castColor);
+            Debug.DrawLine(p8, p5, castColor);
+
+            Debug.DrawLine(p1, p5, Color.grey);
+            Debug.DrawLine(p2, p6, Color.grey);
+            Debug.DrawLine(p3, p7, Color.grey);
+            Debug.DrawLine(p4, p8, Color.grey);
+            if (hit)
+            {
+                Debug.DrawLine(hit.point, hit.point + hit.normal.normalized * 0.2f, Color.yellow);
+            }
         }
     }
 }

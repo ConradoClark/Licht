@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using Licht.Impl.Globals;
 using Licht.Impl.Memory;
 using Licht.Interfaces.Update;
 using Licht.Unity.Extensions;
@@ -10,12 +8,16 @@ using Licht.Unity.Memory;
 using Licht.Unity.Objects;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Licht.Unity.Physics
 {
     [CreateAssetMenu(fileName = "LichtPhysics", menuName = "Licht/Physics/LichtPhysics", order = 1)]
     public class LichtPhysics : ScriptValue, IInitializable, IUpdateable
     {
+        public bool Debug;
+        public float CollisionOffset = 0.01f;
         public float FrameMultiplier = 0.001f;
         public LayerMask ObstacleLayerMask;
         public ScriptBasicMachinery LichtPhysicsMachinery;
@@ -131,24 +133,27 @@ namespace Licht.Unity.Physics
         private CollisionResult CheckVerticals(LichtPhysicsObject obj)
         {
             // Vertical check
-            var dir = obj.CalculatedSpeed.y > 0 ? Vector2.up : Vector2.down;
+            var dir = obj.CalculatedSpeed.y > 0 ? Vector2.up : obj.CalculatedSpeed.y < 0 ? Vector2.down : Vector2.zero;
             var stats = obj.Cast(ObstacleLayerMask, dir);
 
             if (!stats.TriggeredHit) return stats;
 
-            var closestHit = stats.Hits.Where(hit => hit != default && Mathf.Abs(hit.normal.y) > 0 && !Mathf.Sign(hit.normal.y).FloatEq(dir.y))
+            var closestHit = stats.Hits.Where(hit => hit != default)
                 .Select((hit, idx) => (hit.distance, idx, hit))
                 .DefaultIfEmpty()
                 .Min().hit;
 
-            if (closestHit == default) return stats;
+            if (closestHit == default || dir == Vector2.zero) return stats;
 
             var boxCollider = closestHit.collider as BoxCollider2D;
             if (!boxCollider?.enabled ?? false) return stats;
 
-            var clampFix = boxCollider == null ? (0.01f - obj.VerticalCollider.offset.y) * dir.y : 0; 
-            var clampPoint = boxCollider == null ? closestHit.point.y - dir.y * obj.VerticalColliderSize.y - clampFix 
+            var clampFix = boxCollider == null ? (0.01f - obj.VerticalCollider.offset.y) * dir.y : 0;
+            var clampPoint = boxCollider == null ? closestHit.point.y - dir.y * obj.VerticalColliderSize.y - clampFix
                 : closestHit.collider.transform.position.y + closestHit.collider.offset.y - dir.y * (boxCollider.bounds.extents.y + obj.VerticalColliderSize.y);
+
+            if (Vector2.Distance(closestHit.point, new Vector2(closestHit.point.x, clampPoint)) >
+                obj.VerticalCollider.size.magnitude * 0.5f) return stats;
 
             if (dir == Vector2.down)
             {
@@ -161,7 +166,7 @@ namespace Licht.Unity.Physics
                 var stopped = obj.transform.position.y + obj.CalculatedSpeed.y <= clampPoint;
                 if (!obj.Ghost) obj.CalculatedSpeed = new Vector2(obj.CalculatedSpeed.x, stopped ? 0 : Mathf.Min(0, obj.transform.position.y - clampPoint));
 
-                if (stopped)
+                if (stopped && Mathf.Abs(Vector2.Reflect(obj.CalculatedSpeed.normalized, closestHit.normal).y) > 0f)
                 {
                     if (!obj.Static && !obj.Ghost) obj.transform.position = new Vector2(obj.transform.position.x, clampPoint + clampFix);
                     stats.HitNegative = true;
@@ -170,10 +175,12 @@ namespace Licht.Unity.Physics
 
             if (dir == Vector2.up && !_semiSolids.Contains(closestHit.collider))
             {
-                var stopped = obj.transform.position.y + obj.CalculatedSpeed.y > clampPoint;
-                if (!obj.Ghost) obj.CalculatedSpeed = new Vector2(obj.CalculatedSpeed.x, stopped ? 0 : clampPoint - obj.transform.position.y);
+                var stopped = obj.transform.position.y + obj.CalculatedSpeed.y >= clampPoint;
 
-                if (stopped)
+                if (!obj.Ghost) obj.CalculatedSpeed = new Vector2(obj.CalculatedSpeed.x, stopped ? 0 :
+                    Mathf.Min(obj.CalculatedSpeed.y, Mathf.Max(0, clampPoint - obj.transform.position.y)));
+
+                if (stopped && Mathf.Abs(Vector2.Reflect(obj.CalculatedSpeed.normalized, closestHit.normal).y) > 0f)
                 {
                     if (!obj.Static && !obj.Ghost) obj.transform.position = new Vector2(obj.transform.position.x, clampPoint + clampFix);
                     stats.HitPositive = true;
@@ -232,9 +239,7 @@ namespace Licht.Unity.Physics
 
             if (!stats.TriggeredHit) return stats;
 
-
-            var validHits = stats.Hits.Where(hit =>
-                    hit != default && Mathf.Abs(hit.normal.x) > 0 && !Mathf.Sign(hit.normal.x).FloatEq(dir.x))
+            var validHits = stats.Hits.Where(hit => hit != default)
                 .ToArray();
 
             var closestHit = validHits.Select((hit, idx) => (hit.distance, idx, hit))
@@ -260,12 +265,15 @@ namespace Licht.Unity.Physics
             var clampPoint = boxCollider == null ? closestHit.point.x - dir.x * obj.HorizontalColliderSize.x - clampFix :
                 closestHit.collider.transform.position.x + closestHit.collider.offset.x - dir.x * (boxCollider.bounds.extents.x + obj.HorizontalColliderSize.x);
 
+            if (Vector2.Distance(closestHit.point, new Vector2(clampPoint, closestHit.point.y)) >
+                obj.HorizontalCollider.size.magnitude * 0.5f) return stats;
+
             if (dir == Vector2.left && !_semiSolids.Contains(closestHit.collider))
             {
                 var stopped = obj.transform.position.x + obj.CalculatedSpeed.x < clampPoint;
                 if (!obj.Ghost) obj.CalculatedSpeed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.CalculatedSpeed.y);
 
-                if (stopped)
+                if (stopped && Mathf.Abs(Vector2.Reflect(obj.CalculatedSpeed.normalized, closestHit.normal).x) > 0f)
                 {
                     if (!obj.Static && !obj.Ghost) obj.transform.position = new Vector2(clampPoint + clampFix, obj.transform.position.y);
                     stats.HitNegative = true;
@@ -277,7 +285,7 @@ namespace Licht.Unity.Physics
                 var stopped = obj.transform.position.x + obj.CalculatedSpeed.x > clampPoint;
                 if (!obj.Ghost) obj.CalculatedSpeed = new Vector2(stopped ? 0 : clampPoint - obj.transform.position.x, obj.CalculatedSpeed.y);
 
-                if (stopped)
+                if (stopped && Mathf.Abs(Vector2.Reflect(obj.CalculatedSpeed.normalized, closestHit.normal).x) > 0f)
                 {
                     if (!obj.Static && !obj.Ghost) obj.transform.position = new Vector2(clampPoint + clampFix, obj.transform.position.y);
                     stats.HitPositive = true;
@@ -292,7 +300,7 @@ namespace Licht.Unity.Physics
             _collisionTriggers.Clear();
             foreach (var obj in _physicsWorld)
             {
-                obj.CalculatedSpeed =  obj.Speed * FrameMultiplier * (float)ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
+                obj.CalculatedSpeed = obj.Speed * FrameMultiplier * (float)ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
                 var vertical = CheckVerticals(obj);
                 var horizontal = CheckHorizontals(obj);
                 var custom = CheckCustom(obj);
