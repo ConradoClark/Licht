@@ -42,9 +42,9 @@ namespace Licht.Unity.CharacterControllers
         private PlayerInput _input;
         private IEventPublisher<LichtPlatformerJumpEvents, LichtPlatformerJumpEventArgs> _eventPublisher;
 
-        protected override void Awake()
+        protected override void OnAwake()
         {
-            base.Awake();
+            base.OnAwake();
             _physics = this.GetLichtPhysics();
             _input = PlayerInput.GetPlayerByIndex(0);
         }
@@ -80,7 +80,7 @@ namespace Licht.Unity.CharacterControllers
                 .SetTarget(JumpSpeed)
                 .Over(AccelerationTime)
                 .Easing(MovementStartEasing)
-                .BreakIf(() => _physics.GetCollisionState(Target).Vertical.HitPositive || IsBlocked || Interrupted, false)
+                .BreakIf(() => _physics.GetCollisionState(Target).Up.TriggeredHit|| IsBlocked || Interrupted, false)
                 .UsingTimer(_physics.ScriptTimerRef.Timer)
                 .Build();
 
@@ -89,7 +89,7 @@ namespace Licht.Unity.CharacterControllers
                 .SetTarget(0)
                 .Over(DecelerationTime)
                 .Easing(MovementEndEasing)
-                .BreakIf(() => _physics.GetCollisionState(Target).Vertical.HitPositive || IsBlocked || Interrupted, false)
+                .BreakIf(() => _physics.GetCollisionState(Target).Up.TriggeredHit || IsBlocked || Interrupted, false)
                 .UsingTimer(_physics.ScriptTimerRef.Timer)
                 .Build();
 
@@ -111,7 +111,7 @@ namespace Licht.Unity.CharacterControllers
             {
                 var collisionState = _physics.GetCollisionState(Target);
                 var jumped = false;
-                while (!collisionState.Vertical.HitNegative)
+                while (!collisionState.Down.TriggeredHit)
                 {
                     if (IsBlocked)
                     {
@@ -124,7 +124,7 @@ namespace Licht.Unity.CharacterControllers
                         foreach (var _ in TimeYields.WaitSeconds(_physics.ScriptTimerRef.Timer, InputBufferTime))
                         {
                             collisionState = _physics.GetCollisionState(Target);
-                            if (!collisionState.Vertical.HitNegative || IsBlocked)
+                            if (!collisionState.Down.TriggeredHit || IsBlocked)
                             {
                                 yield return TimeYields.WaitOneFrameX;
                                 continue;

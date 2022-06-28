@@ -2,8 +2,11 @@
 {
     public struct CollisionState
     {
-        public CollisionResult Horizontal;
-        public CollisionResult Vertical;
+        public CollisionResult Right;
+        public CollisionResult Left;
+        public CollisionResult Up;
+        public CollisionResult Down;
+
         public CollisionResult[] Custom;
     }
 }

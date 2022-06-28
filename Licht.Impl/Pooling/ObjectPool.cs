@@ -21,6 +21,11 @@ namespace Licht.Impl.Pooling
             _objectFactory = objectFactory;
         }
 
+        public T[] GetActiveObjects()
+        {
+            return _objectPool.Where(obj => obj.IsActive).ToArray();
+        }
+
         public bool Release(T obj)
         {
             if (!IsActive) return false;

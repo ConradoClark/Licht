@@ -47,9 +47,9 @@ namespace Licht.Unity.CharacterControllers
             public Vector2 Direction;
         }
 
-        protected override void Awake()
+        protected override void OnAwake()
         {
-            base.Awake();
+            base.OnAwake();
             _physics = this.GetLichtPhysics();
         }
 

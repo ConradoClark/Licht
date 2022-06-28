@@ -40,6 +40,36 @@ namespace Licht.Unity.Extensions
             }
         }
 
+        public static Action<float> LocalPositionSetter(this Transform transform, Axis axis)
+        {
+            switch (axis)
+            {
+                case Axis.X:
+                    return (value) => transform.localPosition = new Vector3(value, transform.localPosition.y, transform.localPosition.z);
+                case Axis.Y:
+                    return (value) => transform.localPosition = new Vector3(transform.localPosition.x, value, transform.localPosition.z);
+                case Axis.Z:
+                    return (value) => transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, value);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+            }
+        }
+
+        public static Func<float> LocalPositionGetter(this Transform transform, Axis axis)
+        {
+            switch (axis)
+            {
+                case Axis.X:
+                    return () => transform.localPosition.x;
+                case Axis.Y:
+                    return () => transform.localPosition.y;
+                case Axis.Z:
+                    return () => transform.localPosition.z;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+            }
+        }
+
         public static TransformAccessor GetAccessor(this Transform transform)
         {
             return new TransformAccessor(transform);

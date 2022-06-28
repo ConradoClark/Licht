@@ -47,6 +47,11 @@ namespace Licht.Impl.Memory
             return _stack.Count > index - 1;
         }
 
+        public void Clear()
+        {
+            _stack.Clear();
+        }
+
         public void Rewind(int steps)
         {
             if (_stack.Count < steps || TailSize < steps) return;

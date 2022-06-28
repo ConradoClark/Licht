@@ -44,6 +44,8 @@ namespace Licht.Unity.Builders
             _fixedTarget = false;
             _target = _fromOrigin ? _getter() + amount : amount;
             _targetFn = null;
+
+            if (float.IsNaN(_target)) _target = 0;
             return this;
         }
 
@@ -52,6 +54,8 @@ namespace Licht.Unity.Builders
             _fixedTarget = false;
             _target = _fromOrigin ? _getter() - amount : -amount;
             _targetFn = null;
+
+            if (float.IsNaN(_target)) _target = 0;
             return this;
         }
 

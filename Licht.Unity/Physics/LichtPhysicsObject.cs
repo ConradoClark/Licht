@@ -11,6 +11,7 @@ namespace Licht.Unity.Physics
 {
     public class LichtPhysicsObject : MonoBehaviour
     {
+        public bool Debug;
         public bool Static;
         public bool Ghost;
         public Vector2 VerticalColliderSize => VerticalCollider.bounds.extents;
@@ -35,12 +36,12 @@ namespace Licht.Unity.Physics
 
         private Dictionary<Type, object> _customObjects;
 
-        public void AddCustomObject<T>(T obj) where T:class
+        public void AddCustomObject<T>(T obj) where T : class
         {
             _customObjects[typeof(T)] = obj;
         }
 
-        public bool TryGetCustomObject<T>(out T obj) where T:class
+        public bool TryGetCustomObject<T>(out T obj) where T : class
         {
             if (!_customObjects.ContainsKey(typeof(T)))
             {
@@ -133,16 +134,14 @@ namespace Licht.Unity.Physics
             };
         }
 
-        public CollisionResult Cast(LayerMask layerMask, Vector2 direction)
+        public CollisionResult Cast2(LayerMask layerMask, Vector2 direction)
         {
             for (var index = 0; index < _collisionResults.Length; index++)
             {
                 _collisionResults[index] = default;
             }
 
-            var colliderToUse = Mathf.Abs(direction.y) > 0 ? VerticalCollider : HorizontalCollider;
-
-            if (!colliderToUse.enabled)
+            if (!HorizontalCollider.enabled)
             {
                 return new CollisionResult
                 {
@@ -155,19 +154,76 @@ namespace Licht.Unity.Physics
             }
 
             var origin = (Vector2)transform.position
-                         + new Vector2(colliderToUse.offset.x, colliderToUse.offset.y)
-                         + new Vector2(_physics.CollisionOffset * -direction.x,
-                             _physics.CollisionOffset * -direction.y);
+                         + new Vector2(HorizontalCollider.offset.x, HorizontalCollider.offset.y)
+                         + new Vector2(_physics.CollisionOffset * direction.x, _physics.CollisionOffset * direction.y);
 
-            var size = colliderToUse.size - new Vector2(Mathf.Abs(direction.y) * 0.1f, Mathf.Abs(direction.x) * 0.1f);
+            var size = HorizontalCollider.size;
+
+            var rayDistance = Mathf.Max(_physics.MinRayCastSize, (CalculatedSpeed + size * 2f * direction).magnitude);
+
+            Physics2D.BoxCastNonAlloc(origin, size, 0, direction, _collisionResults, rayDistance, layerMask);
+
+            if (Debug)
+            {
+                DebugDraw(origin, size, 0, direction, rayDistance, _collisionResults[0]);
+            }
+
+            var hits = _collisionResults.Where(c => c.collider != HorizontalCollider && c.collider != VerticalCollider
+                    && c != default)
+                .ToArray();
+
+            return new CollisionResult
+            {
+                Orientation = Mathf.Abs(direction.y) > 0 ? CollisionOrientation.Vertical : CollisionOrientation.Horizontal,
+                Hits = hits,
+                Detected = hits.Length > 0,
+                Direction = direction,
+            };
+        }
+
+        public CollisionResult Cast(LayerMask layerMask, BoxCollider2D colliderToUse, Vector2 direction)
+        {
+            for (var index = 0; index < _collisionResults.Length; index++)
+            {
+                _collisionResults[index] = default;
+            }
+
+            if (!colliderToUse.enabled)
+            {
+                return new CollisionResult
+                {
+                    Orientation = colliderToUse == VerticalCollider
+                        ? CollisionOrientation.Vertical
+                        : CollisionOrientation.Horizontal,
+                    Hits = Array.Empty<RaycastHit2D>(),
+                    TriggeredHit = false
+                };
+            }
+
+            var horizontalFactor = colliderToUse == HorizontalCollider ? 1 : 0;
+            var verticalFactor = colliderToUse == VerticalCollider ? 1 : 0;
+
+            var origin = (Vector2)transform.position
+                         + new Vector2(colliderToUse.offset.x, colliderToUse.offset.y)
+                         + new Vector2(_physics.CollisionOffset * -direction.x, _physics.CollisionOffset * -direction.y);
+
+            var size = colliderToUse.size + new Vector2(colliderToUse == HorizontalCollider && direction.x == 0 ? _physics.CollisionOffset : 0,
+                colliderToUse == VerticalCollider && direction.y == 0 ? _physics.CollisionOffset : 0);
+
+            /* - new Vector2(Mathf.Abs(direction.y) * _physics.CollisionOffset, Mathf.Abs(direction.x) * _physics.CollisionOffset)
+                + new Vector2(colliderToUse == HorizontalCollider && direction.x == 0 ? _physics.CollisionOffset : 0, 
+                    colliderToUse == VerticalCollider && direction.y == 0 ? _physics.CollisionOffset : 0);*/
+
+            var distanceMagnitude = new Vector2(CalculatedSpeed.x * Mathf.Abs(direction.x) * horizontalFactor,
+                CalculatedSpeed.y * Mathf.Abs(direction.y) * verticalFactor).magnitude;
 
             Physics2D.BoxCastNonAlloc(origin, size, 0, direction, _collisionResults,
-                CalculatedSpeed.magnitude + _physics.CollisionOffset, layerMask);
+                distanceMagnitude + _physics.MinRayCastSize, layerMask);
 
-            if (_physics.Debug)
-            {
-                DebugDraw(origin, size, 0, direction, CalculatedSpeed.magnitude + _physics.CollisionOffset, _collisionResults[0]);
-            }
+            //if (Debug && colliderToUse == VerticalCollider)
+            //{
+            //    DebugDraw(origin, size, 0, direction, distanceMagnitude + _physics.CollisionOffset, _collisionResults[0]);
+            //}
 
             var hits = _collisionResults.Where(c => c.collider != HorizontalCollider && c.collider != VerticalCollider
                     && c != default)
@@ -211,23 +267,23 @@ namespace Licht.Unity.Physics
 
             //Drawing the cast
             var castColor = hit ? Color.red : Color.green;
-            Debug.DrawLine(p1, p2, castColor);
-            Debug.DrawLine(p2, p3, castColor);
-            Debug.DrawLine(p3, p4, castColor);
-            Debug.DrawLine(p4, p1, castColor);
+            UnityEngine.Debug.DrawLine(p1, p2, castColor);
+            UnityEngine.Debug.DrawLine(p2, p3, castColor);
+            UnityEngine.Debug.DrawLine(p3, p4, castColor);
+            UnityEngine.Debug.DrawLine(p4, p1, castColor);
 
-            Debug.DrawLine(p5, p6, castColor);
-            Debug.DrawLine(p6, p7, castColor);
-            Debug.DrawLine(p7, p8, castColor);
-            Debug.DrawLine(p8, p5, castColor);
+            UnityEngine.Debug.DrawLine(p5, p6, castColor);
+            UnityEngine.Debug.DrawLine(p6, p7, castColor);
+            UnityEngine.Debug.DrawLine(p7, p8, castColor);
+            UnityEngine.Debug.DrawLine(p8, p5, castColor);
 
-            Debug.DrawLine(p1, p5, Color.grey);
-            Debug.DrawLine(p2, p6, Color.grey);
-            Debug.DrawLine(p3, p7, Color.grey);
-            Debug.DrawLine(p4, p8, Color.grey);
+            UnityEngine.Debug.DrawLine(p1, p5, Color.grey);
+            UnityEngine.Debug.DrawLine(p2, p6, Color.grey);
+            UnityEngine.Debug.DrawLine(p3, p7, Color.grey);
+            UnityEngine.Debug.DrawLine(p4, p8, Color.grey);
             if (hit)
             {
-                Debug.DrawLine(hit.point, hit.point + hit.normal.normalized * 0.2f, Color.yellow);
+                UnityEngine.Debug.DrawLine(hit.point, hit.point + hit.normal.normalized * 0.2f, Color.yellow);
             }
         }
     }

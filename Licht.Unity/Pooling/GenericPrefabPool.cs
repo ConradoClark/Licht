@@ -41,6 +41,7 @@ namespace Licht.Unity.Pooling
 
         private void OnDisable()
         {
+            if (_objectPool == null) return;
             _objectPool.ReleaseAll();
             _objectPool = null; 
         }
@@ -51,6 +52,11 @@ namespace Licht.Unity.Pooling
             obj.name = $"{Prefab.name}#{_index}";
             _index++;
             return obj.GetComponent<T>();
+        }
+
+        public T[] GetObjectsInUse()
+        {
+            return _objectPool.GetActiveObjects();
         }
 
         public bool TryGetFromPool(out T obj)

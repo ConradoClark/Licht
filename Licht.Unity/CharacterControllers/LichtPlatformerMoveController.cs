@@ -53,9 +53,9 @@ namespace Licht.Unity.CharacterControllers
         private PlayerInput _input;
         private IEventPublisher<LichtPlatformerMoveEvents, LichtPlatformerMoveEventArgs> _eventPublisher;
 
-        protected override void Awake()
+        protected override void OnAwake()
         {
-            base.Awake();
+            base.OnAwake();
             _physics = this.GetLichtPhysics();
             _input = PlayerInput.GetPlayerByIndex(0);
         }

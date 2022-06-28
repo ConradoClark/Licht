@@ -59,24 +59,24 @@ namespace Licht.Unity.Physics.Forces
         {
             while (physicsObject != null && IsActive && ActivationFlags[physicsObject])
             {
-                while (IsBlocked(physicsObject) || Physics.GetCollisionState(physicsObject).Vertical.HitNegative) yield return TimeYields.WaitOneFrameX;
+                while (IsBlocked(physicsObject) || Physics.GetCollisionState(physicsObject).Down.TriggeredHit) yield return TimeYields.WaitOneFrameX;
 
                 var speed = 0f;
                 foreach (var _ in new LerpBuilder(v => speed = v, () => speed)
                              .SetTarget(Speed)
                              .Over(TimeInSecondsUntilFullEffect)
                              .Easing(EasingYields.EasingFunction.QuadraticEaseIn)
-                             .BreakIf(() => !ActivationFlags[physicsObject] || IsBlocked(physicsObject) || Physics.GetCollisionState(physicsObject).Vertical.HitNegative)
+                             .BreakIf(() => !ActivationFlags[physicsObject] || IsBlocked(physicsObject) || Physics.GetCollisionState(physicsObject).Down.TriggeredHit)
                              .UsingTimer(Physics.ScriptTimerRef.Timer)
                              .Build())
                 {
-                    physicsObject.ApplySpeed(Direction * speed * Physics.FrameMultiplier * (float) Physics.ScriptTimerRef.Timer.UpdatedTimeInMilliseconds);
+                    physicsObject.ApplySpeed(Direction * speed);
                     yield return TimeYields.WaitOneFrameX;
                 }
 
-                while (IsActive && ActivationFlags[physicsObject] && !IsBlocked(physicsObject) && !Physics.GetCollisionState(physicsObject).Vertical.HitNegative)
+                while (IsActive && ActivationFlags[physicsObject] && !IsBlocked(physicsObject) && !Physics.GetCollisionState(physicsObject).Down.TriggeredHit)
                 {   
-                    physicsObject.ApplySpeed(Direction * Speed * Physics.FrameMultiplier * (float)Physics.ScriptTimerRef.Timer.UpdatedTimeInMilliseconds);
+                    physicsObject.ApplySpeed(Direction * Speed);
                     yield return TimeYields.WaitOneFrameX;
                 }
             }

@@ -12,36 +12,47 @@ namespace Licht.Impl.Orchestration
         private bool _started;
         private readonly IEnumerator<Action> _actionEnumerator;
         private readonly Func<bool> _breakCondition;
+        private readonly string _callerName;
 
-        public BasicMachine( IEnumerable<Action> steps, Func<bool> breakCondition = null)
+        public BasicMachine(IEnumerable<Action> steps, Func<bool> breakCondition = null, string callerName = "")
         {
             _actionEnumerator = steps.GetEnumerator();
             _breakCondition = breakCondition;
+            _callerName = callerName;
         }
 
-        public BasicMachine(IEnumerable<IEnumerable<Action>> steps, Func<bool> breakCondition = null)
+        public BasicMachine(IEnumerable<IEnumerable<Action>> steps, Func<bool> breakCondition = null, string callerName = "")
         {
             _actionEnumerator = steps.SelectMany(s => s).GetEnumerator();
             _breakCondition = breakCondition;
+            _callerName = callerName;
         }
 
-        public BasicMachine(Action step, Func<bool> breakCondition = null)
+        public BasicMachine(Action step, Func<bool> breakCondition = null, string callerName = "")
         {
             _actionEnumerator = Enumerable.Repeat(step, 1).GetEnumerator();
             _breakCondition = breakCondition;
+            _callerName = callerName;
         }
 
         public override MachineStepResult RunStep()
         {
-            if (!_started)
+            try
             {
-                _actionEnumerator.MoveNext();
-                _started = true;
-            }
+                if (!_started)
+                {
+                    _actionEnumerator.MoveNext();
+                    _started = true;
+                }
 
-            _actionEnumerator.Current?.Invoke();
-            if (_breakCondition != null && _breakCondition()) return MachineStepResult.Done;
-            return _actionEnumerator.MoveNext() ? MachineStepResult.Processing : MachineStepResult.Done;
+                _actionEnumerator.Current?.Invoke();
+                if (_breakCondition != null && _breakCondition()) return MachineStepResult.Done;
+                return _actionEnumerator.MoveNext() ? MachineStepResult.Processing : MachineStepResult.Done;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in member {_callerName}", ex);
+            }
         }
 
         public override void Cleanup()

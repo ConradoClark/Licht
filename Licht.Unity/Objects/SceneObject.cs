@@ -21,11 +21,11 @@ namespace Licht.Unity.Objects
             NamedObjects.Clear();
         }
 
-        public static T Instance()
+        public static T Instance(bool includeInactive=false)
         {
             if (_storedObject == null)
             {
-                _storedObject = FindObjectOfType<T>();
+                _storedObject = FindObjectOfType<T>(includeInactive);
             }
 
             return _storedObject;

@@ -23,7 +23,20 @@ namespace Licht.Unity.Accessors
             return _transform.PositionGetter(axis);
         }
 
+        public Action<float> LocalSetter(TransformExtensions.Axis axis)
+        {
+            return _transform.LocalPositionSetter(axis);
+        }
+
+        public Func<float> LocalGetter(TransformExtensions.Axis axis)
+        {
+            return _transform.LocalPositionGetter(axis);
+        }
+
+
         public AxisAccessor Position => new AxisAccessor(this);
+
+        public AxisAccessor LocalPosition => new AxisAccessor(this, true);
 
         public CustomAxisAccessor LocalScale => new CustomAxisAccessor(
             value => _transform.localScale = new Vector3(value, _transform.localScale.y, _transform.localScale.z),
@@ -31,7 +44,7 @@ namespace Licht.Unity.Accessors
             value => _transform.localScale = new Vector3(_transform.localScale.x, _transform.localScale.y, value),
             () => _transform.localScale.x, () => _transform.localScale.y, () => _transform.localScale.z);
 
-        public LerpBuilder UniformScale(bool includeZAxis=false) => new LerpBuilder(
+        public LerpBuilder UniformScale(bool includeZAxis = false) => new LerpBuilder(
             value => _transform.localScale = new Vector3(value, value, includeZAxis ? value : _transform.localScale.z),
             () => _transform.localScale.x);
 
