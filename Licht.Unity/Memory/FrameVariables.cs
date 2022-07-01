@@ -6,6 +6,7 @@ namespace Licht.Unity.Memory
 {
     public class FrameVariables : MonoBehaviour
     {
+
         internal static class FrameVariablesStatic<T>
         {
             private static readonly Dictionary<string, T> Variables = new Dictionary<string, T>();

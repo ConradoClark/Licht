@@ -21,6 +21,22 @@ namespace Licht.Unity.Objects
             NamedObjects.Clear();
         }
 
+        public static T FindOrCreate(string defaultName, bool includeInactive = false)
+        {
+            if (_storedObject == null)
+            {
+                _storedObject = FindObjectOfType<T>(includeInactive);
+            }
+
+            if (_storedObject == null && typeof(T).IsAssignableFrom(typeof(Component)))
+            {
+                var obj = new GameObject(defaultName);
+                _storedObject = obj.AddComponent(typeof(T)) as T;
+            }
+
+            return _storedObject;
+        }
+
         public static T Instance(bool includeInactive=false)
         {
             if (_storedObject == null)
