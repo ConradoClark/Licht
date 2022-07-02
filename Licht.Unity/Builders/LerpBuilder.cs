@@ -20,6 +20,7 @@ namespace Licht.Unity.Builders
         private bool _setTargetOnBreak = true;
         private bool _fromOrigin = false;
         private bool _fixedTarget = false;
+        private float? _step = null;
 
         public LerpBuilder(Action<float> setter, Func<float> getter)
         {
@@ -91,6 +92,12 @@ namespace Licht.Unity.Builders
             return this;
         }
 
+        public LerpBuilder WithStep(float? step)
+        {
+            _step = step;
+            return this;
+        }
+
         private LerpBuilder Clone()
         {
             return new LerpBuilder(_setter, _getter)
@@ -104,6 +111,7 @@ namespace Licht.Unity.Builders
                 _setTargetOnBreak = _setTargetOnBreak,
                 _fromOrigin = _fromOrigin,
                 _fixedTarget = _fixedTarget,
+                _step = _step
             };
         }
 
@@ -128,7 +136,8 @@ namespace Licht.Unity.Builders
                     clone._timer ?? DefaultTimer,
                     clone._breakCondition,
                     clone._setTargetOnBreak,
-                    immediate: true
+                    immediate: true,
+                    step: _step
                 );
 
                 foreach (var step in lerpFn)
@@ -151,7 +160,8 @@ namespace Licht.Unity.Builders
                 clone._timer ?? DefaultTimer,
                 clone._breakCondition,
                 clone._setTargetOnBreak,
-                immediate: true
+                immediate: true,
+                step: _step
             );
 
             foreach (var step in lerp)

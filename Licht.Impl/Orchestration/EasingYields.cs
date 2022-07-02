@@ -12,15 +12,15 @@ namespace Licht.Impl.Orchestration
     {
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, float target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false, 
-            float initStep = 0f, bool immediate = false)
+            float initStep = 0f, bool immediate = false, float? step = null)
         {
             return Lerp(setter, getter, seconds, () => target, function, timer, breakCondition, setTargetOnBreak,
-                initStep);
+                initStep, immediate, step);
         }
 
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, Func<float> target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
-            float initStep = 0f, bool immediate = false)
+            float initStep = 0f, bool immediate = false, float? step = null)
         {
             if (!immediate) yield return TimeYields.WaitOneFrame;
 
@@ -49,6 +49,10 @@ namespace Licht.Impl.Orchestration
                     start = initialStart + lastAcc;
                     last = Clamp(Interpolate((float)(time * prop), function), 0, 1);
                     last = Lerp(start, lerpTarget, last);
+                    if (step != null)
+                    {
+                        last = GetStep(last, step.Value);
+                    }
                     setter(last);
                     yield return TimeYields.WaitOneFrame;
                 }
@@ -60,6 +64,18 @@ namespace Licht.Impl.Orchestration
         private static float Lerp(float p1, float p2, float fraction)
         {
             return p1 + (p2 - p1) * fraction;
+        }
+
+        static float GetStep(float value, float step)
+        {
+            var absValue = Math.Abs(value);
+            step = Math.Abs(step);
+
+            var low = absValue - absValue % step;
+            var high = low + step;
+
+            var result = absValue - low < high - absValue ? low : high;
+            return result * Math.Sign(value);
         }
 
         private static float Clamp(float value, float min, float max)

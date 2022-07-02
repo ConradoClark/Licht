@@ -67,6 +67,16 @@ namespace Licht.Impl.Orchestration
             }
         }
 
+        public static IEnumerable<Action> Combine(this IEnumerable<IEnumerable<Action>> source, IEnumerable<IEnumerable<Action>> target)
+        {
+            return source.AsCoroutine().Combine(target.AsCoroutine());
+        }
+
+        public static IEnumerable<Action> Then(this IEnumerable<IEnumerable<Action>> source, IEnumerable<IEnumerable<Action>> target)
+        {
+            return source.AsCoroutine().Then(target.AsCoroutine());
+        }
+
         /// <summary>
         /// Starts a target co-routine when any of the sources are completed.
         /// Ends when all co-routines are completed
