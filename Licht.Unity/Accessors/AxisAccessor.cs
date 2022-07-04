@@ -1,5 +1,6 @@
 ﻿using Licht.Unity.Builders;
 using Licht.Unity.Extensions;
+using UnityEngine;
 
 namespace Licht.Unity.Accessors
 {
@@ -11,6 +12,44 @@ namespace Licht.Unity.Accessors
         {
             _accessor = accessor;
             _useLocal = useLocal;
+        }
+
+        public LerpBuilder ToPosition(Vector3 position)
+        {
+            var current = new Vector3(
+                _useLocal
+                    ? _accessor.LocalGetter(TransformExtensions.Axis.X)()
+                    : _accessor.Getter(TransformExtensions.Axis.X)(),
+                _useLocal
+                    ? _accessor.LocalGetter(TransformExtensions.Axis.Y)()
+                    : _accessor.Getter(TransformExtensions.Axis.Y)(),
+                _useLocal
+                    ? _accessor.LocalGetter(TransformExtensions.Axis.Z)()
+                    : _accessor.Getter(TransformExtensions.Axis.Z)()
+            );
+
+            var @ref = 0f;
+            return new LerpBuilder(value =>
+                    {
+                        var target = Vector3.Lerp(current, position, value);
+
+                        if (_useLocal)
+                        {
+                            _accessor.LocalSetter(TransformExtensions.Axis.X)(target.x);
+                            _accessor.LocalSetter(TransformExtensions.Axis.Y)(target.y);
+                            _accessor.LocalSetter(TransformExtensions.Axis.Z)(target.z);
+                        }
+                        else
+                        {
+                            _accessor.Setter(TransformExtensions.Axis.X)(target.x);
+                            _accessor.Setter(TransformExtensions.Axis.Y)(target.y);
+                            _accessor.Setter(TransformExtensions.Axis.Z)(target.z);
+                        }
+
+                        @ref = value;
+                    },
+                    () => @ref)
+                .SetTarget(1f);
         }
 
         public LerpBuilder X =>

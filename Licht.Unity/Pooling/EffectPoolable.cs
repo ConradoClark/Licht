@@ -28,10 +28,10 @@ namespace Licht.Unity.Pooling
         public bool Activate()
         {
             IsEffectOver = false;
-
-            DefaultMachinery.AddBasicMachine(HandleEffectOver());
             gameObject.SetActive(true);
             IsActive = true;
+
+            DefaultMachinery.AddBasicMachine(HandleEffectOver());
 
             OnActivation();
 

@@ -11,20 +11,20 @@ namespace Licht.Impl.Orchestration
     public static class EasingYields
     {
         public static IEnumerable<Action> Lerp(Action<float> setter,
-            Func<float> getter, float seconds, float target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false, 
-            float initStep = 0f, bool immediate = false, float? step = null)
+            Func<float> getter, float seconds, float target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
+            float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null)
         {
             return Lerp(setter, getter, seconds, () => target, function, timer, breakCondition, setTargetOnBreak,
-                initStep, immediate, step);
+                initStep, immediate, step, pauseCondition);
         }
 
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, Func<float> target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
-            float initStep = 0f, bool immediate = false, float? step = null)
+            float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null)
         {
             if (!immediate) yield return TimeYields.WaitOneFrame;
 
-            var ms = seconds * 1000d;   
+            var ms = seconds * 1000d;
             var initialStart = getter();
             var start = initialStart;
             var last = start;
@@ -36,6 +36,12 @@ namespace Licht.Impl.Orchestration
                 while (time < ms)
                 {
                     var initialTarget = target();
+
+                    if (pauseCondition != null && pauseCondition())
+                    {
+                        yield return TimeYields.WaitOneFrame;
+                        continue;
+                    }
 
                     if (breakCondition != null && breakCondition())
                     {

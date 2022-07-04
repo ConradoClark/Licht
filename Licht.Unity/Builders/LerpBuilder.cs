@@ -17,6 +17,7 @@ namespace Licht.Unity.Builders
         private EasingYields.EasingFunction _easing;
         private ITimer _timer;
         private Func<bool> _breakCondition;
+        private Func<bool> _pauseCondition;
         private bool _setTargetOnBreak = true;
         private bool _fromOrigin = false;
         private bool _fixedTarget = false;
@@ -111,7 +112,8 @@ namespace Licht.Unity.Builders
                 _setTargetOnBreak = _setTargetOnBreak,
                 _fromOrigin = _fromOrigin,
                 _fixedTarget = _fixedTarget,
-                _step = _step
+                _step = _step,
+                _pauseCondition = _pauseCondition
             };
         }
 
@@ -137,7 +139,8 @@ namespace Licht.Unity.Builders
                     clone._breakCondition,
                     clone._setTargetOnBreak,
                     immediate: true,
-                    step: _step
+                    step: _step,
+                    pauseCondition: clone._pauseCondition
                 );
 
                 foreach (var step in lerpFn)
@@ -161,7 +164,8 @@ namespace Licht.Unity.Builders
                 clone._breakCondition,
                 clone._setTargetOnBreak,
                 immediate: true,
-                step: _step
+                step: _step,
+                pauseCondition: clone._pauseCondition
             );
 
             foreach (var step in lerp)
@@ -174,6 +178,12 @@ namespace Licht.Unity.Builders
         {
             _breakCondition = predicate;
             _setTargetOnBreak = setTargetOnBreak;
+            return this;
+        }
+
+        public LerpBuilder PauseIf(Func<bool> predicate)
+        {
+            _pauseCondition = predicate;
             return this;
         }
     }
