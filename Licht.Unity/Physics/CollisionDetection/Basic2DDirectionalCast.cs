@@ -16,6 +16,9 @@ namespace Licht.Unity.Physics.CollisionDetection
         public bool CheckNormals;
         public Vector2 NormalTarget;
 
+        public bool IncreaseBySpeed;
+        public bool ShouldClampSpeed;
+
         public BoxCollider2D BoxCollider;
         protected override void OnAwake()
         {
@@ -31,51 +34,54 @@ namespace Licht.Unity.Physics.CollisionDetection
                 _collisionResults[i] = default;
             }
 
-            var noHits = Physics2D.BoxCastNonAlloc((Vector2) BoxCollider.transform.position + BoxCollider.offset, BoxCollider.size, 0, Direction, _collisionResults, Distance, LayerMask);
+            var noHits = Physics2D.BoxCastNonAlloc((Vector2)BoxCollider.transform.position + BoxCollider.offset, BoxCollider.size, 0, Direction, _collisionResults,
+                IncreaseBySpeed ? Distance + (PhysicsObject.CalculatedSpeed * Direction).magnitude : Distance, LayerMask);
             if (noHits == 0)
             {
-                PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, false);
+                if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, false);
                 return Array.Empty<CollisionResult>();
             }
 
             var results = _collisionResults
-                .Where(col => col.collider != null && !PhysicsObject.CollisionDetectors.Select(c=>c.Collider).Contains(col.collider)
+                .Where(col => col.collider != null && !PhysicsObject.CollisionDetectors.Select(c => c.Collider).Contains(col.collider)
                 && (!CheckNormals || col.normal == NormalTarget)
                 )
                 .Select(col => new CollisionResult
                 {
                     Detected = true,
-                    TriggeredHit = true,
+                    TriggeredHit = col.distance <= Distance,
                     Direction = col.normal,
-                    Collider = col.collider
+                    Collider = col.collider,
+                    Hit = col,
                 })
                 .ToArray();
 
-            PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, results.Any());
+            if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, results.Any());
             return results;
         }
 
         public override Vector2 Clamp()
         {
-            return PhysicsObject.CalculatedSpeed;
-            
-            
-            // fix this later
-            //var results = Triggers;
-            //if (results == null || results.Length == 0 || obj.CalculatedSpeed.magnitude == 0) return Collider.transform.position;
-            //var clampedPosition = Collider.transform.position;
+            if (!ShouldClampSpeed) return PhysicsObject.CalculatedSpeed;
+            var results = Triggers;
+            if (results == null || results.Length == 0 || PhysicsObject.CalculatedSpeed.magnitude == 0) return PhysicsObject.CalculatedSpeed;
 
-            //foreach (var result in results)
-            //{
-            //    var distance = Collider.Distance(result.Collider);
-            //    var distanceToCollide = distance.pointB - distance.pointA;
+            var targetSpeed = PhysicsObject.CalculatedSpeed;
 
-            //    if (distance.isOverlapped)
-            //    {
-            //        clampedPosition += (Vector3)distanceToCollide;
-            //    }
-            //}
-            //return clampedPosition;
+            foreach (var result in results)
+            {
+                var distance = result.Hit.point - (Vector2) PhysicsObject.transform.position;
+                var hasXComponent = Mathf.Abs(Direction.x) > 0;
+                var hasYComponent = Mathf.Abs(Direction.y) > 0;
+
+                targetSpeed = new Vector2(Mathf.Clamp(targetSpeed.x,
+                        hasXComponent ? -Mathf.Abs(distance.x) : PhysicsObject.CalculatedSpeed.x,
+                        hasXComponent ? Mathf.Abs(distance.x) : PhysicsObject.CalculatedSpeed.x),
+                    Mathf.Clamp(targetSpeed.y, hasYComponent ? -Mathf.Abs(distance.y) : PhysicsObject.CalculatedSpeed.y,
+                        hasYComponent ? Mathf.Abs(distance.y) : PhysicsObject.CalculatedSpeed.y));
+            }
+
+            return targetSpeed;
         }
     }
 }

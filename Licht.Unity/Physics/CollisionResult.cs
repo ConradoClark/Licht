@@ -8,6 +8,7 @@ namespace Licht.Unity.Physics
         public bool Detected;
         public bool TriggeredHit;
         public Collider2D Collider;
+        public RaycastHit2D Hit;
     }
 }
 
