@@ -11,14 +11,15 @@ namespace Licht.Unity.Physics.Forces
 {
     public class Gravity : LichtCustomPhysicsForce
     {
-        public ScriptLichtForceIdentifier Identifier;
+        public ScriptIdentifier GravityIdentifier;
+        public ScriptIdentifier GroundedIdentifier;
         public LayerMask Affects;
         public Vector2 Direction;
         public float Speed;
         public float TimeInSecondsUntilFullEffect;
 
         public override bool IsActive { get; set; } = true;
-        public override string Key => Identifier.Name;
+        public override string Key => GravityIdentifier.Name;
 
         protected override void OnEnable()
         {
@@ -55,18 +56,23 @@ namespace Licht.Unity.Physics.Forces
             Physics.LichtPhysicsMachinery.Machinery.AddBasicMachine(UseGravity(obj));
         }
 
+        private bool IsGrounded(LichtPhysicsObject obj)
+        {
+            return obj.GetPhysicsTrigger(GroundedIdentifier) || Physics.GetCollisionState(obj).Down.TriggeredHit;
+        }
+
         private IEnumerable<IEnumerable<Action>> UseGravity(LichtPhysicsObject physicsObject)
         {
             while (physicsObject != null && IsActive && ActivationFlags[physicsObject])
             {
-                while (IsBlocked(physicsObject) || Physics.GetCollisionState(physicsObject).Down.TriggeredHit) yield return TimeYields.WaitOneFrameX;
+                while (IsBlocked(physicsObject) || IsGrounded(physicsObject)) yield return TimeYields.WaitOneFrameX;
 
                 var speed = 0f;
                 foreach (var _ in new LerpBuilder(v => speed = v, () => speed)
                              .SetTarget(Speed)
                              .Over(TimeInSecondsUntilFullEffect)
                              .Easing(EasingYields.EasingFunction.QuadraticEaseIn)
-                             .BreakIf(() => !ActivationFlags[physicsObject] || IsBlocked(physicsObject) || Physics.GetCollisionState(physicsObject).Down.TriggeredHit)
+                             .BreakIf(() => !ActivationFlags[physicsObject] || IsBlocked(physicsObject) || IsGrounded(physicsObject))
                              .UsingTimer(Physics.ScriptTimerRef.Timer)
                              .Build())
                 {
@@ -74,7 +80,7 @@ namespace Licht.Unity.Physics.Forces
                     yield return TimeYields.WaitOneFrameX;
                 }
 
-                while (IsActive && ActivationFlags[physicsObject] && !IsBlocked(physicsObject) && !Physics.GetCollisionState(physicsObject).Down.TriggeredHit)
+                while (IsActive && ActivationFlags[physicsObject] && !IsBlocked(physicsObject) && !IsGrounded(physicsObject))
                 {   
                     physicsObject.ApplySpeed(Direction * Speed);
                     yield return TimeYields.WaitOneFrameX;

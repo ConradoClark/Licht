@@ -6,6 +6,7 @@ using Licht.Interfaces.Update;
 using Licht.Unity.Extensions;
 using Licht.Unity.Memory;
 using Licht.Unity.Objects;
+using Licht.Unity.Physics.CollisionDetection;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using Vector2 = UnityEngine.Vector2;
@@ -220,106 +221,106 @@ namespace Licht.Unity.Physics
             return true;
         }
 
-        private CollisionResult[] CheckCustom(LichtPhysicsObject obj)
-        {
-            var results = new List<CollisionResult>();
-            foreach (var check in obj.CustomCollisionChecks)
-            {
-                var result = obj.CustomCast(check, obj.CalculatedSpeed);
-                if (!result.TriggeredHit) continue;
+        //private CollisionResult[] CheckCustom(LichtPhysicsObject obj)
+        //{
+        //    var results = new List<CollisionResult>();
+        //    foreach (var check in obj.CustomCollisionChecks)
+        //    {
+        //        var result = obj.CustomCast(check, obj.CalculatedSpeed);
+        //        if (!result.TriggeredHit) continue;
 
-                foreach (var hit in result.Hits)
-                {
-                    _collisionTriggers[GetCollisionTriggerName(hit.collider)] = new CollisionTrigger
-                    {
-                        Actor = obj,
-                        Target = hit.collider,
-                        Type = CollisionTrigger.TriggerType.Custom
-                    };
-                }
+        //        foreach (var hit in result.Hits)
+        //        {
+        //            _collisionTriggers[GetCollisionTriggerName(hit.collider)] = new CollisionTrigger
+        //            {
+        //                Actor = obj,
+        //                Target = hit.collider,
+        //                Type = CollisionTrigger.TriggerType.Custom
+        //            };
+        //        }
 
-                results.Add(result);
-            }
+        //        results.Add(result);
+        //    }
 
-            return results.ToArray();
-        }
+        //    return results.ToArray();
+        //}
 
-        private CollisionResult CheckDirection(Vector2 direction, LichtPhysicsObject obj)
-        {
-            var stats = obj.Cast2(ObstacleLayerMask, direction);
+        //private CollisionResult CheckDirection(Vector2 direction, LichtPhysicsObject obj)
+        //{
+        //    var stats = obj.Cast2(ObstacleLayerMask, direction);
 
-            var validHits = stats.Hits.Where(hit => hit != default && direction * hit.normal != Vector2.zero)
-                .ToArray();
+        //    var validHits = stats.Hits.Where(hit => hit != default && direction * hit.normal != Vector2.zero)
+        //        .ToArray();
 
-            var closestHit = validHits
-                .Select((hit, idx) => (hit.distance, idx, hit))
-                .DefaultIfEmpty()
-                .Min().hit;
+        //    var closestHit = validHits
+        //        .Select((hit, idx) => (hit.distance, idx, hit))
+        //        .DefaultIfEmpty()
+        //        .Min().hit;
 
-            stats.Hits = validHits;
-            stats.Detected = stats.Hits.Length > 0;
+        //    stats.Hits = validHits;
+        //    stats.Detected = stats.Hits.Length > 0;
 
-            if (closestHit == default) return stats;
+        //    if (closestHit == default) return stats;
 
-            stats.ClosestHit = closestHit;
+        //    stats.ClosestHit = closestHit;
 
-            foreach (var hit in validHits)
-            {
-                _collisionTriggers[GetCollisionTriggerName(hit.collider)] = new CollisionTrigger
-                {
-                    Actor = obj,
-                    Target = hit.collider,
-                    Type = CollisionTrigger.TriggerType.Obstacle
-                };
-            }
+        //    foreach (var hit in validHits)
+        //    {
+        //        _collisionTriggers[GetCollisionTriggerName(hit.collider)] = new CollisionTrigger
+        //        {
+        //            Actor = obj,
+        //            Target = hit.collider,
+        //            Type = CollisionTrigger.TriggerType.Obstacle
+        //        };
+        //    }
 
-            var clampPoint = (direction * closestHit.point) - obj.HorizontalColliderSize;
-            stats.ClampPoint = clampPoint;
-            if (obj.Debug)
-            {
-                DrawEllipse(clampPoint, Vector3.forward, Vector3.up, 0.15f, 0.15f, 32, Color.magenta, 0);
-            }
+        //    var clampPoint = (direction * closestHit.point) - obj.HorizontalColliderSize;
+        //    stats.ClampPoint = clampPoint;
+        //    if (obj.Debug)
+        //    {
+        //        DrawEllipse(clampPoint, Vector3.forward, Vector3.up, 0.15f, 0.15f, 32, Color.magenta, 0);
+        //    }
 
-            var original = (obj.HorizontalCollider.offset + (Vector2) obj.transform.position) * direction;
+        //    var original = (obj.HorizontalCollider.offset + (Vector2) obj.transform.position) * direction;
 
-            var test = Vector2.Distance(clampPoint, original);
-            var travel = (obj.HorizontalCollider.offset + (Vector2)obj.transform.position + obj.CalculatedSpeed) * direction;
-            var distance = Vector2.Distance(clampPoint, travel);
+        //    var test = Vector2.Distance(clampPoint, original);
+        //    var travel = (obj.HorizontalCollider.offset + (Vector2)obj.transform.position + obj.CalculatedSpeed) * direction;
+        //    var distance = Vector2.Distance(clampPoint, travel);
 
-            stats.OriginalDistance = test;
-            stats.TravelDistance = distance;
+        //    stats.OriginalDistance = test;
+        //    stats.TravelDistance = distance;
 
-            //if (test < CollisionOffset)
-            //{
-            //    stats.TriggeredHit = true;
-            //}
+        //    //if (test < CollisionOffset)
+        //    //{
+        //    //    stats.TriggeredHit = true;
+        //    //}
 
-            //if (!(distance < test)) return stats;
+        //    //if (!(distance < test)) return stats;
 
-            //if (obj.Debug)
-            //{
-            //    DrawEllipse(obj.CalculatedSpeed * direction + (Vector2)obj.transform.position, Vector3.forward, Vector3.up, 0.15f, 0.15f, 32, Color.red, 1f);
-            //}
+        //    //if (obj.Debug)
+        //    //{
+        //    //    DrawEllipse(obj.CalculatedSpeed * direction + (Vector2)obj.transform.position, Vector3.forward, Vector3.up, 0.15f, 0.15f, 32, Color.red, 1f);
+        //    //}
             
-            //obj.CalculatedSpeed = Vector2.ClampMagnitude(obj.CalculatedSpeed, test);
-            //if (travel.x - original.x < 0)
-            //{
-            //    obj.CalculatedSpeed = new Vector2(Mathf.Clamp(obj.CalculatedSpeed.x, 
-            //        travel.x < original.x ? 0 : original.x - travel.x,
-            //        travel.x > original.x ? original.x - travel.x : 0), obj.CalculatedSpeed.y);
-            //    stats.TriggeredHit = true;
-            //}
+        //    //obj.CalculatedSpeed = Vector2.ClampMagnitude(obj.CalculatedSpeed, test);
+        //    //if (travel.x - original.x < 0)
+        //    //{
+        //    //    obj.CalculatedSpeed = new Vector2(Mathf.Clamp(obj.CalculatedSpeed.x, 
+        //    //        travel.x < original.x ? 0 : original.x - travel.x,
+        //    //        travel.x > original.x ? original.x - travel.x : 0), obj.CalculatedSpeed.y);
+        //    //    stats.TriggeredHit = true;
+        //    //}
 
-            //if (travel.y - original.y < 0)
-            //{
-            //    obj.CalculatedSpeed = new Vector2(obj.CalculatedSpeed.x, Mathf.Clamp(obj.CalculatedSpeed.y,
-            //        travel.y < original.y ? travel.y - original.y : 0,
-            //        travel.y > original.y ? original.y - travel.y : 0));
-            //    stats.TriggeredHit = true;
-            //}
+        //    //if (travel.y - original.y < 0)
+        //    //{
+        //    //    obj.CalculatedSpeed = new Vector2(obj.CalculatedSpeed.x, Mathf.Clamp(obj.CalculatedSpeed.y,
+        //    //        travel.y < original.y ? travel.y - original.y : 0,
+        //    //        travel.y > original.y ? original.y - travel.y : 0));
+        //    //    stats.TriggeredHit = true;
+        //    //}
 
-            return stats;
-        }
+        //    return stats;
+        //}
 
         private static void DrawEllipse(Vector3 pos, Vector3 forward, Vector3 up, float radiusX, float radiusY, int segments, Color color, float duration = 0)
         {
@@ -407,77 +408,77 @@ namespace Licht.Unity.Physics
         //    return stats;
         //}
 
-        private CollisionResult HandleHorizontal(CollisionResult result, LichtPhysicsObject obj)
-        {
+        //private CollisionResult HandleHorizontal(CollisionResult result, LichtPhysicsObject obj)
+        //{
 
-            if (obj.transform.position.x < 0 && obj.CalculatedSpeed.x + obj.transform.position.x > 0 && !result.Detected)
-            {
+        //    if (obj.transform.position.x < 0 && obj.CalculatedSpeed.x + obj.transform.position.x > 0 && !result.Detected)
+        //    {
 
-            }
+        //    }
 
-            if (!result.Detected) return result;
-            var diff = result.TravelDistance - result.OriginalDistance;
+        //    if (!result.Detected) return result;
+        //    var diff = result.TravelDistance - result.OriginalDistance;
 
-            var clamp = result.ClampPoint.x - obj.transform.position.x * result.Direction.x;
+        //    var clamp = result.ClampPoint.x - obj.transform.position.x * result.Direction.x;
 
-            if (diff < 0 || diff > clamp || clamp < CollisionOffset)
-            {
-                obj.CalculatedSpeed = new Vector2(
-                    Mathf.Clamp(obj.CalculatedSpeed.x, result.Direction.x > 0 ? obj.CalculatedSpeed.x : -clamp,
-                        result.Direction.x > 0 ? clamp : obj.CalculatedSpeed.x)
-                    ,  obj.CalculatedSpeed.y);
+        //    if (diff < 0 || diff > clamp || clamp < CollisionOffset)
+        //    {
+        //        obj.CalculatedSpeed = new Vector2(
+        //            Mathf.Clamp(obj.CalculatedSpeed.x, result.Direction.x > 0 ? obj.CalculatedSpeed.x : -clamp,
+        //                result.Direction.x > 0 ? clamp : obj.CalculatedSpeed.x)
+        //            ,  obj.CalculatedSpeed.y);
 
-                UnityEngine.Debug.Log("tried to stop");
+        //        UnityEngine.Debug.Log("tried to stop");
 
-                if (Mathf.Abs(clamp) < CollisionOffset)
-                {
-                    UnityEngine.Debug.Log("collided");
-                    result.TriggeredHit = true;
-                }
-            }
+        //        if (Mathf.Abs(clamp) < CollisionOffset)
+        //        {
+        //            UnityEngine.Debug.Log("collided");
+        //            result.TriggeredHit = true;
+        //        }
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        private CollisionResult HandleGround(CollisionResult result, LichtPhysicsObject obj)
-        {
-            if (!result.Detected || result.ClosestHit.normal.y > 0 ) return result;
-            var diff = result.TravelDistance - result.OriginalDistance;
+        //private CollisionResult HandleGround(CollisionResult result, LichtPhysicsObject obj)
+        //{
+        //    if (!result.Detected || result.ClosestHit.normal.y > 0 ) return result;
+        //    var diff = result.TravelDistance - result.OriginalDistance;
 
-            if (diff <= 0 || result.TravelDistance < CollisionOffset)
-            {
-                obj.CalculatedSpeed = new Vector2(obj.CalculatedSpeed.x,
-                    Mathf.Clamp(obj.CalculatedSpeed.y, result.Direction.y > 0 ? 0 : diff,
-                        result.Direction.y > 0 ? -diff : 0));
+        //    if (diff <= 0 || result.TravelDistance < CollisionOffset)
+        //    {
+        //        obj.CalculatedSpeed = new Vector2(obj.CalculatedSpeed.x,
+        //            Mathf.Clamp(obj.CalculatedSpeed.y, result.Direction.y > 0 ? 0 : diff,
+        //                result.Direction.y > 0 ? -diff : 0));
 
-                if (result.TravelDistance < CollisionOffset)
-                {
-                    result.TriggeredHit = true;
-                }
-            }
+        //        if (result.TravelDistance < CollisionOffset)
+        //        {
+        //            result.TriggeredHit = true;
+        //        }
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        private CollisionResult HandleUp(CollisionResult result, LichtPhysicsObject obj)
-        {
-            if (!result.Detected || result.ClosestHit.normal.y < 0) return result;
-            var diff = result.TravelDistance - result.OriginalDistance;
+        //private CollisionResult HandleUp(CollisionResult result, LichtPhysicsObject obj)
+        //{
+        //    if (!result.Detected || result.ClosestHit.normal.y < 0) return result;
+        //    var diff = result.TravelDistance - result.OriginalDistance;
 
-            if (diff <= 0 || result.TravelDistance < CollisionOffset)
-            {
-                obj.CalculatedSpeed = new Vector2(obj.CalculatedSpeed.x,
-                    Mathf.Clamp(obj.CalculatedSpeed.y, result.Direction.y > 0 ? 0 : diff,
-                        result.Direction.y > 0 ? -diff : 0));
+        //    if (diff <= 0 || result.TravelDistance < CollisionOffset)
+        //    {
+        //        obj.CalculatedSpeed = new Vector2(obj.CalculatedSpeed.x,
+        //            Mathf.Clamp(obj.CalculatedSpeed.y, result.Direction.y > 0 ? 0 : diff,
+        //                result.Direction.y > 0 ? -diff : 0));
 
-                if (result.TravelDistance < CollisionOffset)
-                {
-                    result.TriggeredHit = true;
-                }
-            }
+        //        if (result.TravelDistance < CollisionOffset)
+        //        {
+        //            result.TriggeredHit = true;
+        //        }
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
         public void UpdatePositions()
         {
@@ -486,48 +487,29 @@ namespace Licht.Unity.Physics
             {
                 obj.CalculatedSpeed = obj.Speed * FrameMultiplier * (float)ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
 
-                var right = CheckDirection(Vector2.right, obj);
-                var left = CheckDirection(Vector2.left, obj);
-                var up = CheckDirection(Vector2.up, obj);
-                var down = CheckDirection(Vector2.down, obj);
-
-
-                right = HandleHorizontal(right, obj);
-                // left = HandleHorizontal(left,obj);
-               // down = HandleGround(down, obj);
-
-                var custom = CheckCustom(obj);
-
-                _collisionStats[obj].Current = new CollisionState
-                {
-                    Left = left,
-                    Right = right,
-                    Up = up,
-                    Down = down,
-                    Custom = custom
-                };
-
+                obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate);
                 obj.ImplyDirection(obj.CalculatedSpeed.normalized);
                 obj.transform.position += (Vector3)obj.CalculatedSpeed;
+                obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PostUpdate);
             }
 
             foreach (var obj in _physicsStaticWorld)
             {
-                var right = CheckDirection(Vector2.right, obj);
-                var left = CheckDirection(Vector2.left, obj);
-                var up = CheckDirection(Vector2.up, obj);
-                var down = CheckDirection(Vector2.down, obj);
+                //var right = CheckDirection(Vector2.right, obj);
+                //var left = CheckDirection(Vector2.left, obj);
+                //var up = CheckDirection(Vector2.up, obj);
+                //var down = CheckDirection(Vector2.down, obj);
 
-                var custom = CheckCustom(obj);
+                //var custom = CheckCustom(obj);
 
-                _collisionStats[obj].Current = new CollisionState
-                {
-                    Left = left,
-                    Right = right,
-                    Up = up,
-                    Down = down,
-                    Custom = custom
-                };
+                //_collisionStats[obj].Current = new CollisionState
+                //{
+                //    Left = left,
+                //    Right = right,
+                //    Up = up,
+                //    Down = down,
+                //    Custom = custom
+                //};
             }
         }
 
@@ -548,6 +530,12 @@ namespace Licht.Unity.Physics
         public CollisionState GetCollisionState(LichtPhysicsObject obj)
         {
             return !_collisionStats.ContainsKey(obj) ? default : _collisionStats[obj].Current;
+        }
+
+        public void SetCollisionState(LichtPhysicsObject obj, CollisionState state)
+        {
+            _collisionStats[obj] ??= new Caterpillar<CollisionState>();
+            _collisionStats[obj].Current = state;
         }
 
         public void UnblockCustomPhysicsForceForObject(MonoBehaviour src, LichtPhysicsObject obj, string force)

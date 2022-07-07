@@ -24,7 +24,8 @@ namespace Licht.Unity.CharacterControllers
             public LichtPlatformerJumpController Source;
         }
 
-        public ScriptLichtForceIdentifier GravityIdentifier;
+        public ScriptIdentifier GroundedTrigger;
+        public ScriptIdentifier GravityIdentifier;
         public ScriptInput JumpInput;
         public float JumpSpeed;
         public float AccelerationTime;
@@ -104,14 +105,19 @@ namespace Licht.Unity.CharacterControllers
             });
         }
 
+        private bool IsGrounded()
+        {
+            return Target.GetPhysicsTrigger(GroundedTrigger) || _physics.GetCollisionState(Target).Down.TriggeredHit;
+        }
+
+
         protected virtual IEnumerable<IEnumerable<Action>> HandleJump()
         {
             var jumpInput = _input.actions[JumpInput.ActionName];
             while (isActiveAndEnabled)
             {
-                var collisionState = _physics.GetCollisionState(Target);
                 var jumped = false;
-                while (!collisionState.Down.TriggeredHit)
+                while (!IsGrounded())
                 {
                     if (IsBlocked)
                     {
@@ -123,8 +129,7 @@ namespace Licht.Unity.CharacterControllers
                     {
                         foreach (var _ in TimeYields.WaitSeconds(_physics.ScriptTimerRef.Timer, InputBufferTime))
                         {
-                            collisionState = _physics.GetCollisionState(Target);
-                            if (!collisionState.Down.TriggeredHit || IsBlocked)
+                            if (!IsGrounded() || IsBlocked)
                             {
                                 yield return TimeYields.WaitOneFrameX;
                                 continue;
@@ -141,8 +146,6 @@ namespace Licht.Unity.CharacterControllers
                     }
 
                     if (jumped) continue;
-
-                    collisionState = _physics.GetCollisionState(Target);
                 }
 
                 if (CoyoteJumpTime > 0 && !jumped)
