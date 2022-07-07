@@ -19,6 +19,16 @@ namespace Licht.Unity.CharacterControllers
             OnJumpEnd,
         }
 
+        [Serializable]
+        public class CustomJumpParams
+        {
+            public float JumpSpeed;
+            public float AccelerationTime;
+            public float DecelerationTime;
+            public EasingYields.EasingFunction MovementStartEasing;
+            public EasingYields.EasingFunction MovementEndEasing;
+        }
+
         public struct LichtPlatformerJumpEventArgs
         {
             public LichtPlatformerJumpController Source;
@@ -77,8 +87,10 @@ namespace Licht.Unity.CharacterControllers
             _minJumpDelayPassed = true;
         }
 
-        public IEnumerable<IEnumerable<Action>> ExecuteJump(InputAction jumpAction)
+        public IEnumerable<IEnumerable<Action>> ExecuteJump(InputAction jumpAction = null, CustomJumpParams customParams = null)
         {
+            jumpAction ??= _input.actions[JumpInput.ActionName];
+
             IsJumping = true;
             _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpStart, new LichtPlatformerJumpEventArgs
             {
@@ -94,9 +106,9 @@ namespace Licht.Unity.CharacterControllers
 
             yield return Target.GetSpeedAccessor()
                 .Y
-                .SetTarget(JumpSpeed)
-                .Over(AccelerationTime)
-                .Easing(MovementStartEasing)
+                .SetTarget(customParams?.JumpSpeed ?? JumpSpeed)
+                .Over(customParams?.AccelerationTime ?? AccelerationTime)
+                .Easing(customParams?.MovementStartEasing ?? MovementStartEasing)
                 .BreakIf(() => (!jumpAction.IsPressed() && _minJumpDelayPassed) ||
                                Target.GetPhysicsTrigger(CeilingTrigger) || IsBlocked || Interrupted, false)
                 .UsingTimer(_physics.ScriptTimerRef.Timer)
@@ -105,8 +117,8 @@ namespace Licht.Unity.CharacterControllers
             yield return Target.GetSpeedAccessor(new Vector2(0, Target.LatestSpeed.y))
                 .Y
                 .SetTarget(0)
-                .Over(DecelerationTime)
-                .Easing(MovementEndEasing)
+                .Over(customParams?.DecelerationTime ?? DecelerationTime)
+                .Easing(customParams?.MovementEndEasing ?? MovementEndEasing)
                 .BreakIf(() => (!jumpAction.IsPressed() && _minJumpDelayPassed) ||
                                Target.GetPhysicsTrigger(CeilingTrigger) || IsBlocked || Interrupted, false)
                 .UsingTimer(_physics.ScriptTimerRef.Timer)
