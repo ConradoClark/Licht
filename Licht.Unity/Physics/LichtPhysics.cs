@@ -170,6 +170,7 @@ namespace Licht.Unity.Physics
 
         public void Initialize()
         {
+            Physics2D.autoSyncTransforms = true;
             _frameVariables = GetFrameVariables();
             _physicsWorld = new List<LichtPhysicsObject>();
             _physicsStaticWorld = new List<LichtPhysicsObject>();
