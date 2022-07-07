@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Licht.Interfaces.Events
+﻿namespace Licht.Interfaces.Events
 {
     public interface IEventPublisher<in TEventType, in TEventObject>
     {

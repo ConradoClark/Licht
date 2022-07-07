@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Licht.Unity.Objects;
 using Licht.Unity.Pooling;
 using UnityEngine;
-using UnityEngine.Windows.WebCam;
 
 namespace Licht.Unity.Effects
 {

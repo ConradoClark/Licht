@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Licht.Impl.Memory;
 using Licht.Unity.Extensions;
@@ -130,12 +129,10 @@ namespace Licht.Unity.Physics
                 if (detector.IsBlocked || !detector.isActiveAndEnabled) continue;
 
                 detector.CheckCollision();
-                if (detector.ShouldClamp)
-                {
-                    var result = detector.Clamp();
-                    if (type == LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate) CalculatedSpeed = result;
-                    else transform.position = result;
-                }
+
+                var result = detector.Clamp();
+                if (type == LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate) CalculatedSpeed = result;
+                else transform.position = result;
             }
         }
 

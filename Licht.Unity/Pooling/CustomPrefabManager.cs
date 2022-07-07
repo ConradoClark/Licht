@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Licht.Interfaces.Pooling;
+﻿using System.Collections.Generic;
 using Licht.Unity.Objects;
 using UnityEngine;
 

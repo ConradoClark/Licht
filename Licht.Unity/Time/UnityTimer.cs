@@ -1,5 +1,4 @@
-﻿using System;
-using Licht.Impl.Debug;
+﻿using Licht.Impl.Debug;
 using Licht.Impl.Memory;
 using Licht.Interfaces.Time;
 

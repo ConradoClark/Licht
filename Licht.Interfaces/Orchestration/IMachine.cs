@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Licht.Interfaces.Orchestration
+﻿namespace Licht.Interfaces.Orchestration
 {
     public interface IMachine
     {

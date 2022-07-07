@@ -25,6 +25,7 @@ namespace Licht.Unity.CharacterControllers
         }
 
         public ScriptIdentifier GroundedTrigger;
+        public ScriptIdentifier CeilingTrigger;
         public ScriptIdentifier GravityIdentifier;
         public ScriptInput JumpInput;
         public float JumpSpeed;
@@ -35,6 +36,10 @@ namespace Licht.Unity.CharacterControllers
         public LichtPhysicsObject Target;
         public float InputBufferTime;
         public float CoyoteJumpTime;
+
+        public float MinJumpHoldInSeconds;
+
+        private bool _minJumpDelayPassed;
 
         public bool IsJumping { get; protected set; }
         public bool Interrupted { get; protected set; }
@@ -66,22 +71,34 @@ namespace Licht.Unity.CharacterControllers
             if (IsJumping) Interrupted = true;
         }
 
-        private IEnumerable<IEnumerable<Action>> ExecuteJump()
+        private IEnumerable<IEnumerable<Action>> WaitMinJumpDelay()
+        {
+            yield return TimeYields.WaitSeconds(GameTimer, MinJumpHoldInSeconds);
+            _minJumpDelayPassed = true;
+        }
+
+        public IEnumerable<IEnumerable<Action>> ExecuteJump(InputAction jumpAction)
         {
             IsJumping = true;
             _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpStart, new LichtPlatformerJumpEventArgs
             {
                 Source = this
             });
+
             _physics.BlockCustomPhysicsForceForObject(this, Target, GravityIdentifier.Name);
             yield return TimeYields.WaitOneFrameX;
+
+            _minJumpDelayPassed = false;
+
+            DefaultMachinery.AddBasicMachine(WaitMinJumpDelay());
 
             yield return Target.GetSpeedAccessor()
                 .Y
                 .SetTarget(JumpSpeed)
                 .Over(AccelerationTime)
                 .Easing(MovementStartEasing)
-                .BreakIf(() => _physics.GetCollisionState(Target).Up.TriggeredHit|| IsBlocked || Interrupted, false)
+                .BreakIf(() => (!jumpAction.IsPressed() && _minJumpDelayPassed) ||
+                               Target.GetPhysicsTrigger(CeilingTrigger) || IsBlocked || Interrupted, false)
                 .UsingTimer(_physics.ScriptTimerRef.Timer)
                 .Build();
 
@@ -90,7 +107,8 @@ namespace Licht.Unity.CharacterControllers
                 .SetTarget(0)
                 .Over(DecelerationTime)
                 .Easing(MovementEndEasing)
-                .BreakIf(() => _physics.GetCollisionState(Target).Up.TriggeredHit || IsBlocked || Interrupted, false)
+                .BreakIf(() => (!jumpAction.IsPressed() && _minJumpDelayPassed) ||
+                               Target.GetPhysicsTrigger(CeilingTrigger) || IsBlocked || Interrupted, false)
                 .UsingTimer(_physics.ScriptTimerRef.Timer)
                 .Build();
 
@@ -107,7 +125,7 @@ namespace Licht.Unity.CharacterControllers
 
         private bool IsGrounded()
         {
-            return Target.GetPhysicsTrigger(GroundedTrigger) || _physics.GetCollisionState(Target).Down.TriggeredHit;
+            return Target.GetPhysicsTrigger(GroundedTrigger);
         }
 
 
@@ -136,7 +154,7 @@ namespace Licht.Unity.CharacterControllers
                             }
 
                             jumped = true;
-                            yield return ExecuteJump().AsCoroutine();
+                            yield return ExecuteJump(jumpInput).AsCoroutine();
                             break;
                         }
                     }
@@ -159,14 +177,14 @@ namespace Licht.Unity.CharacterControllers
                         }
 
                         jumped = true;
-                        yield return ExecuteJump().AsCoroutine();
+                        yield return ExecuteJump(jumpInput).AsCoroutine();
                         break;
                     }
                 }
 
                 if (jumpInput.WasPerformedThisFrame() && !IsBlocked && !jumped)
                 {
-                    yield return ExecuteJump().AsCoroutine();
+                    yield return ExecuteJump(jumpInput).AsCoroutine();
                     continue;
                 }
 

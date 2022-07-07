@@ -58,7 +58,7 @@ namespace Licht.Unity.Physics.Forces
 
         private bool IsGrounded(LichtPhysicsObject obj)
         {
-            return obj.GetPhysicsTrigger(GroundedIdentifier) || Physics.GetCollisionState(obj).Down.TriggeredHit;
+            return obj.GetPhysicsTrigger(GroundedIdentifier);
         }
 
         private IEnumerable<IEnumerable<Action>> UseGravity(LichtPhysicsObject physicsObject)
@@ -87,7 +87,6 @@ namespace Licht.Unity.Physics.Forces
                 }
             }
         }
-
 
         public override bool Activate()
         {

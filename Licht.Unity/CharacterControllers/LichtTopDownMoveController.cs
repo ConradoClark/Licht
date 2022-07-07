@@ -6,7 +6,6 @@ using Licht.Unity.Builders;
 using Licht.Unity.Extensions;
 using Licht.Unity.Objects;
 using Licht.Unity.Physics;
-using UnityEngine;
 using UnityEngine.InputSystem;
 using Routine = System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<System.Action>>;
 using Vector2 = UnityEngine.Vector2;

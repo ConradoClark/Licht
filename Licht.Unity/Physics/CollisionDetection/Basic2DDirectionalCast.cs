@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Licht.Unity.Objects;
 using UnityEngine;
 
@@ -23,9 +21,8 @@ namespace Licht.Unity.Physics.CollisionDetection
         {
             base.OnAwake();
             Collider = BoxCollider;
+            DetectorType = CollisionDetectorType.PreUpdate;
         }
-
-        public override CollisionDetectorType DetectorType { get; protected set; } = CollisionDetectorType.PreUpdate;
 
         public override CollisionResult[] CheckCollision()
         {

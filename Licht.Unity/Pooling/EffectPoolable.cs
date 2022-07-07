@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Licht.Impl.Orchestration;
-using Licht.Interfaces.Pooling;
 using Licht.Unity.Objects;
 using UnityEngine;
 

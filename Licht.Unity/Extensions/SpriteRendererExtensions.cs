@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Licht.Unity.Accessors;
+﻿using Licht.Unity.Accessors;
 using UnityEngine;
 
 namespace Licht.Unity.Extensions

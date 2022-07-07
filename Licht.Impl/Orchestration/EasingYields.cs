@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Licht.Impl.Events;
 using Licht.Impl.Globals;
 using Licht.Interfaces.Time;
 

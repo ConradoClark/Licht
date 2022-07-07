@@ -2,7 +2,6 @@
 using System.Linq;
 using Licht.Unity.Memory;
 using Licht.Unity.Objects;
-using Unity.Collections;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -16,7 +15,6 @@ namespace Licht.Unity.Physics.CollisionDetection
             PostUpdate
         }
 
-        public bool ShouldClamp;
         public Collider2D Collider;
         public virtual CollisionDetectorType DetectorType { get; protected set; }
         public LichtPhysicsObject PhysicsObject { get; private set; }

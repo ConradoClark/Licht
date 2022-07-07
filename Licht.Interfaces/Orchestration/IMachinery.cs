@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Licht.Interfaces.Update;
+﻿using Licht.Interfaces.Update;
 
 namespace Licht.Interfaces.Orchestration
 {
