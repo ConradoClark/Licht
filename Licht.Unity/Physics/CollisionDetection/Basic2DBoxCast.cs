@@ -44,6 +44,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 
             var results = _collisionResults
                 .Where(col => col.collider != null && !PhysicsObject.CollisionDetectors.Select(c => c.Collider).Contains(col.collider)
+                                                   && !PhysicsObject.AdditionalColliders.Contains(col.collider)
                 && (!CheckNormals || col.normal == NormalTarget)
                 )
                 .Select(col => new CollisionResult

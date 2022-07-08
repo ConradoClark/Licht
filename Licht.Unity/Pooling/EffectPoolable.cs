@@ -9,9 +9,11 @@ namespace Licht.Unity.Pooling
     public abstract class EffectPoolable : BaseGameObject, IPoolableComponent
     {
         public bool ActiveOnInitialization;
+        private Transform _originalParent;
         public void Initialize()
         {
             gameObject.SetActive(ActiveOnInitialization);
+            _originalParent = transform.parent;
             if (ActiveOnInitialization) Activate();
         }
 
@@ -46,6 +48,7 @@ namespace Licht.Unity.Pooling
             {
                 if (IsEffectOver)
                 {
+                    transform.parent = _originalParent;
                     Deactivate();
                     break;
                 }

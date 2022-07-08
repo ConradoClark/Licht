@@ -26,7 +26,8 @@ namespace Licht.Unity.Physics.CollisionDetection
             if (noHits == 0) return Array.Empty<CollisionResult>();
 
             return _collisionResults
-                .Where(col => !PhysicsObject.CollisionDetectors.Select(c => c.Collider).Contains(col))
+                .Where(col => !PhysicsObject.CollisionDetectors.Select(c => c.Collider).Contains(col)
+                   && !PhysicsObject.AdditionalColliders.Contains(col))
                 .Select(col =>
                 {
                     var colliderDistance = col.Distance(Collider);

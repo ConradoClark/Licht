@@ -25,6 +25,7 @@ namespace Licht.Unity.Physics
 
         public TriggerDefinitions[] PhysicsTriggers;
         public LichtPhysicsCollisionDetector[] CollisionDetectors;
+        public Collider2D[] AdditionalColliders;
 
         private LichtPhysics _physics;
         private string PhysicsFrameVar => $"LichtPhysicsObject_{gameObject.name}";
@@ -98,6 +99,12 @@ namespace Licht.Unity.Physics
             {
                 TailSize = 1
             };
+
+
+            foreach (var additionalCollider in AdditionalColliders)
+            {
+                _physics.RegisterCollider(additionalCollider, this);
+            }
         }
 
         public void ImplyDirection(Vector2 direction)

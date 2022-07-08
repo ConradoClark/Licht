@@ -8,11 +8,16 @@ namespace Licht.Unity.Effects
     [DefaultExecutionOrder(-1)]
     public class EffectsManager : SceneObject<EffectsManager>
     {
+        public ScriptPrefab[] PreloadEffects;
         public Dictionary<ScriptPrefab, PrefabPool> Effects { get; private set; }
 
         private void Awake()
         {
             Effects = new Dictionary<ScriptPrefab, PrefabPool>();
+            foreach (var effect in PreloadEffects)
+            {
+                AddEffect(effect);
+            }
         }
 
         public void AddEffect(ScriptPrefab prefabRef)

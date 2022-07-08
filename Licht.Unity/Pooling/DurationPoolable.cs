@@ -12,9 +12,11 @@ namespace Licht.Unity.Pooling
         public ScriptTimer ScriptTimerObject;
         public bool ActiveOnInitialization;
         public int DurationInSeconds;
+        private Transform _originalParent;
 
         public void Initialize()
         {
+            _originalParent = transform.parent;
             gameObject.SetActive(ActiveOnInitialization);
             if (ActiveOnInitialization) Activate();
         }
@@ -22,6 +24,7 @@ namespace Licht.Unity.Pooling
         public bool IsActive => gameObject.activeSelf;
         public bool Deactivate()
         {
+            transform.parent = _originalParent;
             gameObject.SetActive(false);
             return true;
         }
