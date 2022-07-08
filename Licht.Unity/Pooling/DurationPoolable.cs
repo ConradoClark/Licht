@@ -35,6 +35,7 @@ namespace Licht.Unity.Pooling
 
         private IEnumerable<IEnumerable<Action>> Expire()
         {
+            yield return TimeYields.WaitOneFrameX;
             yield return TimeYields.WaitSeconds(ScriptTimerObject.Timer, DurationInSeconds);
             Deactivate();
         }

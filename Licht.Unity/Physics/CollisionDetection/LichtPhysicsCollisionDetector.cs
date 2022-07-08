@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Licht.Unity.Extensions;
 using Licht.Unity.Memory;
 using Licht.Unity.Objects;
 using UnityEngine;
@@ -22,6 +24,7 @@ namespace Licht.Unity.Physics.CollisionDetection
         private HashSet<Object> _collisionBlockers;
         private FrameVariables _frameVariables;
         private FrameVariableDefinition<CollisionResult[]> _collisionResults;
+        private LichtPhysics _physics;
 
         private FrameVariables GetFrameVariables()
         {
@@ -36,17 +39,20 @@ namespace Licht.Unity.Physics.CollisionDetection
         protected override void OnAwake()
         {
             base.OnAwake();
+
+            _physics = this.GetLichtPhysics();
             _collisionBlockers = new HashSet<Object>();
             GetFrameVariables();
 
             _collisionResults =
                 new FrameVariableDefinition<CollisionResult[]>($"{gameObject.GetInstanceID()}_collisionDetector_triggers",
-                    CheckCollision);
+                    CheckCollisionForFrame);
         }
 
         public void AttachPhysicsObject(LichtPhysicsObject obj)
         {
             PhysicsObject = obj;
+            _physics.RegisterCollider(Collider, obj);
         }
 
         public void BlockCollisionDetection(Object source)
@@ -64,6 +70,11 @@ namespace Licht.Unity.Physics.CollisionDetection
         public bool IsBlocked => _collisionBlockers.Any();
 
         public CollisionResult[] Triggers => _frameVariables.Get(_collisionResults);
+
+        private CollisionResult[] CheckCollisionForFrame()
+        {
+            return PhysicsObject == null ? Array.Empty<CollisionResult>() : CheckCollision();
+        }
 
         public abstract CollisionResult[] CheckCollision();
 

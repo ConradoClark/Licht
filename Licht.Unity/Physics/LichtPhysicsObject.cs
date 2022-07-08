@@ -47,6 +47,7 @@ namespace Licht.Unity.Physics
 
         public void AddCustomObject<T>(T obj) where T : class
         {
+            _customObjects ??= new Dictionary<Type, object>();
             _customObjects[typeof(T)] = obj;
         }
 
@@ -86,7 +87,7 @@ namespace Licht.Unity.Physics
 
         private void Awake()
         {
-            _customObjects = new Dictionary<Type, object>();
+            _customObjects ??= new Dictionary<Type, object>();
             _physics = this.GetLichtPhysics();
             _latestSpeed = new Caterpillar<Vector2>
             {

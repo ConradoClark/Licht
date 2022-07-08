@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using JetBrains.Annotations;
 using Licht.Impl.Globals;
 using Licht.Interfaces.Time;
@@ -71,7 +72,7 @@ namespace Licht.Impl.Orchestration
             return p1 + (p2 - p1) * fraction;
         }
 
-        static float GetStep(float value, float step)
+        public static float GetStep(float value, float step)
         {
             var absValue = Math.Abs(value);
             step = Math.Abs(step);

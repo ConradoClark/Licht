@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Licht.Impl.Orchestration;
 using Licht.Interfaces.Update;
 using Licht.Unity.Extensions;
 using Licht.Unity.Memory;
@@ -28,6 +29,8 @@ namespace Licht.Unity.Physics
         private List<LichtPhysicsForce> _physicsForces;
         private Dictionary<string, LichtCustomPhysicsForce> _customPhysicsForces;
         private HashSet<Collider2D> _semiSolids;
+
+        private Dictionary<Collider2D, LichtPhysicsObject> _colliderRegistry;
 
         public event Action<LichtPhysicsObject> OnAddPhysicsObject;
         public event Action<LichtPhysicsObject> OnRemovePhysicsObject;
@@ -155,7 +158,7 @@ namespace Licht.Unity.Physics
 
                 obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate);
                 obj.ImplyDirection(obj.CalculatedSpeed.normalized);
-                obj.transform.position += (Vector3)obj.CalculatedSpeed;
+                obj.transform.position += (Vector3) obj.CalculatedSpeed;
                 obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PostUpdate);
             }
 
@@ -177,6 +180,7 @@ namespace Licht.Unity.Physics
             _physicsForces = new List<LichtPhysicsForce>();
             _customPhysicsForces = new Dictionary<string, LichtCustomPhysicsForce>();
             _semiSolids = new HashSet<Collider2D>();
+            _colliderRegistry = new Dictionary<Collider2D, LichtPhysicsObject>();
         }
 
         public void UnblockCustomPhysicsForceForObject(MonoBehaviour src, LichtPhysicsObject obj, string force)
@@ -191,6 +195,29 @@ namespace Licht.Unity.Physics
             if (!_customPhysicsForces.ContainsKey(force)) return;
 
             _customPhysicsForces[force].BlockForceFor(src, obj);
+        }
+
+        public void RegisterCollider(Collider2D col, LichtPhysicsObject obj)
+        {
+            _colliderRegistry[col] = obj;
+        }
+
+        public void UnregisterCollider(Collider2D col)
+        {
+            if (!_colliderRegistry.ContainsKey(col)) return;
+            _colliderRegistry.Remove(col);
+        }
+
+        public bool TryGetPhysicsObjectByCollider(Collider2D col, out LichtPhysicsObject obj)
+        {
+            if (!_colliderRegistry.ContainsKey(col))
+            {
+                obj = null;
+                return false;
+            }
+
+            obj = _colliderRegistry[col];
+            return true;
         }
     }
 }
