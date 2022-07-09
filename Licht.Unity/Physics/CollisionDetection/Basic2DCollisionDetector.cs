@@ -52,7 +52,8 @@ namespace Licht.Unity.Physics.CollisionDetection
 
             if (!ShouldClamp) return PhysicsObject.transform.position;
             var results = Triggers;
-            if (results == null || results.Length == 0 || PhysicsObject.CalculatedSpeed.magnitude == 0) return PhysicsObject.transform.position;
+            if (results == null || results.Length == 0 ||
+                (PhysicsObject.CalculatedSpeed.magnitude == 0 && results.All(r=> !Collider.Distance(r.Collider).isOverlapped))) return PhysicsObject.transform.position;
             var clampedPosition = PhysicsObject.transform.position;
 
             foreach (var result in results)
