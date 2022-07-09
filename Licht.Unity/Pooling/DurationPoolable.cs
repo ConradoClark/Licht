@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace Licht.Unity.Pooling
 {
-    public class DurationPoolable: MonoBehaviour, IPoolableComponent
+    public class DurationPoolable : MonoBehaviour, IPoolableComponent
     {
         public ScriptBasicMachinery ScriptBasicMachineryObject;
         public ScriptTimer ScriptTimerObject;
         public bool ActiveOnInitialization;
-        public int DurationInSeconds;
+        public float DurationInSeconds;
         private Transform _originalParent;
 
         public void Initialize()
@@ -24,8 +24,8 @@ namespace Licht.Unity.Pooling
         public bool IsActive => gameObject.activeSelf;
         public bool Deactivate()
         {
-            transform.parent = _originalParent;
-            gameObject.SetActive(false);
+            if (transform != null) transform.parent = _originalParent;
+            if (gameObject != null) gameObject.SetActive(false);
             return true;
         }
 

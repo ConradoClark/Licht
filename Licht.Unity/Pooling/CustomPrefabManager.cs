@@ -9,12 +9,21 @@ namespace Licht.Unity.Pooling
         where TPool : GenericPrefabPool<TPoolable>
         where TPoolable : IPoolableComponent
     {
+        public ScriptPrefab[] PreloadEffects;
         public string Name;
         public Dictionary<ScriptPrefab, TPool> Effects { get; private set; }
 
         private void Awake()
         {
             Effects = new Dictionary<ScriptPrefab, TPool>();
+            foreach (var effect in PreloadEffects)
+            {
+                AddEffect(effect);
+                if (effect.Pool.TryGetFromPool(out var component))
+                {
+                    effect.Pool.Release(component);
+                }
+            }
         }
 
         public void AddEffect(ScriptPrefab prefabRef)

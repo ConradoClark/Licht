@@ -17,6 +17,10 @@ namespace Licht.Unity.Effects
             foreach (var effect in PreloadEffects)
             {
                 AddEffect(effect);
+                if (effect.Pool.TryGetFromPool(out var component))
+                {
+                    effect.Pool.Release(component);
+                }
             }
         }
 

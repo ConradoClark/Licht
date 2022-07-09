@@ -48,7 +48,7 @@ namespace Licht.Unity.Pooling
             {
                 if (IsEffectOver)
                 {
-                    transform.parent = _originalParent;
+                    if (transform != null) transform.parent = _originalParent;
                     Deactivate();
                     break;
                 }

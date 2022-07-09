@@ -64,6 +64,11 @@ namespace Licht.Unity.Physics
             return true;
         }
 
+        public bool HasCustomObjectOfType(Type type)
+        {
+            return _customObjects.ContainsKey(type);
+        }
+
         public Vector2 Speed
         {
             get

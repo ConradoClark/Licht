@@ -65,7 +65,7 @@ namespace Licht.Unity.Physics.Forces
         {
             while (physicsObject != null && IsActive && ActivationFlags[physicsObject])
             {
-                while (IsBlocked(physicsObject) || IsGrounded(physicsObject)) yield return TimeYields.WaitOneFrameX;
+                while (ActivationFlags[physicsObject] && (IsBlocked(physicsObject) || IsGrounded(physicsObject))) yield return TimeYields.WaitOneFrameX;
 
                 var speed = 0f;
                 foreach (var _ in new LerpBuilder(v => speed = v, () => speed)
