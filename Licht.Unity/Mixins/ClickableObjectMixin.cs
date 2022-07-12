@@ -30,8 +30,8 @@ namespace Licht.Unity.Mixins
             Camera camera) : base(sourceObject, frameVariables, timer, defaultMachinery)
         {
             _sourceObject = sourceObject;
-            _clicked = new FrameVariableDefinition<bool>($"ClickableObjectMixin_{_sourceObject.name}_Event_Clicked", CheckClick);
-            _hovering = new FrameVariableDefinition<bool>($"ClickableObjectMixin_{_sourceObject.name}_IsHovering", CheckHover);
+            _clicked = new FrameVariableDefinition<bool>($"ClickableObjectMixin_{_sourceObject.GetInstanceID()}_Event_Clicked", CheckClick);
+            _hovering = new FrameVariableDefinition<bool>($"ClickableObjectMixin_{_sourceObject.GetInstanceID()}_IsHovering", CheckHover);
             _clickAction = playerInput.actions[clickInput.ActionName];
             _collider = collider;
             _camera = camera;

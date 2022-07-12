@@ -27,11 +27,13 @@ namespace Licht.Unity.CharacterControllers
             public float DecelerationTime;
             public EasingYields.EasingFunction MovementStartEasing;
             public EasingYields.EasingFunction MovementEndEasing;
+            public float? MinJumpDelay;
         }
 
         public struct LichtPlatformerJumpEventArgs
         {
             public LichtPlatformerJumpController Source;
+            public CustomJumpParams CustomParams;
         }
 
         public ScriptIdentifier GroundedTrigger;
@@ -81,9 +83,9 @@ namespace Licht.Unity.CharacterControllers
             if (IsJumping) Interrupted = true;
         }
 
-        private IEnumerable<IEnumerable<Action>> WaitMinJumpDelay()
+        private IEnumerable<IEnumerable<Action>> WaitMinJumpDelay(float? minDelay = null)
         {
-            yield return TimeYields.WaitSeconds(GameTimer, MinJumpHoldInSeconds);
+            yield return TimeYields.WaitSeconds(GameTimer, minDelay ?? MinJumpHoldInSeconds);
             _minJumpDelayPassed = true;
         }
 
@@ -94,7 +96,8 @@ namespace Licht.Unity.CharacterControllers
             IsJumping = true;
             _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpStart, new LichtPlatformerJumpEventArgs
             {
-                Source = this
+                Source = this,
+                CustomParams = customParams
             });
 
             _physics.BlockCustomPhysicsForceForObject(this, Target, GravityIdentifier.Name);
@@ -102,7 +105,7 @@ namespace Licht.Unity.CharacterControllers
 
             _minJumpDelayPassed = false;
 
-            DefaultMachinery.AddBasicMachine(WaitMinJumpDelay());
+            DefaultMachinery.AddBasicMachine(WaitMinJumpDelay(customParams?.MinJumpDelay));
 
             yield return Target.GetSpeedAccessor()
                 .Y

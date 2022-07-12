@@ -24,6 +24,8 @@ namespace Licht.Unity.Pooling
         public bool IsActive => gameObject.activeSelf;
         public bool Deactivate()
         {
+            if (this == null) return false;
+
             if (transform != null) transform.parent = _originalParent;
             if (gameObject != null) gameObject.SetActive(false);
             return true;

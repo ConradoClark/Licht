@@ -21,7 +21,8 @@ namespace Licht.Unity.Pooling
         public bool Deactivate()
         {
             IsEffectOver = true;
-            gameObject.SetActive(false);
+
+            if (gameObject != null) gameObject.SetActive(false);
             IsActive = false;
             return true;
         }

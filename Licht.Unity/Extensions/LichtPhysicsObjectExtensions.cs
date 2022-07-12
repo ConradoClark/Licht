@@ -1,4 +1,5 @@
-﻿using Licht.Unity.Builders;
+﻿using System;
+using Licht.Unity.Builders;
 using Licht.Unity.Physics;
 using UnityEngine;
 
@@ -31,7 +32,7 @@ namespace Licht.Unity.Extensions
                         f =>
                         {
                             refSpeed = f;
-                            _obj.ApplySpeed(new Vector2(refSpeed,0));
+                            _obj.ApplySpeed(new Vector2(refSpeed, 0));
                         }, () => refSpeed);
                 }
             }
@@ -48,6 +49,20 @@ namespace Licht.Unity.Extensions
                             _obj.ApplySpeed(new Vector2(0, refSpeed));
                         }, () => refSpeed);
                 }
+            }
+
+
+            public LerpBuilder ToSpeed(Vector2 speed)
+            {
+                var @ref = 0f;
+                return new LerpBuilder(
+                    value =>
+                    {
+                        var refSpeed = Vector2.Lerp(_initialSpeed, speed, value);
+                        _obj.ApplySpeed(refSpeed);
+                        @ref = value;
+                    }, () => @ref)
+                    .SetTarget(1f);
             }
         }
     }

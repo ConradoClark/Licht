@@ -25,10 +25,10 @@ namespace Licht.Unity.Physics
 
         public TriggerDefinitions[] PhysicsTriggers;
         public LichtPhysicsCollisionDetector[] CollisionDetectors;
-        public Collider2D[] AdditionalColliders;
+        public List<Collider2D> AdditionalColliders;
 
         private LichtPhysics _physics;
-        private string PhysicsFrameVar => $"LichtPhysicsObject_{gameObject.name}";
+        private string PhysicsFrameVar => $"LichtPhysicsObject_{gameObject.GetInstanceID()}";
         private readonly RaycastHit2D[] _collisionResults = new RaycastHit2D[10];
 
         private Dictionary<Type, object> _customObjects;
@@ -50,6 +50,14 @@ namespace Licht.Unity.Physics
         {
             _customObjects ??= new Dictionary<Type, object>();
             _customObjects[typeof(T)] = obj;
+        }
+
+        public void RemoveCustomObject<T>() where T: class
+        {
+            _customObjects ??= new Dictionary<Type, object>();
+            if (!_customObjects.ContainsKey(typeof(T))) return;
+
+            _customObjects.Remove(typeof(T));
         }
 
         public bool TryGetCustomObject<T>(out T obj) where T : class
