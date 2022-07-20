@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
+using Licht.Interfaces.Time;
 
 namespace Licht.Impl.Orchestration
 {
@@ -75,6 +77,12 @@ namespace Licht.Impl.Orchestration
         public static IEnumerable<Action> Then(this IEnumerable<IEnumerable<Action>> source, IEnumerable<IEnumerable<Action>> target)
         {
             return source.AsCoroutine().Then(target.AsCoroutine());
+        }
+
+        public static IEnumerable<Action> CombineAfterSeconds(this IEnumerable<IEnumerable<Action>> source, float seconds,
+            ITimer timer, IEnumerable<IEnumerable<Action>> target)
+        {
+            return source.AsCoroutine().Combine(TimeYields.WaitSeconds(timer, seconds).Then(target.AsCoroutine()));
         }
 
         /// <summary>

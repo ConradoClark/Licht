@@ -19,9 +19,9 @@ namespace Licht.Unity.Pooling
             foreach (var effect in PreloadEffects)
             {
                 AddEffect(effect);
-                if (effect.Pool.TryGetFromPool(out var component))
+                if (Effects[effect].TryGetFromPool(out var component))
                 {
-                    effect.Pool.Release(component);
+                    Effects[effect].Release(component);
                 }
             }
         }

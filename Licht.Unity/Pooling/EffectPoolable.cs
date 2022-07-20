@@ -21,9 +21,10 @@ namespace Licht.Unity.Pooling
         public bool Deactivate()
         {
             IsEffectOver = true;
-
-            if (gameObject != null) gameObject.SetActive(false);
             IsActive = false;
+
+            if (this == null) return false;
+            if (gameObject != null) gameObject.SetActive(false);
             return true;
         }
 
@@ -49,7 +50,7 @@ namespace Licht.Unity.Pooling
             {
                 if (IsEffectOver)
                 {
-                    if (transform != null) transform.parent = _originalParent;
+                    if (transform != null) transform.SetParent(_originalParent);
                     Deactivate();
                     break;
                 }

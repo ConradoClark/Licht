@@ -22,6 +22,19 @@ namespace Licht.Unity.Objects
             }
         }
 
-        public PrefabPool Pool => EffectsManager.Instance().GetEffect(this);
+        private PrefabPool _pool;
+        public PrefabPool Pool
+        {
+            get
+            {
+                if (_pool == null && EffectsManager.Instance() != null)
+                {
+                    _pool = EffectsManager.Instance().GetEffect(this);
+                }
+
+                return _pool;
+            }
+            set => _pool = value;
+        }
     }
 }
