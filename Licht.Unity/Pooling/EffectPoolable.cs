@@ -34,29 +34,19 @@ namespace Licht.Unity.Pooling
             gameObject.SetActive(true);
             IsActive = true;
 
-            DefaultMachinery.AddBasicMachine(HandleEffectOver());
-
             OnActivation();
 
             return true;
         }
 
         public abstract void OnActivation();
-        public abstract bool IsEffectOver { get; protected set; }
+        public virtual bool IsEffectOver { get; protected set; }
 
-        IEnumerable<Action> HandleEffectOver()
+        public virtual void EndEffect()
         {
-            while (isActiveAndEnabled)
-            {
-                if (IsEffectOver)
-                {
-                    if (transform != null) transform.SetParent(_originalParent);
-                    Deactivate();
-                    break;
-                }
-
-                yield return TimeYields.WaitOneFrame;
-            }
+            IsEffectOver = true;
+            if (transform != null) transform.SetParent(_originalParent);
+            Deactivate();
         }
 
         public MonoBehaviour Component => this;

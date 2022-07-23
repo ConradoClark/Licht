@@ -139,6 +139,10 @@ namespace Licht.Unity.Physics
         private void OnDisable()
         {
             _physics.RemovePhysicsObject(this);
+            foreach (var trigger in PhysicsTriggers)
+            {
+                SetPhysicsTrigger(trigger.TriggerName, false);
+            }
         }
 
         public void CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType type)

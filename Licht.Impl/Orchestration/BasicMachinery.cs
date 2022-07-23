@@ -29,8 +29,8 @@ namespace Licht.Impl.Orchestration
         {
             if (defaultValue == null) throw new Exception("Machinery layer keys cannot be null.");
             IsActive = active;
-            _machinarium = new Dictionary<TKey, List<IMachine>>();
-            _machineLayers = new Dictionary<IMachine, TKey>();
+            _machinarium = new Dictionary<TKey, List<IMachine>>(10000);
+            _machineLayers = new Dictionary<IMachine, TKey>(100);
             _layerOrder = Array.Empty<TKey>();
             _defaultLayer = defaultValue;
         }
@@ -62,8 +62,9 @@ namespace Licht.Impl.Orchestration
             {
                 if (!_machinarium.ContainsKey(layer)) continue;
 
-                foreach (var machine in _machinarium[layer].ToArray())
+                for (var index = 0; index < _machinarium[layer].Count; index++)
                 {
+                    var machine = _machinarium[layer][index];
                     var result = RunStep(machine);
                     if (result == MachineStepResult.Done) _removeList.Add(machine);
                 }

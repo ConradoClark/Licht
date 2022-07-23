@@ -1,4 +1,5 @@
-﻿using Licht.Interfaces.Pooling;
+﻿using System;
+using Licht.Interfaces.Pooling;
 using System.Linq;
 using JetBrains.Annotations;
 
@@ -15,10 +16,13 @@ namespace Licht.Impl.Pooling
         public int PoolSize { get; }
         private readonly IPoolableObjectFactory<T> _objectFactory;
 
+        private T[] _tempPool;
+
         public ObjectPool(int size, IPoolableObjectFactory<T> objectFactory)
         {
             PoolSize = size;
             _objectFactory = objectFactory;
+            _tempPool = new T[50];
         }
 
         public T[] GetActiveObjects()
@@ -71,14 +75,14 @@ namespace Licht.Impl.Pooling
                 return false;
             }
 
-            var available = _objectPool.FirstOrDefault(o => !o.IsActive);
-
-            if (available!=null)
+            for (var index = 0; index < _objectPool.Length; index++)
             {
-                obj = available;
+                if (_objectPool[index].IsActive) continue;
+                obj = _objectPool[index];
                 obj.Activate();
                 return true;
             }
+
             obj = default(T);
             return false;
         }
@@ -91,19 +95,29 @@ namespace Licht.Impl.Pooling
                 return false;
             }
 
-            var available = _objectPool.Where(o => !o.IsActive).Take(amount);
-            var enumerable = available as T[] ?? available.ToArray();
-            foreach(T obj in enumerable)
+            for (var index = 0; index < _tempPool.Length; index++)
             {
-                obj.Activate();
+                _tempPool[index] = default;
             }
-            if (enumerable.Skip(amount-1).Any())
+
+            var currentIndex = 0;
+            for (var index = 0; index < _objectPool.Length; index++)
             {
-                objects = enumerable.ToArray();
-                return true;
+                var obj = _objectPool[index];
+                if (!obj.IsActive)
+                {
+                    obj.Activate();
+                    _tempPool[currentIndex] = obj;
+                    currentIndex++;
+
+                    if (currentIndex >= amount) break;
+                }
             }
-            objects = enumerable.ToArray();
-            return false;
+
+            objects = new T[currentIndex];
+            Array.Copy(_tempPool, objects, currentIndex);
+
+            return currentIndex == amount;
         }
     }
 }

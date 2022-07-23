@@ -17,8 +17,6 @@ namespace Licht.Unity.Effects
             DefaultMachinery.AddBasicMachine(WaitUntilAnimationIsFinished());
         }
 
-        public override bool IsEffectOver { get; protected set; }
-
         private IEnumerable<IEnumerable<Action>> WaitUntilAnimationIsFinished()
         {
             yield return TimeYields.WaitOneFrameX;
@@ -28,7 +26,7 @@ namespace Licht.Unity.Effects
                 yield return TimeYields.WaitOneFrameX;
             }
 
-            IsEffectOver = true;
+            EndEffect();
         }
     }
 }
