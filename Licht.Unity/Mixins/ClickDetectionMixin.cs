@@ -27,17 +27,31 @@ namespace Licht.Unity.Mixins
             _mousePosInput = playerInput.actions[mousePosInput.ActionName];
         }
 
-        public bool WasClickedThisFrame(out Vector3 clickPosition)
+        public bool WasClickedThisFrame(out Vector3 clickPositionWorld)
         {
             if (_clickAction.WasPerformedThisFrame())
             {
                 var pos = _camera.ScreenToWorldPoint(_mousePosInput.ReadValue<Vector2>());
-                clickPosition = pos;
+                clickPositionWorld = pos;
 
                 return true;
             }
 
-            clickPosition = Vector3.zero;
+            clickPositionWorld = Vector3.zero;
+            return false;
+        }
+
+        public bool IsPressed(out Vector3 clickPositionWorld)
+        {
+            if (_clickAction.IsPressed())
+            {
+                var pos = _camera.ScreenToWorldPoint(_mousePosInput.ReadValue<Vector2>());
+                clickPositionWorld = pos;
+
+                return true;
+            }
+
+            clickPositionWorld = Vector3.zero;
             return false;
         }
 

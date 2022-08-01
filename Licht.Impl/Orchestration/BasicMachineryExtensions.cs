@@ -30,6 +30,18 @@ namespace Licht.Impl.Orchestration
             return AddBasicMachine(basicMachinery, default, steps, breakCondition);
         }
 
+        public static BasicMachinery<TKey> AddUniqueMachine<TKey>(this BasicMachinery<TKey> basicMachinery, string identifier, UniqueMachine.UniqueMachineBehaviour behaviour, IEnumerable<Action> steps, Func<bool> breakCondition = null)
+        {
+            basicMachinery.AddMachines(default, new UniqueMachine(identifier, behaviour, steps, breakCondition));
+            return basicMachinery;
+        }
+
+        public static BasicMachinery<TKey> AddUniqueMachine<TKey>(this BasicMachinery<TKey> basicMachinery, string identifier, UniqueMachine.UniqueMachineBehaviour behaviour, IEnumerable<IEnumerable<Action>> steps, Func<bool> breakCondition = null)
+        {
+            basicMachinery.AddMachines(default, new UniqueMachine(identifier, behaviour, steps, breakCondition));
+            return basicMachinery;
+        }
+
         public static IEnumerable<Action> AsCoroutine(this IEnumerable<IEnumerable<Action>> routine)
         {
             return routine.SelectMany(action => action);

@@ -52,7 +52,8 @@ namespace Licht.Unity.Physics.CollisionDetection
         public void AttachPhysicsObject(LichtPhysicsObject obj)
         {
             PhysicsObject = obj;
-            _physics.RegisterCollider(Collider, obj);
+
+            if (Collider != null) _physics.RegisterCollider(Collider, obj);
         }
 
         public void BlockCollisionDetection(Object source)

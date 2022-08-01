@@ -51,7 +51,7 @@ namespace Licht.Unity.Physics.Forces
 
         private void Physics_OnAddPhysicsObject(LichtPhysicsObject obj)
         {
-            if (!Affects.Contains(obj.gameObject.layer)) return;
+            if (!Affects.Contains(obj.gameObject.layer) || obj.Ghost) return;
             ActivationFlags[obj] = true;
             Physics.LichtPhysicsMachinery.Machinery.AddBasicMachine(UseGravity(obj));
         }
@@ -94,6 +94,8 @@ namespace Licht.Unity.Physics.Forces
 
             foreach (var obj in Physics.GetDynamicObjectsByLayerMask(Affects))
             {
+                if (obj.Ghost) continue;
+
                 ActivationFlags[obj] = true;
                 Physics.LichtPhysicsMachinery.Machinery.AddBasicMachine(UseGravity(obj));
             }
