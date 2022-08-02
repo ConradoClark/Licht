@@ -88,10 +88,17 @@ namespace Licht.Unity.Physics
             {
                 _physics.GetFrameVariables().Set(PhysicsFrameVar, value);
                 _latestSpeed.Current = value;
+                if (value != Vector2.zero)
+                {
+                    _latestNonZeroSpeed.Current = value;
+                }
             }
         }
 
         public Vector2 CalculatedSpeed;
+
+        private Caterpillar<Vector2> _latestNonZeroSpeed;
+        public Vector2 LatestNonZeroSpeed => _latestNonZeroSpeed.Current;
 
         private Caterpillar<Vector2> _latestSpeed;
         public Vector2 LatestSpeed => _latestSpeed.Current;
@@ -104,6 +111,11 @@ namespace Licht.Unity.Physics
             _customObjects ??= new Dictionary<Type, object>();
             _physics = this.GetLichtPhysics();
             _latestSpeed = new Caterpillar<Vector2>
+            {
+                TailSize = 1
+            };
+
+            _latestNonZeroSpeed = new Caterpillar<Vector2>
             {
                 TailSize = 1
             };
