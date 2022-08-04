@@ -38,7 +38,7 @@ namespace Licht.Unity.Physics.CollisionDetection
                 IncreaseBySpeed ? Distance + (PhysicsObject.CalculatedSpeed * Direction).magnitude : Distance, LayerMask);
             if (noHits == 0)
             {
-                if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, false);
+                if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, false, this);
                 return Array.Empty<CollisionResult>();
             }
 
@@ -57,7 +57,7 @@ namespace Licht.Unity.Physics.CollisionDetection
                 })
                 .ToArray();
 
-            if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, results.Any());
+            if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, results.Any(), this);
             return results;
         }
 

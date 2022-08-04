@@ -50,7 +50,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 
             if (noHits == 0)
             {
-                if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, false);
+                if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, false, this);
                 return Array.Empty<CollisionResult>();
             }
 
@@ -69,7 +69,7 @@ namespace Licht.Unity.Physics.CollisionDetection
                 })
                 .ToArray();
 
-            if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, results.Any(t=>t.TriggeredHit));
+            if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, results.Any(t=>t.TriggeredHit), this);
             return results;
         }
 

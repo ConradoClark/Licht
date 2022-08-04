@@ -47,7 +47,7 @@ namespace Licht.Unity.Physics.CollisionDetection
         {
             if (HitCeilingIdentifier != null)
             {
-                PhysicsObject.SetPhysicsTrigger(HitCeilingIdentifier, false);
+                PhysicsObject.SetPhysicsTrigger(HitCeilingIdentifier, false, this);
             }
 
             if (!ShouldClamp) return PhysicsObject.transform.position;
@@ -66,7 +66,7 @@ namespace Licht.Unity.Physics.CollisionDetection
                     if (HitCeilingIdentifier != null)
                     {
                         PhysicsObject.SetPhysicsTrigger(HitCeilingIdentifier, distance.pointA.y > PhysicsObject.transform.position.y
-                                                                              && Vector2.Angle(distance.normal, Vector2.up) < 90);
+                                                                              && Vector2.Angle(distance.normal, Vector2.up) < 90, this);
                     }
 
                     clampedPosition += (Vector3)distanceToCollide;

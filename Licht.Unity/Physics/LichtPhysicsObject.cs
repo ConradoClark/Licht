@@ -7,6 +7,7 @@ using Licht.Unity.Memory;
 using Licht.Unity.Objects;
 using Licht.Unity.Physics.CollisionDetection;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Licht.Unity.Physics
 {
@@ -21,6 +22,7 @@ namespace Licht.Unity.Physics
         {
             public ScriptIdentifier TriggerName;
             public bool Triggered;
+            [HideInInspector] public Object UpdatedBy;
         }
 
         public TriggerDefinitions[] PhysicsTriggers;
@@ -38,12 +40,21 @@ namespace Licht.Unity.Physics
             return PhysicsTriggers?.FirstOrDefault(t => t.TriggerName == identifier)?.Triggered ?? false;
         }
 
-        public void SetPhysicsTrigger(ScriptIdentifier identifier, bool value)
+        public bool GetPhysicsTriggerWithSource(ScriptIdentifier identifier, out Object source)
+        {
+            var trigger = PhysicsTriggers?.FirstOrDefault(t => t.TriggerName == identifier);
+            source = trigger?.UpdatedBy;
+
+            return trigger?.Triggered ?? false;
+        }
+
+        public void SetPhysicsTrigger(ScriptIdentifier identifier, bool value, Object updatedBy = null)
         {
             var trigger = PhysicsTriggers?.FirstOrDefault(t => t.TriggerName == identifier);
             if (trigger == null) throw new Exception($"Trigger {identifier.Name} not defined in Physics Object.");
 
             trigger.Triggered = value;
+            trigger.UpdatedBy = updatedBy;
         }
 
         public void AddCustomObject<T>(T obj) where T : class
