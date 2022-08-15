@@ -152,6 +152,11 @@ namespace Licht.Unity.CharacterControllers
                 var jumped = false;
                 while (!IsGrounded())
                 {
+                    if (!isActiveAndEnabled)
+                    {
+                        yield break;
+                    }
+
                     if (IsBlocked)
                     {
                         yield return TimeYields.WaitOneFrameX;

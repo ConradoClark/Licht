@@ -40,6 +40,8 @@ namespace Licht.Unity.Pooling
         private void OnDisable()
         {
             if (_objectPool == null) return;
+
+            IsActive = false;
             _objectPool.ReleaseAll();
             _objectPool = null; 
         }

@@ -15,7 +15,7 @@ namespace Licht.Impl.Generation
         {
             _values = possibleValues.ToArray();
             _floatGenerator = randomFloatGenerator;
-            _floatGenerator.Seed = Seed;
+            Seed = _floatGenerator.Seed;
             _pickedValues = new List<TValue>();
             _repeatValues = repeatValues;
         }
@@ -23,9 +23,10 @@ namespace Licht.Impl.Generation
 
         public TValue Generate()
         {
-            var listToUse = _repeatValues ? _values : _values.Except(_pickedValues).ToArray();
+            var validValues = _values.Where(w => w.Weight > 0).ToArray();
+            var listToUse = _repeatValues ? validValues : validValues.Except(_pickedValues).ToArray();
 
-            if (listToUse.Count == 0) return default;
+            if (listToUse.Length == 0) return default;
 
             var sumOfWeights = listToUse.Sum(v => v.Weight);
             var normalizedWeights = listToUse.Aggregate(Array.Empty<float>(),

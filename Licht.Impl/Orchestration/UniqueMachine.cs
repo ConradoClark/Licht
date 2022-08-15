@@ -30,6 +30,7 @@ namespace Licht.Impl.Orchestration
             _actionEnumerator = steps.GetEnumerator();
             _breakCondition = breakCondition;
             _callerName = callerName;
+            _behaviour = behaviour;
         }
 
         public UniqueMachine(string identifier, UniqueMachineBehaviour behaviour, IEnumerable<IEnumerable<Action>> steps, Func<bool> breakCondition = null, string callerName = "")
@@ -38,6 +39,7 @@ namespace Licht.Impl.Orchestration
             _actionEnumerator = steps.SelectMany(s => s).GetEnumerator();
             _breakCondition = breakCondition;
             _callerName = callerName;
+            _behaviour = behaviour;
         }
 
         public UniqueMachine(string identifier, UniqueMachineBehaviour behaviour, Action step, Func<bool> breakCondition = null, string callerName = "")
@@ -46,6 +48,7 @@ namespace Licht.Impl.Orchestration
             _actionEnumerator = Enumerable.Repeat(step, 1).GetEnumerator();
             _breakCondition = breakCondition;
             _callerName = callerName;
+            _behaviour = behaviour;
         }
 
         public override MachineStepResult RunStep()
