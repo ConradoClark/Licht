@@ -17,14 +17,14 @@ namespace Licht.Unity.Mixins
             FrameVariables frameVariables,
             ITimer timer,
             BasicMachinery<object> defaultMachinery,
-            ScriptInput clickInput,
-            ScriptInput mousePosInput,
+            InputActionReference clickInput,
+            InputActionReference mousePosInput,
             PlayerInput playerInput,
             Camera camera) : base(sourceObject, frameVariables, timer, defaultMachinery)
         {
             _camera = camera;
-            _clickAction = playerInput.actions[clickInput.ActionName];
-            _mousePosInput = playerInput.actions[mousePosInput.ActionName];
+            _clickAction = playerInput.actions[clickInput.action.name];
+            _mousePosInput = playerInput.actions[mousePosInput.action.name];
         }
 
         public bool WasClickedThisFrame(out Vector3 clickPositionWorld)

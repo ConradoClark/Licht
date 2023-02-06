@@ -2,7 +2,7 @@
 
 namespace Licht.Unity.UI
 {
-    public class UICursor : BaseUIObject
+    public class UICursor : BaseGameObject
     {
     }
 }

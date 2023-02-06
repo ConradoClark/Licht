@@ -39,7 +39,7 @@ namespace Licht.Unity.CharacterControllers
         public ScriptIdentifier GroundedTrigger;
         public ScriptIdentifier CeilingTrigger;
         public ScriptIdentifier GravityIdentifier;
-        public ScriptInput JumpInput;
+        public InputActionReference JumpInput;
         public float JumpSpeed;
         public float AccelerationTime;
         public float DecelerationTime;
@@ -91,7 +91,7 @@ namespace Licht.Unity.CharacterControllers
 
         public IEnumerable<IEnumerable<Action>> ExecuteJump(InputAction jumpAction = null, CustomJumpParams customParams = null)
         {
-            jumpAction ??= _input.actions[JumpInput.ActionName];
+            jumpAction ??= _input.actions[JumpInput.action.name];
 
             IsJumping = true;
             _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpStart, new LichtPlatformerJumpEventArgs
@@ -146,7 +146,7 @@ namespace Licht.Unity.CharacterControllers
 
         protected virtual IEnumerable<IEnumerable<Action>> HandleJump()
         {
-            var jumpInput = _input.actions[JumpInput.ActionName];
+            var jumpInput = _input.actions[JumpInput.action.name];
             while (isActiveAndEnabled)
             {
                 var jumped = false;

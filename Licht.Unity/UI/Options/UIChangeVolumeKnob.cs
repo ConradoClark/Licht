@@ -17,7 +17,7 @@ namespace Licht.Unity.UI.Options
         public SpriteRenderer ShadowGauge;
 
         public PlayerInput PlayerInput;
-        public ScriptInput KnobControl;
+        public InputActionReference KnobControl;
 
         public string VolumeParam;
         public float GaugeLevelSize;
@@ -63,7 +63,7 @@ namespace Licht.Unity.UI.Options
 
         private IEnumerable<IEnumerable<Action>> HandleKnob()
         {
-            var action = PlayerInput.actions[KnobControl.ActionName];
+            var action = PlayerInput.actions[KnobControl.action.name];
 
             while (isActiveAndEnabled)
             {

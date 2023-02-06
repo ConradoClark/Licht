@@ -47,7 +47,7 @@ namespace Licht.Unity.CharacterControllers
         public LichtPhysicsObject Target;
         public float LatestDirection { get; private set; } = 1f;
 
-        public ScriptInput AxisInput;
+        public InputActionReference AxisInput;
 
         private LichtPhysics _physics;
         private PlayerInput _input;
@@ -97,7 +97,7 @@ namespace Licht.Unity.CharacterControllers
 
         private IEnumerable<IEnumerable<Action>> HandleMovement()
         {
-            var axisInput = _input.actions[AxisInput.ActionName];
+            var axisInput = _input.actions[AxisInput.action.name];
             var eventObj = new LichtPlatformerMoveEventArgs
             {
                 Source = this

@@ -10,10 +10,10 @@ namespace Licht.Unity.Mixins
         private Camera _camera;
         private Collider2D _collider;
         private PlayerInput _playerInput;
-        private readonly ScriptInput _mousePosInput;
-        private readonly ScriptInput _mouseClickInput;
+        private readonly InputActionReference _mousePosInput;
+        private readonly InputActionReference _mouseClickInput;
         
-        public ClickableObjectMixinBuilder(MonoBehaviour sourceObject, ScriptInput mousePosInput, ScriptInput mouseClickInput) : base(sourceObject)
+        public ClickableObjectMixinBuilder(MonoBehaviour sourceObject, InputActionReference mousePosInput, InputActionReference mouseClickInput) : base(sourceObject)
         {
             _mousePosInput = mousePosInput;
             _mouseClickInput = mouseClickInput;

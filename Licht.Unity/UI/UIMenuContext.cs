@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 
 namespace Licht.Unity.UI
 {
-    public class UIMenuContext : BaseUIObject
+    public class UIMenuContext : BaseGameObject
     {
         public enum UIDirection
         {
@@ -18,10 +18,10 @@ namespace Licht.Unity.UI
 
         public UIDirection Direction;
         public UICursor Cursor;
-        public ScriptInput UIHorizontal;
-        public ScriptInput UIVertical;
-        public ScriptInput UIAccept;
-        public ScriptInput UICancel;
+        public InputActionReference UIHorizontal;
+        public InputActionReference UIVertical;
+        public InputActionReference UIAccept;
+        public InputActionReference UICancel;
         public UIAction CancelAction;
         public PlayerInput PlayerInput;
         public bool UseCursorPositionAsOffset;
@@ -54,13 +54,19 @@ namespace Licht.Unity.UI
             _actions.Add(order, action);
         }
 
+        public void RemoveUIAction(int order)
+        {
+            _actions ??= new SortedList<int, UIAction>();
+            _actions.Remove(order);
+        }
+
         private IEnumerable<IEnumerable<Action>> HandleMenu()
         {
             if (_actions.Count == 0) yield break;
 
-            var uiDirection = PlayerInput.actions[Direction == UIDirection.Horizontal ? UIHorizontal.ActionName : UIVertical.ActionName];
-            var uiAccept = PlayerInput.actions[UIAccept.ActionName];
-            var uiCancel = PlayerInput.actions[UICancel.ActionName];
+            var uiDirection = PlayerInput.actions[Direction == UIDirection.Horizontal ? UIHorizontal.action.name : UIVertical.action.name];
+            var uiAccept = PlayerInput.actions[UIAccept.action.name];
+            var uiCancel = PlayerInput.actions[UICancel.action.name];
             _currentAction = _actions.First();
             _currentAction.Value.SetSelected();
             Cursor.transform.localPosition = _currentAction.Value.CursorPosition;
@@ -70,7 +76,9 @@ namespace Licht.Unity.UI
                 if (uiDirection.WasPerformedThisFrame())
                 {
                     var dir = Mathf.Sign(uiDirection.ReadValue<float>());
-                    var num = (_actions.IndexOfKey(_currentAction.Key) + (dir > 0 ? -1 : +1));
+                    var num = (_actions.IndexOfKey(_currentAction.Key) 
+                               + ((dir > 0 && Direction == UIDirection.Vertical) ||
+                                  (dir < 0 && Direction == UIDirection.Horizontal) ? -1 : +1));
                     _currentAction = _actions.Skip((num < 0 ? _actions.Count - 1 : num) % _actions.Count)
                         .FirstOrDefault();
                     Cursor.transform.localPosition = UseCursorPositionAsOffset ?

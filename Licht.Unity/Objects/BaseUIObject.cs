@@ -1,9 +1,11 @@
-﻿using Licht.Impl.Orchestration;
+﻿using System;
+using Licht.Impl.Orchestration;
 using Licht.Interfaces.Time;
 using UnityEngine;
 
 namespace Licht.Unity.Objects
 {
+    [Obsolete]
     public class BaseUIObject : MonoBehaviour
     {
         public ITimer UITimer { get; protected set; }

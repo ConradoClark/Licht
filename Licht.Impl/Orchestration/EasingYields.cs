@@ -12,15 +12,17 @@ namespace Licht.Impl.Orchestration
     {
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, float target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
-            float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null)
+            float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null, Func<float,float> curve = null,
+            Func<bool> resetCondition=null)
         {
             return Lerp(setter, getter, seconds, () => target, function, timer, breakCondition, setTargetOnBreak,
-                initStep, immediate, step, pauseCondition);
+                initStep, immediate, step, pauseCondition, curve, resetCondition);
         }
 
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, Func<float> target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
-            float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null)
+            float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null, Func<float, float> curve = null,
+            Func<bool> resetCondition = null)
         {
             if (!immediate) yield return TimeYields.WaitOneFrame;
 
@@ -48,12 +50,18 @@ namespace Licht.Impl.Orchestration
                         if (setTargetOnBreak) setter(target());
                         yield break;
                     }
+
+                    if (resetCondition != null && resetCondition())
+                    {
+                        time = initStep * ms;
+                    }
+
                     time += timer.UpdatedTimeInMilliseconds;
                     var pos = getter();
                     var lastAcc = pos - last;
                     var lerpTarget = initialTarget + lastAcc;
                     start = initialStart + lastAcc;
-                    last = Clamp(Interpolate((float)(time * prop), function), 0, 1);
+                    last = Clamp(curve?.Invoke((float) time) ?? Interpolate((float)(time * prop), function), 0, 1);
                     last = Lerp(start, lerpTarget, last);
                     if (step != null)
                     {

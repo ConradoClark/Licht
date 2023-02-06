@@ -2,9 +2,26 @@
 using System.Collections.Generic;
 using Licht.Impl.Orchestration;
 using Licht.Interfaces.Time;
+using Licht.Unity.Objects;
+using UnityEngine;
 
 namespace Licht.Unity.Builders
 {
+    public static class LerpBuilderExtensions
+    {
+        public static LerpBuilder CreateGameLerp(this BaseGameObject baseObject, Action<float> setter, Func<float> getter)
+        {
+            return new LerpBuilder(setter, getter)
+                .UsingTimer(baseObject.GameTimer);
+        }
+
+        public static LerpBuilder CreateUILerp(this BaseGameObject baseObject, Action<float> setter, Func<float> getter)
+        {
+            return new LerpBuilder(setter, getter)
+                .UsingTimer(baseObject.UITimer);
+        }
+    }
+
     public class LerpBuilder
     {
         public static ITimer DefaultTimer;
@@ -17,10 +34,12 @@ namespace Licht.Unity.Builders
         private ITimer _timer;
         private Func<bool> _breakCondition;
         private Func<bool> _pauseCondition;
+        private Func<bool> _resetCondition;
         private bool _setTargetOnBreak = true;
         private bool _fromOrigin = false;
         private bool _fixedTarget = false;
         private float? _step = null;
+        private AnimationCurve _curve;
 
         public LerpBuilder(Action<float> setter, Func<float> getter)
         {
@@ -83,6 +102,13 @@ namespace Licht.Unity.Builders
         public LerpBuilder Easing(EasingYields.EasingFunction easingFunction)
         {
             _easing = easingFunction;
+            _curve = null;
+            return this;
+        }
+
+        public LerpBuilder WithAnimationCurve(AnimationCurve curve)
+        {
+            _curve = curve;
             return this;
         }
 
@@ -112,7 +138,8 @@ namespace Licht.Unity.Builders
                 _fromOrigin = _fromOrigin,
                 _fixedTarget = _fixedTarget,
                 _step = _step,
-                _pauseCondition = _pauseCondition
+                _pauseCondition = _pauseCondition,
+                _curve = _curve
             };
         }
 
@@ -139,7 +166,9 @@ namespace Licht.Unity.Builders
                     clone._setTargetOnBreak,
                     immediate: true,
                     step: _step,
-                    pauseCondition: clone._pauseCondition
+                    pauseCondition: clone._pauseCondition,
+                    curve: clone._curve.Evaluate,
+                    resetCondition: clone._resetCondition
                 );
 
                 foreach (var step in lerpFn)
@@ -164,7 +193,9 @@ namespace Licht.Unity.Builders
                 clone._setTargetOnBreak,
                 immediate: true,
                 step: _step,
-                pauseCondition: clone._pauseCondition
+                pauseCondition: clone._pauseCondition,
+                curve: clone._curve.Evaluate,
+                resetCondition: clone._resetCondition
             );
 
             foreach (var step in lerp)
@@ -183,6 +214,12 @@ namespace Licht.Unity.Builders
         public LerpBuilder PauseIf(Func<bool> predicate)
         {
             _pauseCondition = predicate;
+            return this;
+        }
+
+        public LerpBuilder ResetIf(Func<bool> predicate)
+        {
+            _resetCondition = predicate;
             return this;
         }
     }

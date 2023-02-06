@@ -11,6 +11,7 @@ namespace Licht.Unity.Physics
     {
         private FrameVariables _frameVariables;
         private LichtPhysics _physics;
+        public bool IsUpdating;
 
         public FrameVariables GetFrameVariables()
         {
@@ -25,6 +26,10 @@ namespace Licht.Unity.Physics
         public void Update()
         {
             _physics.UpdatePositions();
+            if (_physics.Debug)
+            {
+                IsUpdating = true;
+            }
         }
 
         public override object Value => this;

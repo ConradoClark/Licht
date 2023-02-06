@@ -23,8 +23,8 @@ namespace Licht.Unity.CharacterControllers
         public LichtPhysicsObject Target;
         public Vector2 LatestDirection;
 
-        public ScriptInput HorizontalAxisInput;
-        public ScriptInput VerticalAxisInput;
+        public InputActionReference HorizontalAxisInput;
+        public InputActionReference VerticalAxisInput;
         public PlayerInput PlayerInput;
 
         public ScriptTimer TimerRef;
@@ -134,8 +134,8 @@ namespace Licht.Unity.CharacterControllers
 
         private Routine HandleMovement()
         {
-            var horizontalAction = PlayerInput.actions[HorizontalAxisInput.ActionName];
-            var verticalAction = PlayerInput.actions[VerticalAxisInput.ActionName];
+            var horizontalAction = PlayerInput.actions[HorizontalAxisInput.action.name];
+            var verticalAction = PlayerInput.actions[VerticalAxisInput.action.name];
             while (isActiveAndEnabled)
             {
                 while (IsBlocked || !horizontalAction.IsPressed() && !verticalAction.IsPressed()) yield return TimeYields.WaitOneFrameX;

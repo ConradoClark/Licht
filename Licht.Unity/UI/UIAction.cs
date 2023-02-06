@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Licht.Unity.UI
 {
     [DefaultExecutionOrder(-1)]
-    public abstract class UIAction : BaseUIObject
+    public abstract class UIAction : BaseGameObject
     {
         public bool Selected;
         public int Order;
@@ -29,6 +29,7 @@ namespace Licht.Unity.UI
         protected void OnDisable()
         {
             MenuContext.OnCursorMoved -= MenuContext_OnCursorMoved;
+            MenuContext.RemoveUIAction(Order);
         }
 
         public void SetSelected()
@@ -38,7 +39,7 @@ namespace Licht.Unity.UI
 
         private void MenuContext_OnCursorMoved(UIAction obj)
         {
-            if (obj == this) OnSelect(true);
+            if (obj.GetInstanceID() == GetInstanceID()) OnSelect(true);
             else if (Selected) OnDeselect();
         }
     }

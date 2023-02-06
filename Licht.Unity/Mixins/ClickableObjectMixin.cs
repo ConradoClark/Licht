@@ -24,18 +24,18 @@ namespace Licht.Unity.Mixins
             ITimer timer,
             BasicMachinery<object> defaultMachinery,
             Collider2D collider,
-            ScriptInput clickInput,
-            ScriptInput mousePosInput,
+            InputActionReference clickInput,
+            InputActionReference mousePosInput,
             PlayerInput playerInput,
             Camera camera) : base(sourceObject, frameVariables, timer, defaultMachinery)
         {
             _sourceObject = sourceObject;
             _clicked = new FrameVariableDefinition<bool>($"ClickableObjectMixin_{_sourceObject.GetInstanceID()}_Event_Clicked", CheckClick);
             _hovering = new FrameVariableDefinition<bool>($"ClickableObjectMixin_{_sourceObject.GetInstanceID()}_IsHovering", CheckHover);
-            _clickAction = playerInput.actions[clickInput.ActionName];
+            _clickAction = playerInput.actions[clickInput.action.name];
             _collider = collider;
             _camera = camera;
-            _mousePosInput = playerInput.actions[mousePosInput.ActionName];
+            _mousePosInput = playerInput.actions[mousePosInput.action.name];
         }
 
         public void HandleClick(Action onClick, Func<bool> breakCondition = null)
