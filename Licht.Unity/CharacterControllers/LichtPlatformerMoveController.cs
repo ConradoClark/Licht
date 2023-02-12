@@ -60,14 +60,16 @@ namespace Licht.Unity.CharacterControllers
             _input = PlayerInput.GetPlayerByIndex(0);
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             _physics.LichtPhysicsMachinery.Machinery.AddBasicMachine(HandleMovement());
             _eventPublisher = this.RegisterAsEventPublisher<LichtPlatformerMoveEvents, LichtPlatformerMoveEventArgs>();
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             this.UnregisterAsEventPublisher<LichtPlatformerMoveEvents, LichtPlatformerMoveEventArgs>();
         }
 

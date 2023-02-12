@@ -10,6 +10,8 @@ namespace Licht.Unity.Objects
         public ITimer UITimer { get; protected set; }
         public BasicMachinery<object> DefaultMachinery { get; protected set; }
 
+        public bool ComponentEnabled { get; private set; }
+
         private void Awake()
         {
             GameTimer = SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer;
@@ -21,6 +23,15 @@ namespace Licht.Unity.Objects
         protected virtual void OnAwake()
         {
 
+        }
+
+        protected virtual void OnEnable()
+        {
+            ComponentEnabled = true;
+        }
+        protected virtual void OnDisable()
+        {
+            ComponentEnabled = false;
         }
     }
 }

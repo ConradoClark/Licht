@@ -18,16 +18,18 @@ namespace Licht.Unity.UI
         public abstract void OnInit();
         public virtual bool IsBlocked { get; }
 
-        protected void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             if (IsBlocked) return;
             MenuContext.AddUIAction(this, Order);
             MenuContext.OnCursorMoved += MenuContext_OnCursorMoved;
             OnInit();
         }
 
-        protected void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             MenuContext.OnCursorMoved -= MenuContext_OnCursorMoved;
             MenuContext.RemoveUIAction(Order);
         }

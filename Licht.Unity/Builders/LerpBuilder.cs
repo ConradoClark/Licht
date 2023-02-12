@@ -167,7 +167,7 @@ namespace Licht.Unity.Builders
                     immediate: true,
                     step: _step,
                     pauseCondition: clone._pauseCondition,
-                    curve: clone._curve.Evaluate,
+                    curve: clone._curve != null ? new Func<float, float>(clone._curve.Evaluate) : null,
                     resetCondition: clone._resetCondition
                 );
 
@@ -194,7 +194,7 @@ namespace Licht.Unity.Builders
                 immediate: true,
                 step: _step,
                 pauseCondition: clone._pauseCondition,
-                curve: clone._curve.Evaluate,
+                curve: clone._curve != null ? new Func<float, float>(clone._curve.Evaluate) : null,
                 resetCondition: clone._resetCondition
             );
 

@@ -38,13 +38,15 @@ namespace Licht.Unity.UI
             _actions ??= new SortedList<int, UIAction>();
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             DefaultMachinery.AddBasicMachine(HandleMenu());
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             _actions.Clear();
         }
 

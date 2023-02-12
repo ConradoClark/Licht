@@ -52,14 +52,16 @@ namespace Licht.Unity.CharacterControllers
             _physics = this.GetLichtPhysics();
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             _eventPublisher = this.RegisterAsEventPublisher<LichtTopDownMoveEvents, LichtTopDownMoveEventArgs>();
             _physics.LichtPhysicsMachinery.Machinery.AddBasicMachine(HandleMovement());
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             this.UnregisterAsEventPublisher<LichtTopDownMoveEvents, LichtTopDownMoveEventArgs>();
         }
 
