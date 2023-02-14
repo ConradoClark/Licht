@@ -22,6 +22,7 @@ namespace Licht.Unity.CharacterControllers
         public EasingYields.EasingFunction MovementEndEasing;
         public LichtPhysicsObject Target;
         public Vector2 LatestDirection;
+        public bool IsMoving { get; private set; }
 
         public InputActionReference HorizontalAxisInput;
         public InputActionReference VerticalAxisInput;
@@ -151,6 +152,7 @@ namespace Licht.Unity.CharacterControllers
                     Source = this
                 });
 
+                IsMoving = true;
                 yield return StartMovement(horizontalAction, verticalAction).AsCoroutine();
 
                 if (horizontalAction.IsPressed() || verticalAction.IsPressed())
@@ -171,6 +173,7 @@ namespace Licht.Unity.CharacterControllers
                 });
 
                 yield return EndMovement(horizontalAction, verticalAction).AsCoroutine();
+                IsMoving = false;
             }
         }
     }

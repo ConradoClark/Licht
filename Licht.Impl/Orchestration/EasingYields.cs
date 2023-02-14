@@ -61,7 +61,8 @@ namespace Licht.Impl.Orchestration
                     var lastAcc = pos - last;
                     var lerpTarget = initialTarget + lastAcc;
                     start = initialStart + lastAcc;
-                    last = Clamp(curve?.Invoke((float) time) ?? Interpolate((float)(time * prop), function), 0, 1);
+                    
+                    last = curve?.Invoke((float)(time * prop)) ?? Clamp(Interpolate((float)(time * prop), function), 0, 1);
                     last = Lerp(start, lerpTarget, last);
                     if (step != null)
                     {

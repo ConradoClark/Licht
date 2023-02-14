@@ -107,7 +107,9 @@ namespace Licht.Unity.CharacterControllers
 
             while (isActiveAndEnabled)
             {
-                while (IsBlocked || !axisInput.IsPressed()) yield return TimeYields.WaitOneFrameX;
+                while (isActiveAndEnabled && (IsBlocked || !axisInput.IsPressed())) yield return TimeYields.WaitOneFrameX;
+
+                if (!isActiveAndEnabled) yield break;
 
                 var axisSign = Mathf.Sign(axisInput.ReadValue<float>());
                 LatestDirection = axisSign;

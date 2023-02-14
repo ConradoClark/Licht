@@ -169,7 +169,7 @@ namespace Licht.Unity.CharacterControllers
                     {
                         foreach (var _ in TimeYields.WaitSeconds(_physics.ScriptTimerRef.Timer, InputBufferTime))
                         {
-                            if (!IsGrounded() || IsBlocked)
+                            if (!IsGrounded() || IsBlocked || IsJumping)
                             {
                                 yield return TimeYields.WaitOneFrameX;
                                 continue;
@@ -192,7 +192,7 @@ namespace Licht.Unity.CharacterControllers
                 {
                     foreach (var _ in TimeYields.WaitSeconds(_physics.ScriptTimerRef.Timer, CoyoteJumpTime))
                     {
-                        if (!jumpInput.WasPerformedThisFrame() || IsBlocked)
+                        if (!jumpInput.WasPerformedThisFrame() || IsBlocked || IsJumping)
                         {
                             yield return TimeYields.WaitOneFrameX;
                             continue;
@@ -204,7 +204,7 @@ namespace Licht.Unity.CharacterControllers
                     }
                 }
 
-                if (jumpInput.WasPerformedThisFrame() && !IsBlocked && !jumped)
+                if (jumpInput.WasPerformedThisFrame() && !IsBlocked && !jumped && !IsJumping)
                 {
                     yield return ExecuteJump(jumpInput).AsCoroutine();
                     continue;

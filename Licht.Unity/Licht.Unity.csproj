@@ -27,4 +27,8 @@
 	    <HintPath>UnityPackages\UnityEngine.Physics2DModule.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Events\" />
+	</ItemGroup>
 </Project>
