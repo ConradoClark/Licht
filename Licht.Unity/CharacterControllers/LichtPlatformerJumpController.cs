@@ -56,6 +56,8 @@ namespace Licht.Unity.CharacterControllers
         public bool IsJumping { get; protected set; }
         public bool Interrupted { get; protected set; }
 
+        public bool IsForcedJump { get; protected set; }
+
         private LichtPhysics _physics;
         private PlayerInput _input;
         private IEventPublisher<LichtPlatformerJumpEvents, LichtPlatformerJumpEventArgs> _eventPublisher;
@@ -91,8 +93,10 @@ namespace Licht.Unity.CharacterControllers
             _minJumpDelayPassed = true;
         }
 
-        public IEnumerable<IEnumerable<Action>> ExecuteJump(InputAction jumpAction = null, CustomJumpParams customParams = null)
+        public IEnumerable<IEnumerable<Action>> ExecuteJump(InputAction jumpAction = null, CustomJumpParams customParams = null
+            , bool forced = true)
         {
+            IsForcedJump = forced;
             jumpAction ??= _input.actions[JumpInput.action.name];
 
             IsJumping = true;
@@ -133,6 +137,7 @@ namespace Licht.Unity.CharacterControllers
 
             Interrupted = false;
             IsJumping = false;
+            IsForcedJump = false;
             _physics.UnblockCustomPhysicsForceForObject(this, Target, GravityIdentifier.Name);
             _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpEnd, new LichtPlatformerJumpEventArgs
             {
@@ -176,7 +181,7 @@ namespace Licht.Unity.CharacterControllers
                             }
 
                             jumped = true;
-                            yield return ExecuteJump(jumpInput).AsCoroutine();
+                            yield return ExecuteJump(jumpInput, forced:false).AsCoroutine();
                             break;
                         }
                     }
@@ -199,14 +204,14 @@ namespace Licht.Unity.CharacterControllers
                         }
 
                         jumped = true;
-                        yield return ExecuteJump(jumpInput).AsCoroutine();
+                        yield return ExecuteJump(jumpInput, forced: false).AsCoroutine();
                         break;
                     }
                 }
 
                 if (jumpInput.WasPerformedThisFrame() && !IsBlocked && !jumped && !IsJumping)
                 {
-                    yield return ExecuteJump(jumpInput).AsCoroutine();
+                    yield return ExecuteJump(jumpInput, forced: false).AsCoroutine();
                     continue;
                 }
 

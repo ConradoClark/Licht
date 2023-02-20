@@ -51,6 +51,10 @@ namespace Licht.Unity.CharacterControllers
         {
             base.OnAwake();
             _physics = this.GetLichtPhysics();
+            if (PlayerInput == null)
+            {
+                PlayerInput = SceneObject<PlayerInput>.Instance();
+            }
         }
 
         protected override void OnEnable()

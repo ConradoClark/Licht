@@ -36,6 +36,10 @@ namespace Licht.Unity.UI
         {
             base.OnAwake();
             _actions ??= new SortedList<int, UIAction>();
+            if (PlayerInput == null)
+            {
+                PlayerInput = SceneObject<PlayerInput>.Instance();
+            }
         }
 
         protected override void OnEnable()
@@ -68,10 +72,10 @@ namespace Licht.Unity.UI
 
             var uiDirection = PlayerInput.actions[Direction == UIDirection.Horizontal ? UIHorizontal.action.name : UIVertical.action.name];
             var uiAccept = PlayerInput.actions[UIAccept.action.name];
-            var uiCancel = PlayerInput.actions[UICancel.action.name];
+            var uiCancel = UICancel != null ? PlayerInput.actions[UICancel.action.name] : null;
             _currentAction = _actions.First();
             _currentAction.Value.SetSelected();
-            Cursor.transform.localPosition = _currentAction.Value.CursorPosition;
+            if (Cursor != null) Cursor.transform.localPosition = _currentAction.Value.CursorPosition;
 
             while (isActiveAndEnabled)
             {
@@ -83,20 +87,25 @@ namespace Licht.Unity.UI
                                   (dir < 0 && Direction == UIDirection.Horizontal) ? -1 : +1));
                     _currentAction = _actions.Skip((num < 0 ? _actions.Count - 1 : num) % _actions.Count)
                         .FirstOrDefault();
-                    Cursor.transform.localPosition = UseCursorPositionAsOffset ?
+                    if (Cursor != null) Cursor.transform.localPosition = UseCursorPositionAsOffset ?
                         (Vector2)_currentAction.Value.transform.position + _currentAction.Value.CursorPosition :
                         _currentAction.Value.CursorPosition;
 
                     OnCursorMoved?.Invoke(_currentAction.Value);
+
+                    while (uiDirection.WasPerformedThisFrame())
+                    {
+                        yield return TimeYields.WaitOneFrameX;
+                    }
                 }
 
-                if (uiAccept.WasPerformedThisFrame())
+                if (uiAccept.WasReleasedThisFrame())
                 {
                     OnActionClicked?.Invoke(_currentAction.Value);
                     yield return _currentAction.Value.DoAction().AsCoroutine();
                 }
 
-                if (uiCancel.WasPerformedThisFrame() && CancelAction != null)
+                if (uiCancel != null && uiCancel.WasReleasedThisFrame() && CancelAction != null)
                 {
                     OnActionClicked?.Invoke(CancelAction);
                     yield return CancelAction.DoAction().AsCoroutine();

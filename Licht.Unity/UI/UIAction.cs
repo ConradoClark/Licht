@@ -13,8 +13,16 @@ namespace Licht.Unity.UI
         public UIMenuContext MenuContext;
         public Vector2 CursorPosition;
         public abstract IEnumerable<IEnumerable<Action>> DoAction();
-        public abstract void OnSelect(bool manual);
-        public abstract void OnDeselect();
+
+        public virtual void OnSelect(bool manual)
+        {
+            Selected = true;
+        }
+
+        public virtual void OnDeselect()
+        {
+            Selected = false;
+        }
         public abstract void OnInit();
         public virtual bool IsBlocked { get; }
 

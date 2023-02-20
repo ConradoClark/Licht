@@ -39,6 +39,7 @@ namespace Licht.Unity.Builders
         private bool _fromOrigin = false;
         private bool _fixedTarget = false;
         private float? _step = null;
+        private Action<float> _onEachStep;
         private AnimationCurve _curve;
 
         public LerpBuilder(Action<float> setter, Func<float> getter)
@@ -124,6 +125,12 @@ namespace Licht.Unity.Builders
             return this;
         }
 
+        public LerpBuilder OnEachStep(Action<float> onEachStep)
+        {
+            _onEachStep = onEachStep;
+            return this;
+        }
+
         private LerpBuilder Clone()
         {
             return new LerpBuilder(_setter, _getter)
@@ -139,7 +146,8 @@ namespace Licht.Unity.Builders
                 _fixedTarget = _fixedTarget,
                 _step = _step,
                 _pauseCondition = _pauseCondition,
-                _curve = _curve
+                _curve = _curve,
+                _onEachStep = _onEachStep
             };
         }
 
@@ -168,7 +176,8 @@ namespace Licht.Unity.Builders
                     step: _step,
                     pauseCondition: clone._pauseCondition,
                     curve: clone._curve != null ? new Func<float, float>(clone._curve.Evaluate) : null,
-                    resetCondition: clone._resetCondition
+                    resetCondition: clone._resetCondition,
+                    onEachStep: clone._onEachStep
                 );
 
                 foreach (var step in lerpFn)
@@ -195,7 +204,8 @@ namespace Licht.Unity.Builders
                 step: _step,
                 pauseCondition: clone._pauseCondition,
                 curve: clone._curve != null ? new Func<float, float>(clone._curve.Evaluate) : null,
-                resetCondition: clone._resetCondition
+                resetCondition: clone._resetCondition,
+                onEachStep: clone._onEachStep
             );
 
             foreach (var step in lerp)

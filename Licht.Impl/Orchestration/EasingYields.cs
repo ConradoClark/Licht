@@ -13,16 +13,16 @@ namespace Licht.Impl.Orchestration
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, float target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
             float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null, Func<float,float> curve = null,
-            Func<bool> resetCondition=null)
+            Func<bool> resetCondition=null, Action<float> onEachStep = null)
         {
             return Lerp(setter, getter, seconds, () => target, function, timer, breakCondition, setTargetOnBreak,
-                initStep, immediate, step, pauseCondition, curve, resetCondition);
+                initStep, immediate, step, pauseCondition, curve, resetCondition, onEachStep);
         }
 
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, Func<float> target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
             float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null, Func<float, float> curve = null,
-            Func<bool> resetCondition = null)
+            Func<bool> resetCondition = null, Action<float> onEachStep = null)
         {
             if (!immediate) yield return TimeYields.WaitOneFrame;
 
@@ -67,6 +67,11 @@ namespace Licht.Impl.Orchestration
                     if (step != null)
                     {
                         last = GetStep(last, step.Value);
+                    }
+
+                    if (onEachStep!=null)
+                    {
+                        onEachStep(last);
                     }
                     setter(last);
                     yield return TimeYields.WaitOneFrame;
