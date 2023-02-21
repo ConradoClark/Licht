@@ -42,6 +42,16 @@ namespace Licht.Impl.Orchestration
             return basicMachinery;
         }
 
+        public static IEnumerable<Action> Repeat(this IEnumerable<Action> target, int times)
+        {
+            return Enumerable.Repeat(target, times).AsCoroutine();
+        }
+
+        public static IEnumerable<IEnumerable<Action>> Repeat(this IEnumerable<IEnumerable<Action>> target, int times)
+        {
+            return Enumerable.Repeat(target.SelectMany(t => t), times);
+        }
+
         public static IEnumerable<Action> AsCoroutine(this IEnumerable<IEnumerable<Action>> routine)
         {
             return routine.SelectMany(action => action);

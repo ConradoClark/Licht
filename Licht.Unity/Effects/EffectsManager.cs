@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Licht.Unity.Objects;
 using Licht.Unity.Pooling;
 using UnityEngine;
@@ -9,6 +10,7 @@ namespace Licht.Unity.Effects
     public class EffectsManager : SceneObject<EffectsManager>
     {
         public ScriptPrefab[] PreloadEffects;
+        public int DefaultPoolSize;
         public Dictionary<ScriptPrefab, PrefabPool> Effects { get; private set; }
 
         private void Awake()
@@ -51,6 +53,19 @@ namespace Licht.Unity.Effects
             }
 
             return Effects[prefabRef];
+        }
+
+        public PrefabPool GetEffect(GameObject prefab)
+        {
+            var scriptPrefab = Effects.Keys.FirstOrDefault(effect => effect.Prefab == prefab);
+            if (scriptPrefab == null)
+            {
+                 scriptPrefab = ScriptableObject.CreateInstance<ScriptPrefab>();
+                 scriptPrefab.name = prefab.name;
+                 scriptPrefab.DefaultPoolSize = DefaultPoolSize;
+            }
+
+            return GetEffect(scriptPrefab);
         }
     }
 }

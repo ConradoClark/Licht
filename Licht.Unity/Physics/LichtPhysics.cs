@@ -20,6 +20,8 @@ namespace Licht.Unity.Physics
         public float MinRayCastSize = 1f;
         public float CollisionOffset = 0.01f;
         public float FrameMultiplier = 0.001f;
+        public float PhysicsUpdateFrequency = 5 / 60f;
+        public float MaxDistanceBeforeCollisionCheck;
         public LayerMask ObstacleLayerMask;
         public ScriptBasicMachinery LichtPhysicsMachinery;
         public ScriptTimer ScriptTimerRef;
@@ -107,6 +109,20 @@ namespace Licht.Unity.Physics
 
         public void Update()
         {
+            if (Physics2D.simulationMode == SimulationMode2D.Script){
+                var timer = PhysicsUpdateFrequency;
+                timer -= (float) ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
+
+                // Catch up with the game time.
+                // Advance the physics simulation in portions of Time.fixedDeltaTime
+                // Note that generally, we don't want to pass variable delta to Simulate as that leads to unstable results.
+                while (timer >= 0)
+                {
+                    timer -= (float)ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
+                    Physics2D.Simulate(PhysicsUpdateFrequency);
+                }
+            }
+
             foreach (var obj in _physicsWorld)
             {
                 foreach (var force in _physicsForces.Where(f =>
@@ -158,6 +174,10 @@ namespace Licht.Unity.Physics
 
                 obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate);
                 obj.ImplyDirection(obj.CalculatedSpeed.normalized);
+
+                //var speedResult = obj.CalculatedSpeed;
+                //while(MaxDistanceBeforeCollisionCheck)
+
                 obj.transform.position += (Vector3) obj.CalculatedSpeed;
                 obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PostUpdate);
             }

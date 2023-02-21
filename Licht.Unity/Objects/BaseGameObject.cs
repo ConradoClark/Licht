@@ -1,4 +1,6 @@
-﻿using Licht.Impl.Orchestration;
+﻿using System;
+using System.Collections.Generic;
+using Licht.Impl.Orchestration;
 using Licht.Interfaces.Time;
 using UnityEngine;
 
@@ -11,6 +13,8 @@ namespace Licht.Unity.Objects
         public BasicMachinery<object> DefaultMachinery { get; protected set; }
 
         public bool ComponentEnabled { get; private set; }
+
+        protected bool IsDefaultHandleBehavior { get; private set; }
 
         private void Awake()
         {
@@ -28,10 +32,18 @@ namespace Licht.Unity.Objects
         protected virtual void OnEnable()
         {
             ComponentEnabled = true;
+            if (!IsDefaultHandleBehavior) DefaultMachinery.AddBasicMachine(Handle());
         }
+
         protected virtual void OnDisable()
         {
             ComponentEnabled = false;
+        }
+
+        protected virtual IEnumerable<IEnumerable<Action>> Handle()
+        {
+            IsDefaultHandleBehavior = true;
+            yield break;
         }
     }
 }

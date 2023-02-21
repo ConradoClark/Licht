@@ -7,6 +7,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 {
     public class Basic2DBoxCast : LichtPhysicsCollisionDetector
     {
+        public bool Debug;
         public ScriptIdentifier TriggerIdentifier;
         public float Distance;
         public Vector2 Direction;
@@ -34,8 +35,40 @@ namespace Licht.Unity.Physics.CollisionDetection
                 _collisionResults[i] = default;
             }
 
-            var noHits = Physics2D.BoxCastNonAlloc((Vector2)BoxCollider.transform.position + BoxCollider.offset, BoxCollider.size, 0, Direction, _collisionResults,
-                IncreaseBySpeed ? Distance + (PhysicsObject.CalculatedSpeed * Direction).magnitude : Distance, LayerMask);
+            var distance = IncreaseBySpeed
+                ? Distance + (PhysicsObject.CalculatedSpeed * Direction).magnitude
+                : Distance;
+
+            var colliderPosition = BoxCollider.transform.position + (Vector3) BoxCollider.offset;
+
+            var noHits = Physics2D.BoxCastNonAlloc((Vector2)colliderPosition, BoxCollider.size, 
+                0, Direction, _collisionResults, distance, LayerMask);
+
+            if (Debug)
+            {
+                var topLeft = new Vector3(BoxCollider.size.x * -0.5f, BoxCollider.size.y * 0.5f);
+                var topRight = new Vector3(BoxCollider.size.x * 0.5f, BoxCollider.size.y * 0.5f);
+                var bottomLeft = new Vector3(BoxCollider.size.x * -0.5f, BoxCollider.size.y * -0.5f);
+                var bottomRight = new Vector3(BoxCollider.size.x * 0.5f, BoxCollider.size.y * -0.5f);
+                UnityEngine.Debug.DrawLine(colliderPosition + topLeft, colliderPosition + topRight, Color.green);
+                UnityEngine.Debug.DrawLine(colliderPosition + topRight, colliderPosition + bottomRight, Color.green);
+                UnityEngine.Debug.DrawLine(colliderPosition + bottomRight, colliderPosition + bottomLeft, Color.green);
+                UnityEngine.Debug.DrawLine(colliderPosition + bottomLeft, colliderPosition + topLeft, Color.green);
+
+                var topLeftCast = topLeft + (Vector3)(distance * Direction);
+                var topRightCast = topRight + (Vector3)(distance * Direction);
+                var bottomLeftCast = bottomLeft + (Vector3)(distance * Direction);
+                var bottomRightCast = bottomRight + (Vector3)(distance * Direction);
+
+                UnityEngine.Debug.DrawLine(colliderPosition + topLeftCast, colliderPosition + topRightCast, Color.yellow);
+                UnityEngine.Debug.DrawLine(colliderPosition + topRightCast, colliderPosition + bottomRightCast, Color.yellow);
+                UnityEngine.Debug.DrawLine(colliderPosition + bottomRightCast, colliderPosition + bottomLeftCast, Color.yellow);
+                UnityEngine.Debug.DrawLine(colliderPosition + bottomLeftCast, colliderPosition + topLeftCast, Color.yellow);
+
+                UnityEngine.Debug.DrawLine(colliderPosition, colliderPosition + (Vector3)(distance * Direction), Color.red);
+
+            }
+
             if (noHits == 0)
             {
                 if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, false, this);
@@ -50,7 +83,7 @@ namespace Licht.Unity.Physics.CollisionDetection
                 .Select(col => new CollisionResult
                 {
                     Detected = true,
-                    TriggeredHit = col.distance <= Distance,
+                    TriggeredHit = col.distance <= distance,
                     Direction = col.normal,
                     Collider = col.collider,
                     Hit = col,
