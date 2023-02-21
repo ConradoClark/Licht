@@ -13,18 +13,20 @@ namespace Licht.Impl.Orchestration
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, float target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
             float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null, Func<float,float> curve = null,
-            Func<bool> resetCondition=null, Action<float> onEachStep = null)
+            Func<bool> resetCondition=null, Action<float> onEachStep = null, Action onStart = null)
         {
             return Lerp(setter, getter, seconds, () => target, function, timer, breakCondition, setTargetOnBreak,
-                initStep, immediate, step, pauseCondition, curve, resetCondition, onEachStep);
+                initStep, immediate, step, pauseCondition, curve, resetCondition, onEachStep, onStart);
         }
 
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, Func<float> target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
             float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null, Func<float, float> curve = null,
-            Func<bool> resetCondition = null, Action<float> onEachStep = null)
+            Func<bool> resetCondition = null, Action<float> onEachStep = null, Action onStart = null)
         {
             if (!immediate) yield return TimeYields.WaitOneFrame;
+
+            onStart?.Invoke();
 
             var ms = seconds * 1000d;
             var initialStart = getter();

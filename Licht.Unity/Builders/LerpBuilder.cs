@@ -32,6 +32,7 @@ namespace Licht.Unity.Builders
         private float _duration;
         private EasingYields.EasingFunction _easing;
         private ITimer _timer;
+        private Action _onStart;
         private Func<bool> _breakCondition;
         private Func<bool> _pauseCondition;
         private Func<bool> _resetCondition;
@@ -125,6 +126,12 @@ namespace Licht.Unity.Builders
             return this;
         }
 
+        public LerpBuilder OnStart(Action onStart)
+        {
+            _onStart = onStart;
+            return this;
+        }
+
         public LerpBuilder OnEachStep(Action<float> onEachStep)
         {
             _onEachStep = onEachStep;
@@ -147,7 +154,8 @@ namespace Licht.Unity.Builders
                 _step = _step,
                 _pauseCondition = _pauseCondition,
                 _curve = _curve,
-                _onEachStep = _onEachStep
+                _onEachStep = _onEachStep,
+                _onStart = _onStart,
             };
         }
 
@@ -169,7 +177,7 @@ namespace Licht.Unity.Builders
                     clone._duration,
                     clone._targetFn,
                     clone._easing,
-                    clone._timer ?? DefaultTimer,
+                    clone._timer ?? DefaultTimer ?? SceneObject<DefaultGameTimer>.Instance(true).TimerRef.Timer,
                     clone._breakCondition,
                     clone._setTargetOnBreak,
                     immediate: true,
@@ -177,7 +185,8 @@ namespace Licht.Unity.Builders
                     pauseCondition: clone._pauseCondition,
                     curve: clone._curve != null ? new Func<float, float>(clone._curve.Evaluate) : null,
                     resetCondition: clone._resetCondition,
-                    onEachStep: clone._onEachStep
+                    onEachStep: clone._onEachStep,
+                    onStart: clone._onStart
                 );
 
                 foreach (var step in lerpFn)
@@ -197,7 +206,7 @@ namespace Licht.Unity.Builders
                 clone._duration,
                 clone._target,
                 clone._easing,
-                clone._timer ?? DefaultTimer,
+                clone._timer ?? DefaultTimer ?? SceneObject<DefaultGameTimer>.Instance(true).TimerRef.Timer,
                 clone._breakCondition,
                 clone._setTargetOnBreak,
                 immediate: true,
@@ -205,7 +214,8 @@ namespace Licht.Unity.Builders
                 pauseCondition: clone._pauseCondition,
                 curve: clone._curve != null ? new Func<float, float>(clone._curve.Evaluate) : null,
                 resetCondition: clone._resetCondition,
-                onEachStep: clone._onEachStep
+                onEachStep: clone._onEachStep,
+                onStart: clone._onStart
             );
 
             foreach (var step in lerp)

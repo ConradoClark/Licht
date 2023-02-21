@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
+using JetBrains.Annotations;
 using Licht.Interfaces.Time;
 
 namespace Licht.Impl.Orchestration
@@ -42,6 +43,16 @@ namespace Licht.Impl.Orchestration
             return basicMachinery;
         }
 
+
+        public static IEnumerable<Action> ThenRun(this IEnumerable<Action> target, Action action)
+        {
+            foreach (var _ in target)
+            {
+                yield return TimeYields.WaitOneFrame;
+            }
+            action();
+        }
+
         public static IEnumerable<Action> Repeat(this IEnumerable<Action> target, int times)
         {
             return Enumerable.Repeat(target, times).AsCoroutine();
@@ -50,6 +61,19 @@ namespace Licht.Impl.Orchestration
         public static IEnumerable<IEnumerable<Action>> Repeat(this IEnumerable<IEnumerable<Action>> target, int times)
         {
             return Enumerable.Repeat(target.SelectMany(t => t), times);
+        }
+
+        public static IEnumerable<Action> Infinite(this IEnumerable<Action> target)
+        {
+            using (var enumerator = target.GetEnumerator())
+                while (true)
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        yield return TimeYields.WaitOneFrame;
+                    }
+                    enumerator.Reset();
+                }
         }
 
         public static IEnumerable<Action> AsCoroutine(this IEnumerable<IEnumerable<Action>> routine)
@@ -68,6 +92,18 @@ namespace Licht.Impl.Orchestration
             using (var targetEnumerator = target.GetEnumerator())
             {
                 while (sourceEnumerator.MoveNext() | targetEnumerator.MoveNext())
+                {
+                    yield return TimeYields.WaitOneFrame;
+                }
+            }
+        }
+
+        public static IEnumerable<Action> UntilAny(this IEnumerable<Action> source, IEnumerable<Action> target)
+        {
+            using (var sourceEnumerator = source.GetEnumerator())
+            using (var targetEnumerator = target.GetEnumerator())
+            {
+                while (sourceEnumerator.MoveNext() & targetEnumerator.MoveNext())
                 {
                     yield return TimeYields.WaitOneFrame;
                 }
