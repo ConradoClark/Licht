@@ -16,6 +16,7 @@ namespace Licht.Unity.Physics
         public bool Debug;
         public bool Static;
         public bool Ghost;
+        public bool Sticky;
 
         [Serializable]
         public class TriggerDefinitions
@@ -108,6 +109,10 @@ namespace Licht.Unity.Physics
 
         public Vector2 CalculatedSpeed;
 
+        private Caterpillar<Vector2> _latestCalculatedSpeed;
+
+        public Vector2 LatestCalculatedSpeed => _latestCalculatedSpeed.Current;
+
         private Caterpillar<Vector2> _latestNonZeroSpeed;
         public Vector2 LatestNonZeroSpeed => _latestNonZeroSpeed.Current;
 
@@ -122,6 +127,11 @@ namespace Licht.Unity.Physics
             _customObjects ??= new Dictionary<Type, object>();
             _physics = this.GetLichtPhysics();
             _latestSpeed = new Caterpillar<Vector2>
+            {
+                TailSize = 1
+            };
+
+            _latestCalculatedSpeed = new Caterpillar<Vector2>
             {
                 TailSize = 1
             };
@@ -166,6 +176,11 @@ namespace Licht.Unity.Physics
             {
                 SetPhysicsTrigger(trigger.TriggerName, false);
             }
+        }
+
+        private void LateUpdate()
+        {
+            _latestCalculatedSpeed.Current = CalculatedSpeed;
         }
 
         public void CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType type)

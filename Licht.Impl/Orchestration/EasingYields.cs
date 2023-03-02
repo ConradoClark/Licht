@@ -71,16 +71,16 @@ namespace Licht.Impl.Orchestration
                         last = GetStep(last, step.Value);
                     }
 
-                    if (onEachStep!=null)
-                    {
-                        onEachStep(last);
-                    }
+                    onEachStep?.Invoke(last);
                     setter(last);
                     yield return TimeYields.WaitOneFrame;
                 }
             }
 
-            setter(target());
+            var finalTarget = target();
+            onEachStep?.Invoke(finalTarget);
+
+            setter(finalTarget);
         }
 
         private static float Lerp(float p1, float p2, float fraction)

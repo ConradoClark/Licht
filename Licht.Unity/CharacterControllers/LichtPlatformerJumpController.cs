@@ -89,15 +89,20 @@ namespace Licht.Unity.CharacterControllers
 
         private IEnumerable<IEnumerable<Action>> WaitMinJumpDelay(float? minDelay = null)
         {
-            yield return TimeYields.WaitSeconds(GameTimer, minDelay ?? MinJumpHoldInSeconds);
+            _minJumpDelayPassed = false;
+            yield return TimeYields.WaitSeconds(GameTimer, minDelay ?? MinJumpHoldInSeconds,
+                breakCondition: () => !IsJumping);
             _minJumpDelayPassed = true;
+            Target.Sticky = true;
         }
 
         public IEnumerable<IEnumerable<Action>> ExecuteJump(InputAction jumpAction = null, CustomJumpParams customParams = null
             , bool forced = true)
         {
+            if (IsJumping) yield break;
             IsForcedJump = forced;
             jumpAction ??= _input.actions[JumpInput.action.name];
+            Target.Sticky = false;
 
             IsJumping = true;
             _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpStart, new LichtPlatformerJumpEventArgs
@@ -109,9 +114,8 @@ namespace Licht.Unity.CharacterControllers
             _physics.BlockCustomPhysicsForceForObject(this, Target, GravityIdentifier.Name);
             yield return TimeYields.WaitOneFrameX;
 
-            _minJumpDelayPassed = false;
-
-            DefaultMachinery.AddBasicMachine(WaitMinJumpDelay(customParams?.MinJumpDelay));
+            DefaultMachinery.AddUniqueMachine($"minJumpDelay_{gameObject.GetInstanceID()}", UniqueMachine.UniqueMachineBehaviour.Replace,
+                WaitMinJumpDelay(customParams?.MinJumpDelay));
 
             yield return Target.GetSpeedAccessor()
                 .Y
@@ -133,10 +137,11 @@ namespace Licht.Unity.CharacterControllers
                 .UsingTimer(_physics.ScriptTimerRef.Timer)
                 .Build();
 
+            IsJumping = false;
+
             yield return TimeYields.WaitOneFrameX;
 
             Interrupted = false;
-            IsJumping = false;
             IsForcedJump = false;
             _physics.UnblockCustomPhysicsForceForObject(this, Target, GravityIdentifier.Name);
             _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpEnd, new LichtPlatformerJumpEventArgs
@@ -174,14 +179,14 @@ namespace Licht.Unity.CharacterControllers
                     {
                         foreach (var _ in TimeYields.WaitSeconds(_physics.ScriptTimerRef.Timer, InputBufferTime))
                         {
-                            if (!IsGrounded() || IsBlocked || IsJumping)
+                            if (!IsGrounded() || IsBlocked)
                             {
                                 yield return TimeYields.WaitOneFrameX;
                                 continue;
                             }
 
                             jumped = true;
-                            yield return ExecuteJump(jumpInput, forced:false).AsCoroutine();
+                            yield return ExecuteJump(jumpInput, forced: false).AsCoroutine();
                             break;
                         }
                     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Licht.Impl.Orchestration;
 using Licht.Interfaces.Update;
 using Licht.Unity.Extensions;
@@ -178,8 +179,10 @@ namespace Licht.Unity.Physics
                 //var speedResult = obj.CalculatedSpeed;
                 //while(MaxDistanceBeforeCollisionCheck)
 
-                obj.transform.position += (Vector3) obj.CalculatedSpeed;
+                obj.transform.position += (Vector3)obj.CalculatedSpeed;
                 obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PostUpdate);
+
+                obj.CalculatedSpeed = obj.Speed;
             }
 
             foreach (var obj in _physicsStaticWorld)

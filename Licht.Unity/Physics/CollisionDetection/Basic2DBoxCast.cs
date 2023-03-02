@@ -21,6 +21,7 @@ namespace Licht.Unity.Physics.CollisionDetection
         public bool ShouldClampSpeed;
 
         public BoxCollider2D BoxCollider;
+
         protected override void OnAwake()
         {
             base.OnAwake();
@@ -112,7 +113,7 @@ namespace Licht.Unity.Physics.CollisionDetection
                         hasXComponent ? -Mathf.Abs(distance.x) : PhysicsObject.CalculatedSpeed.x,
                         hasXComponent ? Mathf.Abs(distance.x) : PhysicsObject.CalculatedSpeed.x),
                     Mathf.Clamp(targetSpeed.y, hasYComponent ? -Mathf.Abs(distance.y) : PhysicsObject.CalculatedSpeed.y,
-                        hasYComponent ? Mathf.Abs(distance.y) : PhysicsObject.CalculatedSpeed.y));
+                        hasYComponent && (PhysicsObject.Sticky || Math.Sign(PhysicsObject.CalculatedSpeed.y) == Math.Sign(Direction.y)) ? Mathf.Abs(distance.y) : PhysicsObject.CalculatedSpeed.y));
             }
 
             return targetSpeed;

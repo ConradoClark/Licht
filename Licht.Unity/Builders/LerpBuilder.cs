@@ -43,6 +43,13 @@ namespace Licht.Unity.Builders
         private Action<float> _onEachStep;
         private AnimationCurve _curve;
 
+        public LerpBuilder(float initialValue = 0f)
+        {
+            var tempFloat = initialValue;
+            _getter = () => tempFloat;
+            _setter = f => tempFloat = f;
+        }
+
         public LerpBuilder(Action<float> setter, Func<float> getter)
         {
             _setter = setter;
