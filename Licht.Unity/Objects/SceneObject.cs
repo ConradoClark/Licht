@@ -9,7 +9,7 @@ namespace Licht.Unity.Objects
     {
         private static T _storedObject;
         private static readonly Dictionary<string, T> NamedObjects = new Dictionary<string, T>();
-
+        private static bool _notFound;
         static SceneObject()
         {
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
@@ -37,11 +37,15 @@ namespace Licht.Unity.Objects
             return _storedObject;
         }
 
-        public static T Instance(bool includeInactive=false)
+        public static T Instance(bool includeInactive=false, bool includeNew = false)
         {
-            if (_storedObject == null)
+            if (_storedObject == null && (includeNew || !_notFound))
             {
                 _storedObject = FindObjectOfType<T>(includeInactive);
+                if (_storedObject == null)
+                {
+                    _notFound = true;
+                }
             }
 
             return _storedObject;

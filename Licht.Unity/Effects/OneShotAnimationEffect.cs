@@ -1,18 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using Licht.Impl.Orchestration;
+using Licht.Unity.Objects;
 using Licht.Unity.Pooling;
 using UnityEngine;
 
 namespace Licht.Unity.Effects
 {
-    public class OneShotAnimationEffect : EffectPoolable
+    public class OneShotAnimationEffect : BaseGameObject
     {
-        public Animator Animator;
-        public string State;
+        [field: SerializeField]
+        public EffectPoolable Poolable { get; private set; }
 
-        public override void OnActivation()
+        [field: SerializeField]
+        public Animator Animator { get; private set; }
+        [field:SerializeField]
+        public string State { get; private set; }
+
+        override protected void OnEnable()
         {
+            base.OnEnable();
             Animator.Play(State);
             DefaultMachinery.AddBasicMachine(WaitUntilAnimationIsFinished());
         }
@@ -26,7 +33,7 @@ namespace Licht.Unity.Effects
                 yield return TimeYields.WaitOneFrameX;
             }
 
-            EndEffect();
+            Poolable.EndEffect();
         }
     }
 }

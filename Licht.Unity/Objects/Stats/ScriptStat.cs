@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Objects.Stats
 {
+
     public class ScriptStat<T> : ScriptableObject
     {
         [SerializeField]

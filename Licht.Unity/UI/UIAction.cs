@@ -14,14 +14,19 @@ namespace Licht.Unity.UI
         public Vector2 CursorPosition;
         public abstract IEnumerable<IEnumerable<Action>> DoAction();
 
+        public event Action<bool> OnSelected;
+        public event Action OnDeselected;
+
         public virtual void OnSelect(bool manual)
         {
             Selected = true;
+            OnSelected?.Invoke(manual);
         }
 
         public virtual void OnDeselect()
         {
             Selected = false;
+            OnDeselected?.Invoke();
         }
         public abstract void OnInit();
         public virtual bool IsBlocked { get; }

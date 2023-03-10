@@ -45,5 +45,10 @@ namespace Licht.Unity.Objects
             IsDefaultHandleBehavior = true;
             yield break;
         }
+
+        public virtual IEnumerable<IEnumerable<Action>> AsMachine()
+        {
+            yield break;
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Licht.Unity.Memory;
 using Licht.Unity.Objects;
+using Licht.Unity.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,13 +14,15 @@ namespace Licht.Unity.Mixins
         private readonly InputActionReference _mousePosInput;
         private readonly InputActionReference _mouseClickInput;
         
-        public ClickableObjectMixinBuilder(MonoBehaviour sourceObject, InputActionReference mousePosInput, InputActionReference mouseClickInput) : base(sourceObject)
+        public ClickableObjectMixinBuilder(MonoBehaviour sourceObject, InputActionReference mousePosInput = null, 
+            InputActionReference mouseClickInput = null, bool rightClick = false) : base(sourceObject)
         {
-            _mousePosInput = mousePosInput;
-            _mouseClickInput = mouseClickInput;
+            _mousePosInput = mousePosInput ?? SceneObject<DefaultMouseInputs>.Instance()?.MousePos;
+            _mouseClickInput = mouseClickInput ?? rightClick ? SceneObject<DefaultMouseInputs>.Instance()?.MouseRightClick 
+                : SceneObject<DefaultMouseInputs>.Instance()?.MouseLeftClick;
             _playerInput = PlayerInput.GetPlayerByIndex(0);
             _collider = SourceObject?.GetComponent<Collider2D>();
-            _camera = Camera.main;
+            _camera = SceneObject<UICamera>.Instance()?.Camera ?? Camera.main;
         }
 
         public ClickableObjectMixinBuilder WithCamera(Camera camera)
