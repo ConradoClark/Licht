@@ -28,6 +28,7 @@ namespace Licht.Unity.CharacterControllers
             public EasingYields.EasingFunction MovementStartEasing;
             public EasingYields.EasingFunction MovementEndEasing;
             public float? MinJumpDelay;
+            public string Identifier;
         }
 
         public struct LichtPlatformerJumpEventArgs
@@ -61,6 +62,9 @@ namespace Licht.Unity.CharacterControllers
         private LichtPhysics _physics;
         private PlayerInput _input;
         private IEventPublisher<LichtPlatformerJumpEvents, LichtPlatformerJumpEventArgs> _eventPublisher;
+
+        public event Action<LichtPlatformerJumpEventArgs> OnJumpStart;
+        public event Action<LichtPlatformerJumpEventArgs> OnJumpEnd;
 
         protected override void OnAwake()
         {
@@ -105,11 +109,14 @@ namespace Licht.Unity.CharacterControllers
             Target.Sticky = false;
 
             IsJumping = true;
-            _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpStart, new LichtPlatformerJumpEventArgs
+            var eventObject = new LichtPlatformerJumpEventArgs
             {
                 Source = this,
                 CustomParams = customParams
-            });
+            };
+
+            _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpStart, eventObject);
+            OnJumpStart?.Invoke(eventObject);
 
             _physics.BlockCustomPhysicsForceForObject(this, Target, GravityIdentifier.Name);
             yield return TimeYields.WaitOneFrameX;
@@ -144,10 +151,8 @@ namespace Licht.Unity.CharacterControllers
             Interrupted = false;
             IsForcedJump = false;
             _physics.UnblockCustomPhysicsForceForObject(this, Target, GravityIdentifier.Name);
-            _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpEnd, new LichtPlatformerJumpEventArgs
-            {
-                Source = this
-            });
+            _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpEnd, eventObject);
+            OnJumpEnd?.Invoke(eventObject);
         }
 
         private bool IsGrounded()

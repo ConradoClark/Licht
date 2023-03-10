@@ -8,10 +8,13 @@ namespace Licht.Unity.Pooling
 {
     public abstract class EffectPoolable : BaseGameObject, IPoolableComponent
     {
+        public event Action OnEffectOver;
         public bool ActiveOnInitialization;
         private Transform _originalParent;
+
         public void Initialize()
         {
+            _customProps = new Dictionary<string, float>();
             gameObject.SetActive(ActiveOnInitialization);
             _originalParent = transform.parent;
             if (ActiveOnInitialization) Activate();
@@ -45,10 +48,14 @@ namespace Licht.Unity.Pooling
         public virtual void EndEffect()
         {
             IsEffectOver = true;
+            OnEffectOver?.Invoke();
             if (transform != null) transform.SetParent(_originalParent);
             Deactivate();
         }
 
         public MonoBehaviour Component => this;
+
+        private Dictionary<string, float> _customProps;
+        public Dictionary<string, float> CustomProps => _customProps;
     }
 }

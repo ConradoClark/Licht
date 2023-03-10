@@ -73,7 +73,10 @@ namespace Licht.Unity.UI
             var uiDirection = PlayerInput.actions[Direction == UIDirection.Horizontal ? UIHorizontal.action.name : UIVertical.action.name];
             var uiAccept = PlayerInput.actions[UIAccept.action.name];
             var uiCancel = UICancel != null ? PlayerInput.actions[UICancel.action.name] : null;
-            _currentAction = _actions.First();
+
+            var initialSelection = _actions.FirstOrDefault(act => act.Value.Selected);
+
+            _currentAction = initialSelection.Value != null ? initialSelection : _actions.First();
             _currentAction.Value.SetSelected();
             if (Cursor != null) Cursor.transform.localPosition = _currentAction.Value.CursorPosition;
 
@@ -113,6 +116,24 @@ namespace Licht.Unity.UI
 
                 yield return TimeYields.WaitOneFrameX;
             }
+        }
+
+        public void Select(UIAction action)
+        {
+            _currentAction = _actions.FirstOrDefault(a => a.Value == action);
+
+            if (Cursor != null) Cursor.transform.localPosition = UseCursorPositionAsOffset ?
+                (Vector2)_currentAction.Value.transform.position + _currentAction.Value.CursorPosition :
+                _currentAction.Value.CursorPosition;
+
+            OnCursorMoved?.Invoke(_currentAction.Value);
+        }
+
+        public void Click(UIAction action)
+        {
+            _currentAction = _actions.FirstOrDefault(a => a.Value == action);
+            OnActionClicked?.Invoke(_currentAction.Value);
+            DefaultMachinery.AddBasicMachine(_currentAction.Value.DoAction());
         }
     }
 }

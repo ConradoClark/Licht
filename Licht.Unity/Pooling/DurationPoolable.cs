@@ -16,6 +16,7 @@ namespace Licht.Unity.Pooling
 
         public void Initialize()
         {
+            _customProps = new Dictionary<string, float>();
             _originalParent = transform.parent;
             gameObject.SetActive(ActiveOnInitialization);
             if (ActiveOnInitialization) Activate();
@@ -46,5 +47,7 @@ namespace Licht.Unity.Pooling
         }
 
         public MonoBehaviour Component => this;
+        private Dictionary<string, float> _customProps;
+        public Dictionary<string, float> CustomProps => _customProps;
     }
 }
