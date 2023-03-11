@@ -65,15 +65,7 @@ namespace Licht.Impl.Orchestration
 
         public static IEnumerable<Action> Infinite(this IEnumerable<Action> target)
         {
-            using (var enumerator = target.GetEnumerator())
-                while (true)
-                {
-                    while (enumerator.MoveNext())
-                    {
-                        yield return TimeYields.WaitOneFrame;
-                    }
-                    enumerator.Reset();
-                }
+            return target.Repeat(int.MaxValue);
         }
 
         public static IEnumerable<Action> AsCoroutine(this IEnumerable<IEnumerable<Action>> routine)
@@ -94,6 +86,28 @@ namespace Licht.Impl.Orchestration
                 while (sourceEnumerator.MoveNext() | targetEnumerator.MoveNext())
                 {
                     yield return TimeYields.WaitOneFrame;
+                }
+            }
+        }
+
+        public static IEnumerable<Action> Until(this IEnumerable<Action> source, Func<bool> breakCondition)
+        {
+            using (var sourceEnumerator = source.GetEnumerator())
+            {
+                while (sourceEnumerator.MoveNext() && !breakCondition())
+                {
+                    yield return TimeYields.WaitOneFrame;
+                }
+            }
+        }
+
+        public static IEnumerable<IEnumerable<Action>> Until(this IEnumerable<IEnumerable<Action>> source, Func<bool> breakCondition)
+        {
+            using (var sourceEnumerator = source.GetEnumerator())
+            {
+                while (sourceEnumerator.MoveNext() && !breakCondition())
+                {
+                    yield return TimeYields.WaitOneFrameX;
                 }
             }
         }

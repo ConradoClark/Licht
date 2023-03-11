@@ -16,7 +16,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 
         protected override void OnAwake()
         {
-            base.OnAwake();
+            base.OnAwake(); 
             DetectorType = CollisionDetectorType.PostUpdate;
         }
 

@@ -102,6 +102,10 @@ namespace Licht.Impl.Orchestration
 
         public override void Cleanup()
         {
+            if (_uniqueChecker.ContainsKey(_identifier))
+            {
+                _uniqueChecker.Remove(_identifier);
+            }
             _actionEnumerator.Dispose();
         }
     }

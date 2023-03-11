@@ -3,10 +3,15 @@ using System.Linq;
 using Licht.Interfaces.Update;
 using Licht.Unity.Objects;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Licht.Unity
 {
     [DefaultExecutionOrder(-2000)]
+    [RequireComponent(typeof(DefaultGameTimer))]
+    [RequireComponent(typeof(DefaultUITimer))]
+    [RequireComponent(typeof(DefaultMachinery))]
+    [RequireComponent(typeof(PlayerInput))]
     public class BasicToolbox : SceneObject<BasicToolbox>
     {
         public int TargetFrameRate;

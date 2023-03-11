@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using Licht.Impl.Events;
 using Licht.Interfaces.Orchestration;
 
 namespace Licht.Impl.Orchestration
@@ -48,6 +49,7 @@ namespace Licht.Impl.Orchestration
             {
                 foreach (var machine in _machineLayers)
                 {
+                    machine.Key.Cleanup();
                     _machinarium[_machineLayers[machine.Key]].Remove(machine.Key);
                 }
 
@@ -176,6 +178,7 @@ namespace Licht.Impl.Orchestration
         public void FinalizeWith(Action action)
         {
             _finalizeAction = action;
+            EventBroadcasterDisposer.Cleanup();
         }
     }
 }

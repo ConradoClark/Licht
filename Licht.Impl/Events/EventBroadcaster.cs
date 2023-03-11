@@ -60,6 +60,27 @@ namespace Licht.Impl.Events
         }
     }
 
+    public static class EventBroadcasterDisposer
+    {
+        public static List<Action> DisposeList { get; } = new List<Action>();
+
+        public static void AddToDisposeList(Action action)
+        {
+            DisposeList.Add(action);
+        }
+
+        public static void Cleanup()
+        {
+            foreach (var action in DisposeList)
+            {
+                action();
+            }
+
+            DisposeList.Clear();
+        }
+
+    }
+
     public class EventBroadcaster<TEventType, TEventObject> : IEventObservable<TEventType, TEventObject>
     {
 
@@ -119,6 +140,7 @@ namespace Licht.Impl.Events
             };
 
             ObjectEvent += _eventRefs[eventRef];
+            EventBroadcasterDisposer.AddToDisposeList(() => StopObservingEvent(eventName, onEvent));
         }
 
         public void StopObservingEvent(TEventType eventName, Action<TEventObject> onEvent)
@@ -143,6 +165,9 @@ namespace Licht.Impl.Events
             var eventPublisher = new EventPublisher<TEventType, TEventObject>(publisher,
                 (@event, @object) => ObjectEvent?.Invoke(@event, @object));
             _publishers.Add(eventPublisher);
+
+            EventBroadcasterDisposer.AddToDisposeList(()=> UnregisterPublisher(publisher));
+
             return eventPublisher;
         }
 
@@ -151,6 +176,9 @@ namespace Licht.Impl.Events
             var eventPublisher = new VoidEventPublisher<TEventType, TEventObject>(publisher,
                 (@event, @object) => ObjectEvent?.Invoke(@event, @object));
             _publishers.Add(eventPublisher);
+
+            EventBroadcasterDisposer.AddToDisposeList(() => UnregisterPublisher(publisher));
+
             return eventPublisher;
         }
 
