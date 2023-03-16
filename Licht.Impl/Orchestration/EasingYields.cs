@@ -13,16 +13,16 @@ namespace Licht.Impl.Orchestration
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, float target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
             float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null, Func<float,float> curve = null,
-            Func<bool> resetCondition=null, Action<float> onEachStep = null, Action onStart = null)
+            Func<bool> resetCondition=null, Action<float> onEachStep = null, Action onStart = null, Func<float,float,float> customInterpolation = null)
         {
             return Lerp(setter, getter, seconds, () => target, function, timer, breakCondition, setTargetOnBreak,
-                initStep, immediate, step, pauseCondition, curve, resetCondition, onEachStep, onStart);
+                initStep, immediate, step, pauseCondition, curve, resetCondition, onEachStep, onStart, customInterpolation);
         }
 
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, Func<float> target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
             float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null, Func<float, float> curve = null,
-            Func<bool> resetCondition = null, Action<float> onEachStep = null, Action onStart = null)
+            Func<bool> resetCondition = null, Action<float> onEachStep = null, Action onStart = null, Func<float,float, float> customInterpolation = null)
         {
             if (!immediate) yield return TimeYields.WaitOneFrame;
 
@@ -64,7 +64,8 @@ namespace Licht.Impl.Orchestration
                     var lerpTarget = initialTarget + lastAcc;
                     start = initialStart + lastAcc;
                     
-                    last = curve?.Invoke((float)(time * prop)) ?? Clamp(Interpolate((float)(time * prop), function), 0, 1);
+                    last = curve?.Invoke((float)(time * prop)) ?? Clamp(
+                        customInterpolation?.Invoke((float) time, (float) prop) ?? Interpolate((float)(time * prop), function), 0, 1);
                     last = Lerp(start, lerpTarget, last);
                     if (step != null)
                     {

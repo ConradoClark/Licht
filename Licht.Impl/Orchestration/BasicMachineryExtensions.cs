@@ -105,7 +105,29 @@ namespace Licht.Impl.Orchestration
         {
             using (var sourceEnumerator = source.GetEnumerator())
             {
-                while (sourceEnumerator.MoveNext() && !breakCondition())
+                while (!breakCondition() && sourceEnumerator.MoveNext())
+                {
+                    yield return TimeYields.WaitOneFrameX;
+                }
+            }
+        }
+
+        public static IEnumerable<Action> RepeatUntil(this IEnumerable<Action> source, Func<bool> breakCondition)
+        {
+            using (var sourceEnumerator = source.Infinite().GetEnumerator())
+            {
+                while (!breakCondition() && sourceEnumerator.MoveNext())
+                {
+                    yield return TimeYields.WaitOneFrame;
+                }
+            }
+        }
+
+        public static IEnumerable<IEnumerable<Action>> RepeatUntil(this IEnumerable<IEnumerable<Action>> source, Func<bool> breakCondition)
+        {
+            using (var sourceEnumerator = source.AsCoroutine().Infinite().GetEnumerator())
+            {
+                while (!breakCondition() && sourceEnumerator.MoveNext())
                 {
                     yield return TimeYields.WaitOneFrameX;
                 }

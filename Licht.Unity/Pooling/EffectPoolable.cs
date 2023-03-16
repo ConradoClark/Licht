@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Licht.Impl.Orchestration;
+using Licht.Interfaces.Pooling;
 using Licht.Unity.Objects;
 using UnityEngine;
 
@@ -57,5 +58,6 @@ namespace Licht.Unity.Pooling
 
         private Dictionary<string, float> _customProps;
         public Dictionary<string, float> CustomProps => _customProps;
+        public IPool Pool { get; set; }
     }
 }

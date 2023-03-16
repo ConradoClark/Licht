@@ -7,7 +7,8 @@ using UnityEngine;
 namespace Licht.Unity.Pooling
 {
     [DefaultExecutionOrder(-1000)]
-    public class GenericPrefabPool<T> : MonoBehaviour, IPoolableObjectFactory<T>, IActivable where T: IPoolableComponent
+    public class GenericPrefabPool<T> : MonoBehaviour, IPoolableObjectFactory<T>, IActivable
+        where T: IPoolableComponent
     {
         public bool AutoActivate;
         public GameObject Prefab;

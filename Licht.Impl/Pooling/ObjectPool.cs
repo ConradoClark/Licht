@@ -30,10 +30,10 @@ namespace Licht.Impl.Pooling
             return _objectPool.Where(obj => obj.IsActive).ToArray();
         }
 
-        public bool Release(T obj)
+        public bool Release(IPoolableObject obj)
         {
             if (!IsActive) return false;
-            if (!_objectPool.Contains(obj)) return false;
+            if (_objectPool.All(o=> !Equals(o, obj))) return false;
             if (obj == null) return false;
 
             obj.Deactivate();
@@ -71,7 +71,7 @@ namespace Licht.Impl.Pooling
         {
             if (!IsActive)
             {
-                obj = default(T);
+                obj = default;
                 return false;
             }
 
@@ -79,11 +79,12 @@ namespace Licht.Impl.Pooling
             {
                 if (_objectPool[index].IsActive) continue;
                 obj = _objectPool[index];
+                obj.Pool = this;
                 obj.Activate();
                 return true;
             }
 
-            obj = default(T);
+            obj = default;
             return false;
         }
 
@@ -91,7 +92,7 @@ namespace Licht.Impl.Pooling
         {
             if (amount <= 0 || !IsActive)
             {
-                objects = new T[0];
+                objects = Array.Empty<T>();
                 return false;
             }
 
@@ -104,14 +105,14 @@ namespace Licht.Impl.Pooling
             for (var index = 0; index < _objectPool.Length; index++)
             {
                 var obj = _objectPool[index];
-                if (!obj.IsActive)
-                {
-                    obj.Activate();
-                    _tempPool[currentIndex] = obj;
-                    currentIndex++;
+                obj.Pool = this;
 
-                    if (currentIndex >= amount) break;
-                }
+                if (obj.IsActive) continue;
+                obj.Activate();
+                _tempPool[currentIndex] = obj;
+                currentIndex++;
+
+                if (currentIndex >= amount) break;
             }
 
             objects = new T[currentIndex];

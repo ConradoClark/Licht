@@ -16,14 +16,14 @@ public class SpriteTransformer : BaseGameObject
     private Vector3 _initialPosition;
 
     [field: SerializeField]
-    public SpriteRenderer SpriteRenderer { get; private set; }
+    public Transform Target { get; private set; }
 
     protected override void OnAwake()
     {
         base.OnAwake();
-        _initialRotation = SpriteRenderer.transform.localRotation;
-        _initialScale = SpriteRenderer.transform.localScale;
-        _initialPosition = SpriteRenderer.transform.localPosition;
+        _initialRotation = Target.localRotation;
+        _initialScale = Target.localScale;
+        _initialPosition = Target.localPosition;
     }
 
     private void ResetValues()
@@ -53,10 +53,10 @@ public class SpriteTransformer : BaseGameObject
         var rotation = _initialRotation * Rotation;
         var position = _initialPosition + Position;
 
-        SpriteRenderer.transform.localScale = Vector3.Scale(_initialScale, Scale);
-        SpriteRenderer.transform.localPosition = position;
-        SpriteRenderer.transform.localRotation = _initialRotation;
-        SpriteRenderer.transform.RotateAround(CenterPivot.position, Vector3.forward, rotation.eulerAngles.z);
+        Target.localScale = Vector3.Scale(_initialScale, Scale);
+        Target.localPosition = position;
+        Target.localRotation = _initialRotation;
+        Target.RotateAround(CenterPivot.position, Vector3.forward, rotation.eulerAngles.z);
 
         ResetValues();
     }
