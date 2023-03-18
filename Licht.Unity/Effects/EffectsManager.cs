@@ -39,7 +39,7 @@ namespace Licht.Unity.Effects
             var pool = prefabPool.AddComponent<PrefabPool>();
             pool.Size = prefabRef.DefaultPoolSize;
             pool.Prefab = prefabRef.Prefab;
-
+            prefabRef.Pool = pool;
             pool.Activate();
 
             Effects[prefabRef] = pool;

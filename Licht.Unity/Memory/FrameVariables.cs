@@ -41,6 +41,11 @@ namespace Licht.Unity.Memory
             Clear();
         }
 
+        private void OnDestroy()
+        {
+            Clear();
+        }
+
         private void Clear()
         {
             foreach (var action in _clearActions.Values)

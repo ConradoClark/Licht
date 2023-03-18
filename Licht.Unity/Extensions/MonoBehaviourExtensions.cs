@@ -15,9 +15,9 @@ namespace Licht.Unity.Extensions
             return BasicToolbox.Instance().ScriptableObjects.OfType<LichtPhysics>().FirstOrDefault();
         }
 
-        public static T FromScene<T>(this T obj, bool includeInactive = false) where T : MonoBehaviour
+        public static T FromScene<T>(this T obj, bool includeInactive = false, bool includeNew = false) where T : MonoBehaviour
         {
-            return SceneObject<T>.Instance(includeInactive);
+            return SceneObject<T>.Instance(includeInactive, includeNew);
         }
 
         public static PrefabPool GetPoolFromEffects(this MonoBehaviour obj, ScriptPrefab prefab)

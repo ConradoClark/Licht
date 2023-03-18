@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace Licht.Unity.Juicers.JuiceExtensions.Transform
 {
-    [AddComponentMenu("JUICE_UniformScale")]
-    public class UniformScale : BaseGameRunner
+    [AddComponentMenu("JUICE_UniformScaleInOut")]
+    public class UniformScaleInOut : BaseGameRunner
     {
         [field: SerializeField]
         public Transformer SpriteTransformer { get; private set; }
@@ -27,7 +27,10 @@ namespace Licht.Unity.Juicers.JuiceExtensions.Transform
         public float TimeInSeconds { get; private set; }
 
         [field: SerializeField]
-        public EasingYields.EasingFunction Easing { get; private set; }
+        public EasingYields.EasingFunction EaseIn { get; private set; }
+
+        [field: SerializeField]
+        public EasingYields.EasingFunction EaseOut { get; private set; }
 
         protected override IEnumerable<IEnumerable<Action>> Handle()
         {
@@ -35,10 +38,18 @@ namespace Licht.Unity.Juicers.JuiceExtensions.Transform
 
             yield return new LerpBuilder()
                 .SetTarget(1f)
-                .Easing(Easing)
-                .Over(TimeInSeconds)
+                .Easing(EaseIn)
+                .Over(TimeInSeconds*0.5f)
                 .UsingTimer(Timer)
                 .OnEachStep(f=> SpriteTransformer.ApplyScale(Vector3.Lerp(InitialScale, TargetScale, f)))
+                .Build();
+
+            yield return new LerpBuilder(0f)
+                .SetTarget(1f)
+                .Easing(EaseOut)
+                .Over(TimeInSeconds * 0.5f)
+                .UsingTimer(Timer)
+                .OnEachStep(f => SpriteTransformer.ApplyScale(Vector3.Lerp(TargetScale, InitialScale, f)))
                 .Build();
         }
     }

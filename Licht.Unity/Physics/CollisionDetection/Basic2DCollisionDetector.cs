@@ -12,7 +12,13 @@ namespace Licht.Unity.Physics.CollisionDetection
         public ContactFilter2D ContactFilter;
         private readonly List<Collider2D> _collisionResults = new List<Collider2D>();
 
+        public ScriptIdentifier TriggerIdentifier;
         public ScriptIdentifier HitCeilingIdentifier;
+
+        public bool PreventUpClamp;
+        public bool PreventDownClamp;
+        public bool PreventRightClamp;
+        public bool PreventLeftClamp;
 
         protected override void OnAwake()
         {
@@ -23,9 +29,13 @@ namespace Licht.Unity.Physics.CollisionDetection
         public override CollisionResult[] CheckCollision()
         {
             var noHits = Collider.OverlapCollider(ContactFilter, _collisionResults);
-            if (noHits == 0) return Array.Empty<CollisionResult>();
+            if (noHits == 0)
+            {
+                if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, false, this);
+                return Array.Empty<CollisionResult>();
+            }
 
-            return _collisionResults
+            var results = _collisionResults
                 .Where(col => !PhysicsObject.CollisionDetectors.Select(c => c.Collider).Contains(col)
                    && !PhysicsObject.AdditionalColliders.Contains(col))
                 .Select(col =>
@@ -41,6 +51,9 @@ namespace Licht.Unity.Physics.CollisionDetection
                     };
                 })
                 .ToArray();
+
+            if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, results.Any(r=>r.TriggeredHit), this);
+            return results;
         }
 
         public override Vector2 Clamp()
@@ -69,7 +82,14 @@ namespace Licht.Unity.Physics.CollisionDetection
                                                                               && Vector2.Angle(distance.normal, Vector2.up) < 90, this);
                     }
 
-                    clampedPosition += (Vector3)distanceToCollide;
+                    var clamp = new Vector3(
+                        Mathf.Clamp(distanceToCollide.x, PreventLeftClamp ? 0 : distanceToCollide.x,
+                            PreventRightClamp ? 0 : distanceToCollide.x),
+                        Mathf.Clamp(distanceToCollide.y, PreventDownClamp ? 0 : distanceToCollide.y,
+                            PreventUpClamp ? 0 : distanceToCollide.y)
+                    );
+
+                    clampedPosition += clamp;
                 }
             }
             return clampedPosition;

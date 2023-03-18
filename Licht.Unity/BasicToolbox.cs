@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Licht.Impl.Events;
 using Licht.Interfaces.Update;
 using Licht.Unity.Objects;
 using UnityEngine;
@@ -46,6 +48,13 @@ namespace Licht.Unity
             {
                 scriptableObject.Update();
             }
+        }
+
+        protected void OnDestroy()
+        {
+            EventBroadcasterDisposer.Cleanup();
+            _updateableScriptableObjects = Array.Empty<IUpdateable>();
+            _initializableScriptableObjects = Array.Empty<IInitializable>();
         }
     }
 }

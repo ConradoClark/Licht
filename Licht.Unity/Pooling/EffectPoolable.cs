@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Pooling
 {
-    public abstract class EffectPoolable : BaseGameObject, IPoolableComponent
+    public class EffectPoolable : BaseGameObject, IPoolableComponent
     {
         public event Action OnEffectOver;
         public bool ActiveOnInitialization;
@@ -16,6 +16,7 @@ namespace Licht.Unity.Pooling
         public void Initialize()
         {
             _customProps = new Dictionary<string, float>();
+            _customTags = new Dictionary<string, string>();
             gameObject.SetActive(ActiveOnInitialization);
             _originalParent = transform.parent;
             if (ActiveOnInitialization) Activate();
@@ -43,7 +44,10 @@ namespace Licht.Unity.Pooling
             return true;
         }
 
-        public abstract void OnActivation();
+        public virtual void OnActivation()
+        {
+        }
+
         public virtual bool IsEffectOver { get; protected set; }
 
         public virtual void EndEffect()
@@ -58,6 +62,20 @@ namespace Licht.Unity.Pooling
 
         private Dictionary<string, float> _customProps;
         public Dictionary<string, float> CustomProps => _customProps;
+
+        private Dictionary<string, string> _customTags;
+        public Dictionary<string, string> CustomTags => _customTags;
         public IPool Pool { get; set; }
+
+        public bool HasTag(string customTag, string value = null)
+        {
+            return _customTags.ContainsKey(customTag) && (value == null || _customTags[customTag] == value);
+        }
+
+        public bool HasProp(string customProp, float? value = null, float tolerance=0.01f)
+        {
+            return _customProps.ContainsKey(customProp) &&
+                   (value == null || Mathf.Abs(_customProps[customProp] - value.Value) < tolerance);
+        }
     }
 }

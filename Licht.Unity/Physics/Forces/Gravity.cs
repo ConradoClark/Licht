@@ -18,6 +18,9 @@ namespace Licht.Unity.Physics.Forces
         public float Speed;
         public float TimeInSecondsUntilFullEffect;
 
+        [field:SerializeField]
+        public float StartDelayInSeconds { get; private set; }
+
         public override bool IsActive { get; set; } = true;
         public override string Key => GravityIdentifier.Name;
 
@@ -34,9 +37,11 @@ namespace Licht.Unity.Physics.Forces
             Physics.OnRemovePhysicsObject -= Physics_OnRemovePhysicsObject;
         }
 
-        private IEnumerable<Action> StartGravity()
+        private IEnumerable<IEnumerable<Action>> StartGravity()
         {
-            yield return TimeYields.WaitOneFrame;
+            yield return TimeYields.WaitOneFrameX;
+            yield return TimeYields.WaitSeconds(
+                SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer, StartDelayInSeconds);
             Activate();
 
             Physics.OnAddPhysicsObject += Physics_OnAddPhysicsObject;

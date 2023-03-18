@@ -18,6 +18,7 @@ namespace Licht.Unity.Objects
         private static void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
         {
             _storedObject = null;
+            _notFound = false;
             NamedObjects.Clear();
         }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Licht.Unity.Objects;
 using UnityEngine;
 
-public class SpriteTransformer : BaseGameObject
+public class Transformer : BaseGameObject
 {
     [field: SerializeField]
     public Transform CenterPivot { get; private set; }
