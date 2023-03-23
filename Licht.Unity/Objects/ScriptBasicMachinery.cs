@@ -8,5 +8,10 @@ namespace Licht.Unity.Objects
     {
         public override object Value => Machinery;
         public BasicMachinery<object> Machinery { get; } = new BasicMachinery<object>(0);
+
+        private void OnEnable()
+        {
+            Machinery.Activate();
+        }
     }
 }

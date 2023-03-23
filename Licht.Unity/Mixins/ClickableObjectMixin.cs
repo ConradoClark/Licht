@@ -12,7 +12,8 @@ namespace Licht.Unity.Mixins
     public class ClickableObjectMixin : BaseObjectMixin
     {
         private readonly FrameVariableDefinition<bool> _clicked;
-        private readonly FrameVariableDefinition<bool> _hovering;
+        private readonly 
+            FrameVariableDefinition<bool> _hovering;
         private readonly MonoBehaviour _sourceObject;
         private readonly InputAction _clickAction;
         private readonly InputAction _mousePosInput;

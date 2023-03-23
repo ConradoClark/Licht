@@ -29,6 +29,9 @@ namespace Licht.Unity.Objects
 
         protected virtual void OnEnable()
         {
+            GameTimer ??= SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer;
+            UITimer ??= SceneObject<DefaultUITimer>.Instance().TimerRef.Timer;
+            DefaultMachinery ??= SceneObject<DefaultMachinery>.Instance().MachineryRef.Machinery;
             ComponentEnabled = true;
         }
 

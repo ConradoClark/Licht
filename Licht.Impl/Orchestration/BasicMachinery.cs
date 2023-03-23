@@ -43,8 +43,6 @@ namespace Licht.Impl.Orchestration
 
         public void Update()
         {
-            if (!IsActive) return;
-
             if (_finalizeAction != null)
             {
                 foreach (var machine in _machineLayers)
@@ -56,6 +54,8 @@ namespace Licht.Impl.Orchestration
                 _finalizeAction();
                 _finalizeAction = null;
             }
+
+            if (!IsActive) return;
 
             _queueExhaustion = new Dictionary<IMachineQueue, bool>();
             _removeList.Clear();
@@ -165,6 +165,7 @@ namespace Licht.Impl.Orchestration
 
         public bool Activate()
         {
+            _finalizeAction = null;
             if (IsActive) return false;
             IsActive = true;
             return true;
@@ -177,6 +178,11 @@ namespace Licht.Impl.Orchestration
 
         public void FinalizeWith(Action action)
         {
+            IsActive = false;
+            _machinarium.Clear();
+            _machineLayers.Clear();
+            _layerOrder = Array.Empty<TKey>();
+
             _finalizeAction = action;
             EventBroadcasterDisposer.Cleanup();
         }

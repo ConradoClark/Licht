@@ -32,14 +32,6 @@ namespace Licht.Unity
             {
                 Application.targetFrameRate = -1;
             }
-            
-            _updateableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IUpdateable>().ToArray();
-            _initializableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IInitializable>().ToArray();
-
-            foreach (var obj in _initializableScriptableObjects)
-            {
-                obj.Initialize();
-            }
         }
 
         protected void Update()
@@ -48,6 +40,29 @@ namespace Licht.Unity
             {
                 scriptableObject.Update();
             }
+        }
+
+        protected void OnEnable()
+        {
+            _updateableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IUpdateable>().ToArray();
+            _initializableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IInitializable>().ToArray();
+
+            foreach (var obj in _initializableScriptableObjects)
+            {
+                obj.Initialize();
+            }
+
+            DefaultMachinery.Instance().MachineryRef.Machinery.Activate();
+        }
+
+        protected void OnDisable()
+        {
+            DefaultMachinery.Instance().MachineryRef.Machinery.FinalizeWith(() =>
+            {
+                EventBroadcasterDisposer.Cleanup();
+                _updateableScriptableObjects = Array.Empty<IUpdateable>();
+                _initializableScriptableObjects = Array.Empty<IInitializable>();
+            });
         }
 
         protected void OnDestroy()
