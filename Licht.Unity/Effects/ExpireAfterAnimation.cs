@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Effects
 {
-    public class OneShotAnimationEffect : BaseGameObject
+    public class ExpireAfterAnimation : BaseGameRunner
     {
         [field: SerializeField]
         public EffectPoolable Poolable { get; private set; }
@@ -21,10 +21,9 @@ namespace Licht.Unity.Effects
         {
             base.OnEnable();
             Animator.Play(State);
-            DefaultMachinery.AddBasicMachine(WaitUntilAnimationIsFinished());
         }
 
-        private IEnumerable<IEnumerable<Action>> WaitUntilAnimationIsFinished()
+        override protected IEnumerable<IEnumerable<Action>> Handle()
         {
             yield return TimeYields.WaitOneFrameX;
 

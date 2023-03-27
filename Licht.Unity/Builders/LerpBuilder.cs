@@ -43,6 +43,7 @@ namespace Licht.Unity.Builders
         private Action<float> _onEachStep;
         private AnimationCurve _curve;
         private Func<float,float, float> _customInterpolation;
+        private Func<float> _customDuration;
 
         public LerpBuilder(float initialValue = 0f)
         {
@@ -66,6 +67,12 @@ namespace Licht.Unity.Builders
         public LerpBuilder FromUpdatedValues()
         {
             _fromOrigin = false;
+            return this;
+        }
+
+        public LerpBuilder WithVariableDuration(Func<float> durationGetter)
+        {
+            _customDuration = durationGetter;
             return this;
         }
 
@@ -171,7 +178,8 @@ namespace Licht.Unity.Builders
                 _curve = _curve,
                 _onEachStep = _onEachStep,
                 _onStart = _onStart,
-                _customInterpolation = _customInterpolation
+                _customInterpolation = _customInterpolation,
+                _customDuration = _customDuration
             };
         }
 
@@ -203,7 +211,8 @@ namespace Licht.Unity.Builders
                     resetCondition: clone._resetCondition,
                     onEachStep: clone._onEachStep,
                     onStart: clone._onStart,
-                    customInterpolation: clone._customInterpolation
+                    customInterpolation: clone._customInterpolation,
+                    customSeconds: clone._customDuration
                 );
 
                 foreach (var step in lerpFn)
@@ -233,7 +242,8 @@ namespace Licht.Unity.Builders
                 resetCondition: clone._resetCondition,
                 onEachStep: clone._onEachStep,
                 onStart: clone._onStart,
-                customInterpolation: clone._customInterpolation
+                customInterpolation: clone._customInterpolation,
+                customSeconds: clone._customDuration
             );
 
             foreach (var step in lerp)

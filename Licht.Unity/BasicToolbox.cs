@@ -52,17 +52,20 @@ namespace Licht.Unity
                 obj.Initialize();
             }
 
-            DefaultMachinery.Instance().MachineryRef.Machinery.Activate();
+            SceneObject<DefaultMachinery>.Instance(includeNew: true).MachineryRef.Machinery.Activate();
         }
 
         protected void OnDisable()
         {
-            DefaultMachinery.Instance().MachineryRef.Machinery.FinalizeWith(() =>
+            EventBroadcasterDisposer.Cleanup();
+            _updateableScriptableObjects = Array.Empty<IUpdateable>();
+            _initializableScriptableObjects = Array.Empty<IInitializable>();
+            var machinery = SceneObject<DefaultMachinery>.Instance(includeNew: true);
+
+            if (machinery != null)
             {
-                EventBroadcasterDisposer.Cleanup();
-                _updateableScriptableObjects = Array.Empty<IUpdateable>();
-                _initializableScriptableObjects = Array.Empty<IInitializable>();
-            });
+                machinery.MachineryRef.Machinery.FinalizeWith(() => { });
+            }
         }
 
         protected void OnDestroy()

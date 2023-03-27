@@ -67,7 +67,7 @@ namespace Licht.Impl.Pooling
             return true;
         }
 
-        public bool TryGetFromPool(out T obj)
+        public bool TryGetFromPool(out T obj, Action<T> beforeActivation = null)
         {
             if (!IsActive)
             {
@@ -80,6 +80,8 @@ namespace Licht.Impl.Pooling
                 if (_objectPool[index].IsActive) continue;
                 obj = _objectPool[index];
                 obj.Pool = this;
+
+                beforeActivation?.Invoke(obj);
                 obj.Activate();
                 return true;
             }
@@ -88,7 +90,7 @@ namespace Licht.Impl.Pooling
             return false;
         }
 
-        public bool GetManyFromPool(int amount, out T[] objects)
+        public bool GetManyFromPool(int amount, out T[] objects, Action<T, int> beforeActivation = null)
         {
             if (amount <= 0 || !IsActive)
             {
@@ -108,6 +110,8 @@ namespace Licht.Impl.Pooling
                 obj.Pool = this;
 
                 if (obj.IsActive) continue;
+
+                beforeActivation?.Invoke(obj, index);
                 obj.Activate();
                 _tempPool[currentIndex] = obj;
                 currentIndex++;

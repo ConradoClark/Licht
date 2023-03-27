@@ -13,22 +13,24 @@ namespace Licht.Impl.Orchestration
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, float target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
             float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null, Func<float,float> curve = null,
-            Func<bool> resetCondition=null, Action<float> onEachStep = null, Action onStart = null, Func<float,float,float> customInterpolation = null)
+            Func<bool> resetCondition=null, Action<float> onEachStep = null, Action onStart = null, Func<float,float,float> customInterpolation = null,
+            Func<float> customSeconds = null)
         {
             return Lerp(setter, getter, seconds, () => target, function, timer, breakCondition, setTargetOnBreak,
-                initStep, immediate, step, pauseCondition, curve, resetCondition, onEachStep, onStart, customInterpolation);
+                initStep, immediate, step, pauseCondition, curve, resetCondition, onEachStep, onStart, customInterpolation, customSeconds);
         }
 
         public static IEnumerable<Action> Lerp(Action<float> setter,
             Func<float> getter, float seconds, Func<float> target, EasingFunction function, ITimer timer, Func<bool> breakCondition = null, bool setTargetOnBreak = false,
             float initStep = 0f, bool immediate = false, float? step = null, Func<bool> pauseCondition = null, Func<float, float> curve = null,
-            Func<bool> resetCondition = null, Action<float> onEachStep = null, Action onStart = null, Func<float,float, float> customInterpolation = null)
+            Func<bool> resetCondition = null, Action<float> onEachStep = null, Action onStart = null, Func<float,float, float> customInterpolation = null,
+            Func<float> customSeconds = null)
         {
             if (!immediate) yield return TimeYields.WaitOneFrame;
 
             onStart?.Invoke();
 
-            var ms = seconds * 1000d;
+            var ms = (customSeconds?.Invoke() ?? seconds) * 1000d;
             var initialStart = getter();
             var start = initialStart;
             var last = start;
@@ -74,7 +76,16 @@ namespace Licht.Impl.Orchestration
 
                     onEachStep?.Invoke(last);
                     setter(last);
+
                     yield return TimeYields.WaitOneFrame;
+
+                    if (customSeconds != null)
+                    {
+                        var newMs = (customSeconds?.Invoke() ?? seconds) * 1000d;
+                        time += ms / newMs;
+                        ms = newMs;
+                        prop = 1 / ms;
+                    }
                 }
             }
 

@@ -33,6 +33,11 @@ namespace Licht.Unity.CharacterControllers
         private LichtPhysics _physics;
         private IEventPublisher<LichtTopDownMoveEvents, LichtTopDownMoveEventArgs> _eventPublisher;
 
+        public event Action<LichtTopDownMoveEventArgs> OnStartMoving;
+        public event Action<LichtTopDownMoveEventArgs> OnStopMoving;
+        public event Action<LichtTopDownMoveEventArgs> OnTopSpeed;
+        public event Action<LichtTopDownMoveEventArgs> OnChangeDirection;
+
         public enum LichtTopDownMoveEvents
         {
             OnStartMoving,
@@ -72,14 +77,17 @@ namespace Licht.Unity.CharacterControllers
 
         private void CheckChangeDirectionEvent(Vector2 direction)
         {
-            if (direction != LatestDirection && Vector2.Distance(direction, LatestDirection) > ChangeDirectionEventSensitivity)
+            if (direction == LatestDirection ||
+                !(Vector2.Distance(direction, LatestDirection) > ChangeDirectionEventSensitivity)) return;
+
+
+            var @event = new LichtTopDownMoveEventArgs
             {
-                _eventPublisher.PublishEvent(LichtTopDownMoveEvents.OnChangeDirection, new LichtTopDownMoveEventArgs
-                {
-                    Direction = direction,
-                    Source = this
-                });
-            }
+                Direction = direction,
+                Source = this
+            };
+            _eventPublisher.PublishEvent(LichtTopDownMoveEvents.OnChangeDirection, @event);
+            OnChangeDirection?.Invoke(@event);
         }
 
         private Routine StartMovement(InputAction horizontalAction, InputAction verticalAction)
@@ -150,31 +158,39 @@ namespace Licht.Unity.CharacterControllers
                 LatestDirection = new Vector2(horizontalAction.ReadValue<float>(), verticalAction.ReadValue<float>())
                     .normalized;
 
-                _eventPublisher.PublishEvent(LichtTopDownMoveEvents.OnStartMoving, new LichtTopDownMoveEventArgs
+                var @event = new LichtTopDownMoveEventArgs
                 {
                     Direction = LatestDirection,
                     Source = this
-                });
+                };
+
+                _eventPublisher.PublishEvent(LichtTopDownMoveEvents.OnStartMoving, @event);
+
+                OnStartMoving?.Invoke(@event);
 
                 IsMoving = true;
                 yield return StartMovement(horizontalAction, verticalAction).AsCoroutine();
 
                 if (horizontalAction.IsPressed() || verticalAction.IsPressed())
                 {
-                    _eventPublisher.PublishEvent(LichtTopDownMoveEvents.OnTopSpeed, new LichtTopDownMoveEventArgs
+                    var topSpeed = new LichtTopDownMoveEventArgs
                     {
                         Direction = LatestDirection,
                         Source = this
-                    });
+                    };
+                    _eventPublisher.PublishEvent(LichtTopDownMoveEvents.OnTopSpeed, topSpeed);
+                    OnTopSpeed?.Invoke(topSpeed);
                 }
 
                 yield return Move(horizontalAction, verticalAction).AsCoroutine();
 
-                _eventPublisher.PublishEvent(LichtTopDownMoveEvents.OnStopMoving, new LichtTopDownMoveEventArgs
+                var stopMoving = new LichtTopDownMoveEventArgs
                 {
                     Direction = LatestDirection,
                     Source = this
-                });
+                };
+                _eventPublisher.PublishEvent(LichtTopDownMoveEvents.OnStopMoving, stopMoving);
+                OnStopMoving?.Invoke(stopMoving);
 
                 yield return EndMovement(horizontalAction, verticalAction).AsCoroutine();
                 IsMoving = false;

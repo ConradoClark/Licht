@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Objects.Stats
 {
+    [DefaultExecutionOrder(-2000)]
     [CreateAssetMenu(fileName = "ObjectStats", menuName = "Licht/Stats/ObjectStats", order = 1)]
     public class ObjectStats : ScriptableObject
     {
@@ -25,23 +26,32 @@ namespace Licht.Unity.Objects.Stats
         public DictAccessor<string> Strings { get; private set; }
 
 
-        private void Awake()
+        private void OnEnable()
         {
-            _intStatsDict =
-                new Dictionary<string, ScriptStat<int>>(IntStats?.Select(i =>
-                    new KeyValuePair<string, ScriptStat<int>>(i.Name, i)));
+            if (IntStats != null)
+            {
+                _intStatsDict =
+                    new Dictionary<string, ScriptStat<int>>(IntStats?.Select(i =>
+                        new KeyValuePair<string, ScriptStat<int>>(i.Name, i)));
+            }
 
-            _floatStatsDict =
-                new Dictionary<string, ScriptStat<float>>(FloatStats?.Select(i =>
-                    new KeyValuePair<string, ScriptStat<float>>(i.Name, i)));
+            if (FloatStats != null)
+            {
+                _floatStatsDict =
+                    new Dictionary<string, ScriptStat<float>>(FloatStats?.Select(i =>
+                        new KeyValuePair<string, ScriptStat<float>>(i.Name, i)));
+            }
 
-            _stringStatsDict =
-                new Dictionary<string, ScriptStat<string>>(StringStats?.Select(i =>
-                    new KeyValuePair<string, ScriptStat<string>>(i.Name, i)));
+            if (StringStats != null)
+            {
+                _stringStatsDict =
+                    new Dictionary<string, ScriptStat<string>>(StringStats?.Select(i =>
+                        new KeyValuePair<string, ScriptStat<string>>(i.Name, i)));
+            }
 
-            Ints = new DictAccessor<int>(_intStatsDict);
-            Floats = new DictAccessor<float>(_floatStatsDict);
-            Strings = new DictAccessor<string>(_stringStatsDict);
+            Ints = new DictAccessor<int>(_intStatsDict ?? new Dictionary<string, ScriptStat<int>>());
+            Floats = new DictAccessor<float>(_floatStatsDict ?? new Dictionary<string, ScriptStat<float>>());
+            Strings = new DictAccessor<string>(_stringStatsDict ?? new Dictionary<string, ScriptStat<string>>());
         }
 
         public class DictAccessor<T>
@@ -54,7 +64,7 @@ namespace Licht.Unity.Objects.Stats
             }
             public T this[string index]
             {
-                get => _dict[index].Stat;
+                get => _dict.ContainsKey(index) ? _dict [index].Stat : default;
                 set => _dict[index].Stat = value;
             }
         }

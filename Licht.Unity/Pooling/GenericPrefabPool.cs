@@ -60,14 +60,14 @@ namespace Licht.Unity.Pooling
             return _objectPool.GetActiveObjects();
         }
 
-        public bool TryGetFromPool(out T obj)
+        public bool TryGetFromPool(out T obj, Action<T> beforeActivation = null)
         {
-            return _objectPool.TryGetFromPool(out obj);
+            return _objectPool.TryGetFromPool(out obj, beforeActivation);
         }
 
-        public bool TryGetManyFromPool(int amount, out T[] objects)
+        public bool TryGetManyFromPool(int amount, out T[] objects, Action<T, int> beforeActivation = null)
         {
-            return _objectPool.GetManyFromPool(amount, out objects);
+            return _objectPool.GetManyFromPool(amount, out objects, beforeActivation);
         }
 
         public bool Release(T obj)

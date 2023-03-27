@@ -13,6 +13,12 @@ namespace Licht.Unity.Objects
         static SceneObject()
         {
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+            Application.unloading+=ApplicationOnUnloading;
+        }
+
+        private static void ApplicationOnUnloading()
+        {
+            _notFound = false;
         }
 
         private static void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)

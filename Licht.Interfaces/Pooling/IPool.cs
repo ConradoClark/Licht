@@ -1,4 +1,5 @@
-﻿using Licht.Interfaces.Update;
+﻿using System;
+using Licht.Interfaces.Update;
 
 namespace Licht.Interfaces.Pooling
 {
@@ -14,7 +15,7 @@ namespace Licht.Interfaces.Pooling
 
     public interface IPool<T> : IPool where T : IPoolableObject
     {
-        bool TryGetFromPool(out T obj);
-        bool GetManyFromPool(int amount, out T[] objects);
+        bool TryGetFromPool(out T obj, Action<T> beforeActivation = null);
+        bool GetManyFromPool(int amount, out T[] objects, Action<T, int> beforeActivation = null);
     }
 }

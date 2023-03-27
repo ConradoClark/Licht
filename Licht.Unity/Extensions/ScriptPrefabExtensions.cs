@@ -23,5 +23,19 @@ namespace Licht.Unity.Extensions
 
             return result;
         }
+
+        public static bool TrySpawnEffect(this ScriptPrefab prefab, Vector3 position, Action<IPoolableComponent> init, out IPoolableComponent effect)
+        {
+            var result = SceneObject<EffectsManager>.Instance(true)
+                .GetEffect(prefab)
+                .TryGetFromPool(out effect, init);
+
+            if (result)
+            {
+                effect.Component.transform.position = position;
+            }
+
+            return result;
+        }
     }
 }

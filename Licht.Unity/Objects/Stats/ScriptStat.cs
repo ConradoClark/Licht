@@ -4,7 +4,8 @@ using UnityEngine;
 namespace Licht.Unity.Objects.Stats
 {
 
-    public class ScriptStat<T> : ScriptableObject
+    [Serializable]
+    public class ScriptStat<T>
     {
         [SerializeField]
         private T _stat;
