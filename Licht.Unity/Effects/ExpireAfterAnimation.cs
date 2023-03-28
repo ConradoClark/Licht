@@ -17,6 +17,9 @@ namespace Licht.Unity.Effects
         [field:SerializeField]
         public string State { get; private set; }
 
+        [field: SerializeField]
+        public bool CheckTransition { get; private set; }
+
         override protected void OnEnable()
         {
             base.OnEnable();
@@ -27,7 +30,7 @@ namespace Licht.Unity.Effects
         {
             yield return TimeYields.WaitOneFrameX;
 
-            while (Animator.GetCurrentAnimatorStateInfo(0).normalizedTime <= 1 || Animator.IsInTransition(0))
+            while (Animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1 || (CheckTransition && Animator.IsInTransition(0)))
             {
                 yield return TimeYields.WaitOneFrameX;
             }

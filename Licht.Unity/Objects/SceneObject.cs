@@ -12,13 +12,18 @@ namespace Licht.Unity.Objects
         private static bool _notFound;
         static SceneObject()
         {
+            _storedObject = null;
+            _notFound = false;
+            NamedObjects.Clear();
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             Application.unloading+=ApplicationOnUnloading;
         }
 
         private static void ApplicationOnUnloading()
         {
+            _storedObject = null;
             _notFound = false;
+            NamedObjects.Clear();
         }
 
         private static void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
@@ -44,7 +49,7 @@ namespace Licht.Unity.Objects
             return _storedObject;
         }
 
-        public static T Instance(bool includeInactive=false, bool includeNew = false)
+        public static T Instance(bool includeInactive=false, bool includeNew = true)
         {
             if (_storedObject == null && (includeNew || !_notFound))
             {
