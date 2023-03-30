@@ -4,6 +4,8 @@ This is a work-in-progress general purpose library for Unity based around custom
 
 The goal for this library is to be able to chain and orchestrate coroutines in a organic way and provide ways to quickly implement some stuff such as pooling, event systems, UI actions and more.
 
+It also contains a half-assed Physics engine that purposefully has no inertia at all, and whose forces can be enabled/disabled by object. It has a couple character controllers which use it. I use it to simulate movement frame by frame (basically, to produce inorganic physics).
+
 ### Getting Started
 
 (WIP)

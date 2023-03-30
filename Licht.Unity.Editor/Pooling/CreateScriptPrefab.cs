@@ -25,8 +25,7 @@ namespace Licht.Unity.Editor.Pooling
         private static void CreateScriptableObject(MenuCommand command, PrefabType type)
         {
             // Get the selected Prefab
-            var prefab = command.context as GameObject;
-
+            var prefab = command.context as GameObject ?? Selection.activeGameObject;
             if (prefab == null)
             {
                 Debug.LogWarning("Select a prefab first!");
@@ -43,7 +42,7 @@ namespace Licht.Unity.Editor.Pooling
 
             // Save the ScriptableObject to a new asset file
             var assetPath = AssetDatabase.GetAssetPath(prefab);
-            var assetName = $"{prefab.name}_POOL.asset";
+            var assetName = $"{prefab.name}_PO.asset";
             var assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(
                 System.IO.Path.Combine(System.IO.Path.GetDirectoryName(assetPath) ?? string.Empty, assetName));
             AssetDatabase.CreateAsset(scriptableObject, assetPathAndName);
