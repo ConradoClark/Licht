@@ -15,7 +15,7 @@ using Vector3 = UnityEngine.Vector3;
 namespace Licht.Unity.Physics
 {
     [CreateAssetMenu(fileName = "LichtPhysics", menuName = "Licht/Physics/LichtPhysics", order = 1)]
-    public class LichtPhysics : ScriptValue, IInitializable, IUpdateable
+    public class LichtPhysics : ScriptValue, ICanInitialize, IUpdateable
     {
         public bool Debug;
         public float MinRayCastSize = 1f;

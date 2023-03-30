@@ -10,7 +10,7 @@ namespace Licht.Unity.Effects
     public class ExpireAfterAnimation : BaseGameRunner
     {
         [field: SerializeField]
-        public EffectPoolable Poolable { get; private set; }
+        public PooledComponent Poolable { get; private set; }
 
         [field: SerializeField]
         public Animator Animator { get; private set; }

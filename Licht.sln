@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Licht.Interfaces", "Licht.Interfaces\Licht.Interfaces.csproj", "{47D0C3B4-8C8B-4CFE-B376-F0015531EA0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Licht.Interfaces", "Licht.Interfaces\Licht.Interfaces.csproj", "{47D0C3B4-8C8B-4CFE-B376-F0015531EA0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Licht.Impl", "Licht.Impl\Licht.Impl.csproj", "{994216F0-B087-4213-938E-009C4D0EDCFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Licht.Impl", "Licht.Impl\Licht.Impl.csproj", "{994216F0-B087-4213-938E-009C4D0EDCFB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Licht.Test", "Licht.Test\Licht.Test.csproj", "{5366E020-9508-4FF2-9062-A77E4E1FD400}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D153F82F-9A1C-42BA-8556-57F152491B19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Licht.Unity", "Licht.Unity\Licht.Unity.csproj", "{226026B6-24B5-4C31-A332-F314411D24EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Licht.Unity", "Licht.Unity\Licht.Unity.csproj", "{226026B6-24B5-4C31-A332-F314411D24EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Licht.Unity.Editor", "Licht.Unity.Editor\Licht.Unity.Editor.csproj", "{EEE0F3CF-D73E-4000-980C-4B4B08E98BE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{226026B6-24B5-4C31-A332-F314411D24EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{226026B6-24B5-4C31-A332-F314411D24EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{226026B6-24B5-4C31-A332-F314411D24EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEE0F3CF-D73E-4000-980C-4B4B08E98BE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEE0F3CF-D73E-4000-980C-4B4B08E98BE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEE0F3CF-D73E-4000-980C-4B4B08E98BE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEE0F3CF-D73E-4000-980C-4B4B08E98BE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

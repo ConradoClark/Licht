@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Physics
 {
-    public abstract class LichtCustomPhysicsForce : MonoBehaviour, IActivable, IDeactivable
+    public abstract class LichtCustomPhysicsForce : MonoBehaviour, ICanActivate, ICanDeactivate
     {
         public abstract bool IsActive { get; set; }
         public abstract bool Deactivate();

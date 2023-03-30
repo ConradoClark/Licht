@@ -10,7 +10,7 @@ namespace Licht.Unity.Effects
     public class ExpireByDistanceToPoint : BaseGameObject
     {
         [field: SerializeField]
-        public EffectPoolable Poolable { get; private set; }
+        public PooledComponent Poolable { get; private set; }
 
         [field: SerializeField]
         public Transform Reference { get; private set; }

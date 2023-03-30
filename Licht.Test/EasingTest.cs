@@ -13,7 +13,7 @@ namespace Licht.Test
         [Parallelizable(ParallelScope.Self)]
         public void LinearEaseIn()
         {
-            var timer = new DefaultTimer(() => 1000d, 1);
+            var timer = new DefaultTimer(() => 1000f, 1);
             timer.Activate();
 
             var f = new StrongBox<float>(0);

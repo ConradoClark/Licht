@@ -11,7 +11,7 @@ namespace Licht.Unity.Effects
     public class ExpireAfterDuration : BaseGameRunner
     {
         [field: SerializeField]
-        public EffectPoolable Poolable { get; private set; }
+        public PooledComponent Poolable { get; private set; }
 
         [field: SerializeField]
         public float DurationInSeconds { get; private set; }

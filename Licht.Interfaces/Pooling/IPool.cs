@@ -3,7 +3,7 @@ using Licht.Interfaces.Update;
 
 namespace Licht.Interfaces.Pooling
 {
-    public interface IPool : IActivable
+    public interface IPool : ICanActivate
     {
         int AvailableObjects { get; }
         int ObjectsInUse { get; }

@@ -19,7 +19,7 @@ namespace Licht.Unity
         public int TargetFrameRate;
         public List<ScriptValue> ScriptableObjects;
         private IUpdateable[] _updateableScriptableObjects;
-        private IInitializable[] _initializableScriptableObjects;
+        private ICanInitialize[] _initializableScriptableObjects;
 
         protected void Awake()
         {
@@ -45,7 +45,7 @@ namespace Licht.Unity
         protected void OnEnable()
         {
             _updateableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IUpdateable>().ToArray();
-            _initializableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IInitializable>().ToArray();
+            _initializableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<ICanInitialize>().ToArray();
 
             foreach (var obj in _initializableScriptableObjects)
             {
@@ -59,7 +59,7 @@ namespace Licht.Unity
         {
             EventBroadcasterDisposer.Cleanup();
             _updateableScriptableObjects = Array.Empty<IUpdateable>();
-            _initializableScriptableObjects = Array.Empty<IInitializable>();
+            _initializableScriptableObjects = Array.Empty<ICanInitialize>();
             var machinery = SceneObject<DefaultMachinery>.Instance(includeNew: true);
 
             if (machinery != null)
@@ -72,7 +72,7 @@ namespace Licht.Unity
         {
             EventBroadcasterDisposer.Cleanup();
             _updateableScriptableObjects = Array.Empty<IUpdateable>();
-            _initializableScriptableObjects = Array.Empty<IInitializable>();
+            _initializableScriptableObjects = Array.Empty<ICanInitialize>();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Licht.Test
         [Parallelizable(ParallelScope.Self)]
         public void DefaultFloatTimer_NoMultiplier_StopAfter1Second()
         {
-            DefaultTimer timer = new DefaultTimer(() => 1000d, 1);
+            DefaultTimer timer = new DefaultTimer(() => 1000f, 1);
             timer.Update();
             timer.Deactivate();
             Assert.IsTrue(Math.Abs(timer.TotalElapsedTimeInMilliseconds - 1000d) < Margin);
@@ -23,7 +23,7 @@ namespace Licht.Test
         [Parallelizable(ParallelScope.Self)]
         public void DefaultFloatTimer_2Multiplier_StopAfter1Second()
         {
-            DefaultTimer timer = new DefaultTimer(() => 1000d, 1) { Multiplier = 2 };
+            DefaultTimer timer = new DefaultTimer(() => 1000f, 1) { Multiplier = 2 };
             timer.Update();
             timer.Deactivate();
             Assert.IsTrue(Math.Abs(timer.TotalElapsedTimeInMilliseconds - 1000d) < Margin);
@@ -33,7 +33,7 @@ namespace Licht.Test
         [Parallelizable(ParallelScope.Self)]
         public void DefaultFloatTimer_NoMultiplier_StopAfter1Second_Reset_StartAndStopAfter1Second()
         {
-            DefaultTimer timer = new DefaultTimer(() => 1000d, 1);
+            DefaultTimer timer = new DefaultTimer(() => 1000f, 1);
             timer.Activate();
             timer.Update();
             timer.PerformReset();

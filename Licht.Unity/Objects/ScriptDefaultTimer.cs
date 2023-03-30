@@ -8,8 +8,8 @@ namespace Licht.Unity.Objects
     [CreateAssetMenu(fileName = "DefaultTimer", menuName = "Licht/Timers/DefaultTimer", order = 1)]
     public class ScriptDefaultTimer : ScriptTimer
     {
-        private double _setMultiplier = 1;
-        public double Multiplier = 1;
+        private float _setMultiplier = 1;
+        public float Multiplier = 1;
         public override object Value => Timer;
 
         private ITimer _timer;

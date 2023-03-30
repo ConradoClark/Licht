@@ -2,7 +2,7 @@
 
 namespace Licht.Interfaces.Pooling
 {
-    public interface IPoolableObject : IInitializable, IActivable, IDeactivable
+    public interface IPoolableObject : ICanInitialize, ICanActivate, ICanDeactivate
     {
         IPool Pool { get; set; }
     }
