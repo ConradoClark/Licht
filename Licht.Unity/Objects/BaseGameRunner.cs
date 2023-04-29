@@ -23,8 +23,11 @@ namespace Licht.Unity.Objects
         protected override void OnEnable()
         {
             base.OnEnable();
-            if (RunOnEnable) DefaultMachinery.AddBasicMachine(Loop ? Handle().AsCoroutine().RepeatUntil(()=>!ComponentEnabled)
-                : Handle().AsCoroutine());
+            if (RunOnEnable)
+            {
+                DefaultMachinery.AddUniqueMachine($"Handle_{GetInstanceID()}", UniqueMachine.UniqueMachineBehaviour.Replace,
+                    Loop ? Handle().AsCoroutine().RepeatUntil(() => !ComponentEnabled) : Handle().AsCoroutine());
+            }
         }
 
         protected abstract IEnumerable<IEnumerable<Action>> Handle();

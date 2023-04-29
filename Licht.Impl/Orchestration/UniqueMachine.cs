@@ -108,5 +108,10 @@ namespace Licht.Impl.Orchestration
             }
             _actionEnumerator.Dispose();
         }
+
+        public static void CleanAllUniqueMachines()
+        {
+            _uniqueChecker.Clear();
+        }
     }
 }

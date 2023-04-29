@@ -159,6 +159,7 @@ namespace Licht.Impl.Orchestration
         public bool Deactivate()
         {
             if (!IsActive) return false;
+            UniqueMachine.CleanAllUniqueMachines();
             IsActive = false;
             return true;
         }
@@ -182,6 +183,7 @@ namespace Licht.Impl.Orchestration
             _machinarium.Clear();
             _machineLayers.Clear();
             _layerOrder = Array.Empty<TKey>();
+            UniqueMachine.CleanAllUniqueMachines();
 
             _finalizeAction = action;
             EventBroadcasterDisposer.Cleanup();

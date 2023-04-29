@@ -67,6 +67,11 @@ namespace Licht.Unity.Objects.Stats
                 get => _dict.ContainsKey(index) ? _dict [index].Stat : default;
                 set => _dict[index].Stat = value;
             }
+
+            public ScriptStat<T> GetStat(string index)
+            {
+                return _dict.ContainsKey(index) ? _dict[index] : default;
+            }
         }
     }
 }

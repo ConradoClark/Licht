@@ -50,6 +50,8 @@ namespace Licht.Unity.Pooling
 
         public virtual void EndEffect()
         {
+            if (this == null) return;
+
             IsEffectOver = true;
             OnEffectOver?.Invoke();
             if (transform != null) transform.SetParent(_originalParent);
