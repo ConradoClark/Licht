@@ -21,8 +21,6 @@ public class BaseAI : BaseGameObject
         public bool Enabled;
     }
 
-    private bool _enabled;
-
     [SerializeField]
     private AIPattern[] _patterns;
 
@@ -38,16 +36,15 @@ public class BaseAI : BaseGameObject
     protected override void OnAwake()
     {
         base.OnAwake();
-        _enabled = isActiveAndEnabled;
     }
 
     private IEnumerable<IEnumerable<Action>> RunAI()
     {
-        while (_enabled)
+        while (ComponentEnabled)
         {
             var foundPattern = false;
             foreach (var pattern in _patterns
-                         .Where(pat => pat.Enabled)
+                         .Where(pat => pat.Enabled && pat.Condition.ComponentEnabled)
                          .OrderBy(pat => pat.Priority).ToArray())
             {
                 if (!pattern.Condition.CheckCondition()) continue;
@@ -55,8 +52,11 @@ public class BaseAI : BaseGameObject
 
                 foreach (var action in pattern.Actions)
                 {
-                    yield return action.Execute(() => _breakConditions.Any(cond=>cond.CheckCondition())
+                    yield return action.Execute(() =>
+                        !pattern.Enabled || !pattern.Condition.ComponentEnabled ||
+                        _breakConditions.Any(cond=>cond.CheckCondition())
                     ).AsCoroutine();
+                    if (!pattern.Enabled || !pattern.Condition.ComponentEnabled) break;
                 }
 
                 break;

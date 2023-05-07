@@ -42,6 +42,9 @@ public static class SpriteRendererJuiceExtensions
         var wait = TimeYields.WaitSeconds(usableTimer, timeInSeconds);
 
         yield return wait.UntilAny(TimeYields.WaitMilliseconds(usableTimer, blinkFrequencyInMs)
-            .ThenRun(() => spriteRenderer.enabled = !spriteRenderer.enabled));
+            .ThenRun(() => spriteRenderer.enabled = !spriteRenderer.enabled).Infinite());
+
+        spriteRenderer.enabled = true;
+
     }
 } 

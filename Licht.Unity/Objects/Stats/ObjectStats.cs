@@ -49,18 +49,47 @@ namespace Licht.Unity.Objects.Stats
                         new KeyValuePair<string, ScriptStat<string>>(i.Name, i)));
             }
 
-            Ints = new DictAccessor<int>(_intStatsDict ?? new Dictionary<string, ScriptStat<int>>());
-            Floats = new DictAccessor<float>(_floatStatsDict ?? new Dictionary<string, ScriptStat<float>>());
-            Strings = new DictAccessor<string>(_stringStatsDict ?? new Dictionary<string, ScriptStat<string>>());
+            Ints = new DictAccessor<int>(_intStatsDict ?? new Dictionary<string, ScriptStat<int>>(), IntStatFactory);
+            Floats = new DictAccessor<float>(_floatStatsDict ?? new Dictionary<string, ScriptStat<float>>(), FloatStatFactory);
+            Strings = new DictAccessor<string>(_stringStatsDict ?? new Dictionary<string, ScriptStat<string>>(), StringStatFactory);
+        }
+
+        private static ScriptStat<int> IntStatFactory(string index, int value)
+        {
+            return new ScriptIntegerStat
+            {
+                Name = index,
+                Stat = value
+            };
+        }
+
+        private static ScriptStat<float> FloatStatFactory(string index, float value)
+        {
+            return new ScriptFloatStat
+            {
+                Name = index,
+                Stat = value
+            };
+        }
+
+        private static ScriptStat<string> StringStatFactory(string index, string value)
+        {
+            return new ScriptStringStat
+            {
+                Name = index,
+                Stat = value
+            };
         }
 
         public class DictAccessor<T>
         {
             private readonly IDictionary<string, ScriptStat<T>> _dict;
+            private readonly Func<string, T, ScriptStat<T>> _factory;
 
-            public DictAccessor(IDictionary<string, ScriptStat<T>> dict)
+            public DictAccessor(IDictionary<string, ScriptStat<T>> dict, Func<string,T,ScriptStat<T>> factory)
             {
                 _dict = dict;
+                _factory = factory;
             }
             public T this[string index]
             {
@@ -71,6 +100,15 @@ namespace Licht.Unity.Objects.Stats
             public ScriptStat<T> GetStat(string index)
             {
                 return _dict.ContainsKey(index) ? _dict[index] : default;
+            }
+
+            public bool AddStat(string index, T value)
+            {
+                if (_dict.ContainsKey(index)) return false;
+
+                var obj = _factory(index, value);
+                _dict.Add(index, obj);
+                return true;
             }
         }
     }
