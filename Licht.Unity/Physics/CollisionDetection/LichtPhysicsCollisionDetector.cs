@@ -74,11 +74,27 @@ namespace Licht.Unity.Physics.CollisionDetection
 
         private CollisionResult[] CheckCollisionForFrame()
         {
-            return PhysicsObject == null ? Array.Empty<CollisionResult>() : CheckCollision();
+            return CheckCollision();
         }
 
-        public abstract CollisionResult[] CheckCollision();
+        public CollisionResult[] CheckCollision()
+        {
+            if (PhysicsObject == null || IsBlocked) return Array.Empty<CollisionResult>();
+            return CalculateCollision();
+        }
+
+        public abstract CollisionResult[] CalculateCollision();
 
         public abstract Vector2 Clamp();
+
+        public IEnumerable<T> FindTriggersAsObjects<T>(bool triggeredOnDetection = false) where T : class
+        {
+            foreach (var trigger in Triggers)
+            {
+                if (!trigger.TriggeredHit || (triggeredOnDetection && !trigger.Detected)) continue;
+                if (!_physics.TryGetCustomObjectByCollider<T>(trigger.Collider, out var target)) continue;
+                yield return target;
+            }
+        }
     }
 }

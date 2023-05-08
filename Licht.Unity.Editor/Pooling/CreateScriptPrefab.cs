@@ -28,7 +28,7 @@ namespace Licht.Unity.Editor.Pooling
             var prefab = command.context as GameObject ?? Selection.activeGameObject;
             if (prefab == null)
             {
-                Debug.LogWarning("Select a prefab first!");
+                UnityEngine.Debug.LogWarning("Select a prefab first!");
                 return;
             }
 

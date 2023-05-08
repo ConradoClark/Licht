@@ -18,12 +18,8 @@ namespace Licht.Unity.Physics
     public class LichtPhysics : ScriptValue, ICanInitialize, IUpdateable
     {
         public bool Debug;
-        public float MinRayCastSize = 1f;
-        public float CollisionOffset = 0.01f;
         public float FrameMultiplier = 0.001f;
         public float PhysicsUpdateFrequency = 5 / 60f;
-        public float MaxDistanceBeforeCollisionCheck;
-        public LayerMask ObstacleLayerMask;
         public ScriptBasicMachinery LichtPhysicsMachinery;
         public ScriptTimer ScriptTimerRef;
         private FrameVariables _frameVariables;
@@ -31,9 +27,9 @@ namespace Licht.Unity.Physics
         private List<LichtPhysicsObject> _physicsStaticWorld;
         private List<LichtPhysicsForce> _physicsForces;
         private Dictionary<string, LichtCustomPhysicsForce> _customPhysicsForces;
-        private HashSet<Collider2D> _semiSolids;
 
         private Dictionary<Collider2D, LichtPhysicsObject> _colliderRegistry;
+        private Dictionary<Collider2D, BaseActor> _actorColliderRegistry;
 
         public event Action<LichtPhysicsObject> OnAddPhysicsObject;
         public event Action<LichtPhysicsObject> OnRemovePhysicsObject;
@@ -78,21 +74,6 @@ namespace Licht.Unity.Physics
             _physicsForces.Remove(obj);
         }
 
-        public void AddSemiSolid(Collider2D semiSolid)
-        {
-            _semiSolids.Add(semiSolid);
-        }
-
-        public void RemoveSemiSolid(Collider2D semiSolid)
-        {
-            _semiSolids.Remove(semiSolid);
-        }
-
-        public bool IsSemiSolid(Collider2D obj)
-        {
-            return _semiSolids.Contains(obj);
-        }
-
         public void AddPhysicsForce(LichtCustomPhysicsForce obj)
         {
             _customPhysicsForces[obj.Key] = obj;
@@ -110,6 +91,7 @@ namespace Licht.Unity.Physics
 
         public void Update()
         {
+            Physics2D.SyncTransforms();
             if (Physics2D.simulationMode == SimulationMode2D.Script){
                 var timer = PhysicsUpdateFrequency;
                 timer -= (float) ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
@@ -119,7 +101,7 @@ namespace Licht.Unity.Physics
                 // Note that generally, we don't want to pass variable delta to Simulate as that leads to unstable results.
                 while (timer >= 0)
                 {
-                    timer -= (float)ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
+                    timer -= ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
                     Physics2D.Simulate(PhysicsUpdateFrequency);
                 }
             }
@@ -141,47 +123,23 @@ namespace Licht.Unity.Physics
             }
         }
 
-        private static string GetCollisionTriggerName(Object collider)
-        {
-            return $"Collider_{collider.GetInstanceID()}";
-        }
-        private static void DrawEllipse(Vector3 pos, Vector3 forward, Vector3 up, float radiusX, float radiusY, int segments, Color color, float duration = 0)
-        {
-            var angle = 0f;
-            var rot = Quaternion.LookRotation(forward, up);
-            var lastPoint = Vector3.zero;
-            var thisPoint = Vector3.zero;
-
-            for (var i = 0; i < segments + 1; i++)
-            {
-                thisPoint.x = Mathf.Sin(Mathf.Deg2Rad * angle) * radiusX;
-                thisPoint.y = Mathf.Cos(Mathf.Deg2Rad * angle) * radiusY;
-
-                if (i > 0)
-                {
-                    UnityEngine.Debug.DrawLine(rot * lastPoint + pos, rot * thisPoint + pos, color, duration);
-                }
-
-                lastPoint = thisPoint;
-                angle += 360f / segments;
-            }
-        }
-
         public void UpdatePositions()
         {
             foreach (var obj in _physicsWorld)
             {
-                obj.CalculatedSpeed = obj.Speed * FrameMultiplier * (float)ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
+                obj.CalculatedSpeed = obj.Speed * FrameMultiplier * ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
 
                 obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate);
                 obj.ImplyDirection(obj.CalculatedSpeed.normalized);
 
-                //var speedResult = obj.CalculatedSpeed;
-                //while(MaxDistanceBeforeCollisionCheck)
-
                 obj.transform.position += (Vector3)obj.CalculatedSpeed;
-                obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PostUpdate);
+            }
 
+            Physics2D.SyncTransforms();
+
+            foreach (var obj in _physicsWorld)
+            {
+                obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PostUpdate);
                 obj.CalculatedSpeed = obj.Speed;
             }
 
@@ -196,14 +154,13 @@ namespace Licht.Unity.Physics
 
         public void Initialize()
         {
-            Physics2D.autoSyncTransforms = true;
             _frameVariables = GetFrameVariables();
             _physicsWorld = new List<LichtPhysicsObject>();
             _physicsStaticWorld = new List<LichtPhysicsObject>();
             _physicsForces = new List<LichtPhysicsForce>();
             _customPhysicsForces = new Dictionary<string, LichtCustomPhysicsForce>();
-            _semiSolids = new HashSet<Collider2D>();
             _colliderRegistry = new Dictionary<Collider2D, LichtPhysicsObject>();
+            _actorColliderRegistry = new Dictionary<Collider2D, BaseActor>();
         }
 
         public void UnblockCustomPhysicsForceForObject(MonoBehaviour src, LichtPhysicsObject obj, string force)
@@ -241,6 +198,37 @@ namespace Licht.Unity.Physics
 
             obj = _colliderRegistry[col];
             return true;
+        }
+
+        public bool TryGetCustomObjectByCollider<T>(Collider2D col, out T obj) where T:class
+        {
+            if (_colliderRegistry.ContainsKey(col))
+            {
+                return _colliderRegistry[col].TryGetCustomObject(out obj);
+            }
+
+            if (_actorColliderRegistry.ContainsKey(col))
+            {
+                var actor = _actorColliderRegistry[col];
+                return actor.TryGetCustomObject(out obj);
+            }
+
+            var sameHierarchy = col.GetComponent<BaseActor>();
+            if (sameHierarchy != null)
+            {
+                _actorColliderRegistry[col] = sameHierarchy;
+                return sameHierarchy.TryGetCustomObject(out obj);
+            }
+
+            var parent = col.GetComponentInParent<BaseActor>();
+            if (parent != null)
+            {
+                _actorColliderRegistry[col] = parent;
+                return parent.TryGetCustomObject(out obj);
+            }
+
+            obj = default(T);
+            return false;
         }
     }
 }

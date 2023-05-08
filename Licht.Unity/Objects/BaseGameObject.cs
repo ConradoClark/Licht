@@ -8,6 +8,7 @@ namespace Licht.Unity.Objects
 {
     public abstract class BaseGameObject : MonoBehaviour
     {
+        public BaseActor Actor { get; set; }
         public ITimer GameTimer { get; protected set; }
         public ITimer UITimer { get; protected set; }
         public BasicMachinery<object> DefaultMachinery { get; protected set; }
@@ -16,6 +17,15 @@ namespace Licht.Unity.Objects
 
         private void Awake()
         {
+            Actor = GetComponent<BaseActor>();
+            if (Actor == null)
+            {
+                Actor = GetComponentInParent<BaseActor>();
+            }
+            if (Actor != null)
+            {
+                Actor.AddCustomObject(GetType(), this);
+            }
             GameTimer = SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer;
             UITimer = SceneObject<DefaultUITimer>.Instance().TimerRef.Timer;
             DefaultMachinery = SceneObject<DefaultMachinery>.Instance().MachineryRef.Machinery;
@@ -39,5 +49,6 @@ namespace Licht.Unity.Objects
         {
             ComponentEnabled = false;
         }
+
     }
 }

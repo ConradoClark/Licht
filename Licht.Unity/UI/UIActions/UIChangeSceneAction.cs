@@ -34,7 +34,7 @@ namespace Licht.Unity.UI.UIActions
         {
             if (SceneUtility.GetBuildIndexByScenePath(SceneName) == -1)
             {
-                Debug.LogWarning($"UIChangeSceneAction scene not on build or non-existent. Scene Name: '{SceneName}'");
+                UnityEngine.Debug.LogWarning($"UIChangeSceneAction scene not on build or non-existent. Scene Name: '{SceneName}'");
             }
         }
     }

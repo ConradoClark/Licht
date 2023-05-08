@@ -41,7 +41,7 @@ namespace Licht.Unity.Physics.CollisionDetection
             if (remove.Collider != null) _internalResults.Remove(remove);
         }
 
-        public override CollisionResult[] CheckCollision()
+        public override CollisionResult[] CalculateCollision()
         {
             return _internalResults.ToArray();
         }

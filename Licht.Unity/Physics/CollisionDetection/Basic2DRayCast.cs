@@ -33,7 +33,7 @@ namespace Licht.Unity.Physics.CollisionDetection
             DetectorType = CollisionDetectorType.PreUpdate;
         }
 
-        public override CollisionResult[] CheckCollision()
+        public override CollisionResult[] CalculateCollision()
         {
             for (var i = 0; i < _collisionResults.Length; i++)
             {

@@ -118,7 +118,7 @@ namespace Licht.Unity.CharacterControllers
             _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpStart, eventObject);
             OnJumpStart?.Invoke(eventObject);
 
-            _physics.BlockCustomPhysicsForceForObject(this, Target, GravityIdentifier.Name);
+            _physics.BlockCustomPhysicsForceForObject(this, Target, GravityIdentifier.name);
             yield return TimeYields.WaitOneFrameX;
 
             DefaultMachinery.AddUniqueMachine($"minJumpDelay_{gameObject.GetInstanceID()}", UniqueMachine.UniqueMachineBehaviour.Replace,
@@ -150,7 +150,7 @@ namespace Licht.Unity.CharacterControllers
 
             Interrupted = false;
             IsForcedJump = false;
-            _physics.UnblockCustomPhysicsForceForObject(this, Target, GravityIdentifier.Name);
+            _physics.UnblockCustomPhysicsForceForObject(this, Target, GravityIdentifier.name);
             _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpEnd, eventObject);
             OnJumpEnd?.Invoke(eventObject);
         }

@@ -22,7 +22,7 @@ namespace Licht.Unity.Physics.Forces
         public float StartDelayInSeconds { get; private set; }
 
         public override bool IsActive { get; set; } = true;
-        public override string Key => GravityIdentifier.Name;
+        public override string Key => GravityIdentifier.name;
 
         protected override void OnEnable()
         {

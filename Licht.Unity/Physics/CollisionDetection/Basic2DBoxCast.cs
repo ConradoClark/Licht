@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Licht.Unity.Debug;
 using Licht.Unity.Objects;
 using UnityEngine;
 
@@ -7,20 +8,30 @@ namespace Licht.Unity.Physics.CollisionDetection
 {
     public class Basic2DBoxCast : LichtPhysicsCollisionDetector
     {
-        public bool Debug;
-        public ScriptIdentifier TriggerIdentifier;
-        public float Distance;
-        public Vector2 Direction;
-        public LayerMask LayerMask;
+        [field:SerializeField]
+        public bool Debug { get; set; }
+        [field: SerializeField]
+        public ScriptIdentifier TriggerIdentifier { get; set; }
+        [field: SerializeField]
+        public float Distance { get; set; }
+        [field: SerializeField]
+        public Vector2 Direction { get; set; }
+        [field: SerializeField]
+        public LayerMask LayerMask { get; set; }
         private readonly RaycastHit2D[] _collisionResults = new RaycastHit2D[10];
 
-        public bool CheckNormals;
-        public Vector2 NormalTarget;
+        [field: SerializeField]
+        public bool CheckNormals { get; set; }
+        [field: SerializeField]
+        public Vector2 NormalTarget { get; set; }
 
-        public bool IncreaseBySpeed;
-        public bool ShouldClampSpeed;
+        [field: SerializeField]
+        public bool IncreaseBySpeed { get; set; }
+        [field: SerializeField]
+        public bool ShouldClampSpeed { get; set; }
 
-        public BoxCollider2D BoxCollider;
+        [field: SerializeField]
+        public BoxCollider2D BoxCollider { get; set; }
 
         protected override void OnAwake()
         {
@@ -29,7 +40,7 @@ namespace Licht.Unity.Physics.CollisionDetection
             DetectorType = CollisionDetectorType.PreUpdate;
         }
 
-        public override CollisionResult[] CheckCollision()
+        public override CollisionResult[] CalculateCollision()
         {
             for (var i = 0; i < _collisionResults.Length; i++)
             {
@@ -47,27 +58,9 @@ namespace Licht.Unity.Physics.CollisionDetection
 
             if (Debug)
             {
-                var topLeft = new Vector3(BoxCollider.size.x * -0.5f, BoxCollider.size.y * 0.5f);
-                var topRight = new Vector3(BoxCollider.size.x * 0.5f, BoxCollider.size.y * 0.5f);
-                var bottomLeft = new Vector3(BoxCollider.size.x * -0.5f, BoxCollider.size.y * -0.5f);
-                var bottomRight = new Vector3(BoxCollider.size.x * 0.5f, BoxCollider.size.y * -0.5f);
-                UnityEngine.Debug.DrawLine(colliderPosition + topLeft, colliderPosition + topRight, Color.green);
-                UnityEngine.Debug.DrawLine(colliderPosition + topRight, colliderPosition + bottomRight, Color.green);
-                UnityEngine.Debug.DrawLine(colliderPosition + bottomRight, colliderPosition + bottomLeft, Color.green);
-                UnityEngine.Debug.DrawLine(colliderPosition + bottomLeft, colliderPosition + topLeft, Color.green);
-
-                var topLeftCast = topLeft + (Vector3)(distance * Direction);
-                var topRightCast = topRight + (Vector3)(distance * Direction);
-                var bottomLeftCast = bottomLeft + (Vector3)(distance * Direction);
-                var bottomRightCast = bottomRight + (Vector3)(distance * Direction);
-
-                UnityEngine.Debug.DrawLine(colliderPosition + topLeftCast, colliderPosition + topRightCast, Color.yellow);
-                UnityEngine.Debug.DrawLine(colliderPosition + topRightCast, colliderPosition + bottomRightCast, Color.yellow);
-                UnityEngine.Debug.DrawLine(colliderPosition + bottomRightCast, colliderPosition + bottomLeftCast, Color.yellow);
-                UnityEngine.Debug.DrawLine(colliderPosition + bottomLeftCast, colliderPosition + topLeftCast, Color.yellow);
-
-                UnityEngine.Debug.DrawLine(colliderPosition, colliderPosition + (Vector3)(distance * Direction), Color.red);
-
+                DebugPresets.DrawRectangle(colliderPosition, BoxCollider.size, Color.green);
+                DebugPresets.DrawRectangle(colliderPosition + (Vector3)(distance * Direction), BoxCollider.size, Color.yellow);
+                UnityEngine.Debug.DrawLine(colliderPosition, colliderPosition + (Vector3)(distance * Direction), Color.yellow);
             }
 
             if (noHits == 0)

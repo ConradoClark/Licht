@@ -11,7 +11,7 @@ namespace Licht.Unity.Physics
     {
         private FrameVariables _frameVariables;
         private LichtPhysics _physics;
-        public bool IsUpdating;
+        public bool IsUpdating { get; private set; }
 
         public FrameVariables GetFrameVariables()
         {
