@@ -24,7 +24,7 @@ namespace Licht.Unity.Physics.CollisionDetection
         private HashSet<Object> _collisionBlockers;
         private FrameVariables _frameVariables;
         private FrameVariableDefinition<CollisionResult[]> _collisionResults;
-        private LichtPhysics _physics;
+        protected LichtPhysics Physics;
 
         private FrameVariables GetFrameVariables()
         {
@@ -40,7 +40,7 @@ namespace Licht.Unity.Physics.CollisionDetection
         {
             base.OnAwake();
 
-            _physics = this.GetLichtPhysics();
+            Physics = this.GetLichtPhysics();
             _collisionBlockers = new HashSet<Object>();
             GetFrameVariables();
 
@@ -53,7 +53,7 @@ namespace Licht.Unity.Physics.CollisionDetection
         {
             PhysicsObject = obj;
 
-            if (Collider != null) _physics.RegisterCollider(Collider, obj);
+            if (Collider != null) Physics.RegisterCollider(Collider, obj);
         }
 
         public void BlockCollisionDetection(Object source)
@@ -92,7 +92,7 @@ namespace Licht.Unity.Physics.CollisionDetection
             foreach (var trigger in Triggers)
             {
                 if (!trigger.TriggeredHit || (triggeredOnDetection && !trigger.Detected)) continue;
-                if (!_physics.TryGetCustomObjectByCollider<T>(trigger.Collider, out var target)) continue;
+                if (!Physics.TryGetCustomObjectByCollider<T>(trigger.Collider, out var target)) continue;
                 yield return target;
             }
         }

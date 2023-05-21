@@ -87,7 +87,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 
                 UpdateHitCeilingTrigger(distance);
 
-                var clamp = CalculateClampVector(distance);
+                var clamp = CalculateClampVector(distance, result.Collider);
                 clampedPosition += clamp;
             }
 
@@ -104,17 +104,33 @@ namespace Licht.Unity.Physics.CollisionDetection
             PhysicsObject.SetPhysicsTrigger(HitCeilingIdentifier, isHittingCeiling, this);
         }
 
-        private Vector3 CalculateClampVector(ColliderDistance2D distance)
+        private Vector3 CalculateClampVector(ColliderDistance2D distance, Collider2D target)
         {
+            Physics.TryGetCustomObjectByCollider(target, out ColliderPushOutHint hint);
+
             var distanceToCollide = distance.pointB - distance.pointA;
 
             var clampedX = PreventLeftClamp && distanceToCollide.x < 0 ? 0 :
                 PreventRightClamp && distanceToCollide.x > 0 ? 0 :
                 distanceToCollide.x;
 
+            clampedX = hint?.HorizontalHintDirection switch
+            {
+                ColliderPushOutHint.PushOutDirection.Positive => Mathf.Abs(clampedX),
+                ColliderPushOutHint.PushOutDirection.Negative => -Mathf.Abs(clampedX),
+                _ => clampedX
+            };
+
             var clampedY = PreventDownClamp && distanceToCollide.y < 0 ? 0 :
                 PreventUpClamp && distanceToCollide.y > 0 ? 0 :
                 distanceToCollide.y;
+
+            clampedY = hint?.VerticalHintDirection switch
+            {
+                ColliderPushOutHint.PushOutDirection.Positive => Mathf.Abs(clampedY),
+                ColliderPushOutHint.PushOutDirection.Negative => -Mathf.Abs(clampedY),
+                _ => clampedY
+            };
 
             return new Vector3(clampedX, clampedY);
         }
