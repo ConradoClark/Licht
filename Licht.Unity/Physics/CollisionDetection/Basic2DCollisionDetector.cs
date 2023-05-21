@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Licht.Unity.Memory;
 using Licht.Unity.Objects;
 using UnityEngine;
 
@@ -27,7 +28,6 @@ namespace Licht.Unity.Physics.CollisionDetection
         public bool PreventRightClamp;
         [field: SerializeField]
         public bool PreventLeftClamp;
-
         protected override void OnAwake()
         {
             base.OnAwake(); 
@@ -108,6 +108,31 @@ namespace Licht.Unity.Physics.CollisionDetection
         {
             Physics.TryGetCustomObjectByCollider(target, out ColliderPushOutHint hint);
 
+            var frameVariables = Physics.GetFrameVariables();
+
+            var registry = new FrameVariableDefinition<CollisionPositionClampRegister>(
+                $"clamp_registry_{Collider.GetInstanceID()}",
+                () => null);
+
+            var frameRegistry = frameVariables.Get(registry);
+
+            if (frameRegistry != null)
+            {
+                hint.HorizontalHintDirection = Math.Sign(frameRegistry.Clamp.x) switch
+                {
+                    1 => ColliderPushOutHint.PushOutDirection.Negative,
+                    -1 => ColliderPushOutHint.PushOutDirection.Positive,
+                    _ => hint.HorizontalHintDirection
+                };
+
+                hint.VerticalHintDirection = Math.Sign(frameRegistry.Clamp.y) switch
+                {
+                    1 => ColliderPushOutHint.PushOutDirection.Negative,
+                    -1 => ColliderPushOutHint.PushOutDirection.Positive,
+                    _ => hint.VerticalHintDirection
+                };
+            };
+
             var distanceToCollide = distance.pointB - distance.pointA;
 
             var clampedX = PreventLeftClamp && distanceToCollide.x < 0 ? 0 :
@@ -131,6 +156,13 @@ namespace Licht.Unity.Physics.CollisionDetection
                 ColliderPushOutHint.PushOutDirection.Negative => -Mathf.Abs(clampedY),
                 _ => clampedY
             };
+
+            frameVariables.Set($"clamp_registry_{target.GetInstanceID()}", new CollisionPositionClampRegister
+            {
+                Origin = Collider,
+                Target = target,
+                Clamp = new Vector2(clampedX, clampedY)
+            });
 
             return new Vector3(clampedX, clampedY);
         }

@@ -18,10 +18,10 @@ namespace Licht.Unity.Physics.CollisionDetection
         }
 
         [field:SerializeField]
-        public PushOutDirection HorizontalHintDirection { get; private set; }
+        public PushOutDirection HorizontalHintDirection { get; set; }
 
 
         [field: SerializeField]
-        public PushOutDirection VerticalHintDirection { get; private set; }
+        public PushOutDirection VerticalHintDirection { get; set; }
     }
 }
