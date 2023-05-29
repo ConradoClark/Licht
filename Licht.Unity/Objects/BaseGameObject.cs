@@ -17,19 +17,29 @@ namespace Licht.Unity.Objects
 
         private void Awake()
         {
+            GameTimer = SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer;
+            UITimer = SceneObject<DefaultUITimer>.Instance().TimerRef.Timer;
+            DefaultMachinery = SceneObject<DefaultMachinery>.Instance().MachineryRef.Machinery;
+
+            OnAwake();
+        }
+
+        public virtual void Init()
+        {
+            AttachActor();
+        }
+
+        private void AttachActor()
+        {
             Actor = GetComponent<BaseActor>();
             if (Actor == null)
             {
-                Actor = GetComponentInParent<BaseActor>();
+                Actor = GetComponentInParent<BaseActor>(true);
             }
             if (Actor != null)
             {
                 Actor.AddCustomObject(GetType(), this);
             }
-            GameTimer = SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer;
-            UITimer = SceneObject<DefaultUITimer>.Instance().TimerRef.Timer;
-            DefaultMachinery = SceneObject<DefaultMachinery>.Instance().MachineryRef.Machinery;
-            OnAwake();
         }
 
         protected virtual void OnAwake()
@@ -39,6 +49,11 @@ namespace Licht.Unity.Objects
 
         protected virtual void OnEnable()
         {
+            if (Actor == null)
+            {
+                AttachActor();
+            }
+
             GameTimer ??= SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer;
             UITimer ??= SceneObject<DefaultUITimer>.Instance().TimerRef.Timer;
             DefaultMachinery ??= SceneObject<DefaultMachinery>.Instance().MachineryRef.Machinery;

@@ -20,6 +20,17 @@ namespace Licht.Unity.Physics.CollisionDetection
         [field: SerializeField]
         public ScriptIdentifier HitCeilingIdentifier;
 
+        [Header("Filter by Speed")]
+        [field: SerializeField]
+        public bool PreventByGoingUp;
+        [field: SerializeField]
+        public bool PreventByGoingDown;
+        [field: SerializeField]
+        public bool PreventByGoingRight;
+        [field: SerializeField]
+        public bool PreventByGoingLeft;
+
+        [Header("Prevent Collisions by Direction")]
         [field: SerializeField]
         public bool PreventUpClamp;
         [field: SerializeField]
@@ -28,9 +39,10 @@ namespace Licht.Unity.Physics.CollisionDetection
         public bool PreventRightClamp;
         [field: SerializeField]
         public bool PreventLeftClamp;
+
         protected override void OnAwake()
         {
-            base.OnAwake(); 
+            base.OnAwake();
             DetectorType = CollisionDetectorType.PostUpdate;
         }
 
@@ -62,7 +74,7 @@ namespace Licht.Unity.Physics.CollisionDetection
                 })
                 .ToArray();
 
-            if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, results.Any(r=>r.TriggeredHit), this);
+            if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, results.Any(r => r.TriggeredHit), this);
             return results;
         }
 
@@ -77,7 +89,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 
             var results = Triggers;
             if (results == null || results.Length == 0 ||
-                (PhysicsObject.CalculatedSpeed.magnitude == 0 && results.All(r=> !Collider.Distance(r.Collider).isOverlapped))) return PhysicsObject.transform.position;
+                (PhysicsObject.CalculatedSpeed.magnitude == 0 && results.All(r => !Collider.Distance(r.Collider).isOverlapped))) return PhysicsObject.transform.position;
             var clampedPosition = PhysicsObject.transform.position;
 
             foreach (var result in results)
@@ -135,8 +147,16 @@ namespace Licht.Unity.Physics.CollisionDetection
 
             var distanceToCollide = distance.pointB - distance.pointA;
 
-            var clampedX = PreventLeftClamp && distanceToCollide.x < 0 ? 0 :
-                PreventRightClamp && distanceToCollide.x > 0 ? 0 :
+            var preventBySpeed = (PreventByGoingRight && PhysicsObject.CalculatedSpeed.x > 0) ||
+                                 (PreventByGoingLeft && PhysicsObject.CalculatedSpeed.x < 0) ||
+                                 (PreventByGoingUp && PhysicsObject.CalculatedSpeed.y > 0) ||
+                                 (PreventByGoingDown && PhysicsObject.CalculatedSpeed.y < 0);
+
+            var preventLeft = PreventLeftClamp || preventBySpeed;
+            var preventRight = PreventRightClamp || preventBySpeed;
+
+            var clampedX = preventLeft && distanceToCollide.x < 0 ? 0 :
+                preventRight && distanceToCollide.x > 0 ? 0 :
                 distanceToCollide.x;
 
             clampedX = hint?.HorizontalHintDirection switch
@@ -146,8 +166,11 @@ namespace Licht.Unity.Physics.CollisionDetection
                 _ => clampedX
             };
 
-            var clampedY = PreventDownClamp && distanceToCollide.y < 0 ? 0 :
-                PreventUpClamp && distanceToCollide.y > 0 ? 0 :
+            var preventDown = PreventDownClamp || preventBySpeed;
+            var preventUp = PreventDownClamp || preventBySpeed;
+
+            var clampedY = preventDown && distanceToCollide.y < 0 ? 0 :
+                preventUp && distanceToCollide.y > 0 ? 0 :
                 distanceToCollide.y;
 
             clampedY = hint?.VerticalHintDirection switch

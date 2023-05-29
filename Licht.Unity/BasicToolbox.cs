@@ -32,6 +32,12 @@ namespace Licht.Unity
             {
                 Application.targetFrameRate = -1;
             }
+
+            var allObjects = FindObjectsOfType<BaseGameObject>(true);
+            foreach (var obj in allObjects)
+            {
+                obj.Init();
+            }
         }
 
         protected void Update()

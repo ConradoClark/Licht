@@ -48,7 +48,11 @@ namespace Licht.Impl.Orchestration
                 foreach (var machine in _machineLayers)
                 {
                     machine.Key.Cleanup();
-                    _machinarium[_machineLayers[machine.Key]].Remove(machine.Key);
+                    if (_machineLayers.ContainsKey(machine.Key) && 
+                        _machinarium.ContainsKey(_machineLayers[machine.Key]))
+                    {
+                        _machinarium[_machineLayers[machine.Key]].Remove(machine.Key);
+                    }
                 }
 
                 _finalizeAction();
@@ -64,16 +68,22 @@ namespace Licht.Impl.Orchestration
             {
                 if (!_machinarium.ContainsKey(layer)) continue;
 
-                for (var index = 0; index < _machinarium[layer].Count; index++)
+                var count = _machinarium[layer].Count;
+
+                for (var index = 0; index < count; index++)
                 {
+                    if (!_machinarium.ContainsKey(layer)) break;
                     var machine = _machinarium[layer][index];
                     var result = RunStep(machine);
                     if (result == MachineStepResult.Done) _removeList.Add(machine);
                 }
+
+                if (!_machinarium.ContainsKey(layer)) break;
             }
 
             foreach (var machine in _removeList.Where(machine => _machineLayers.ContainsKey(machine)))
             {
+                if (!_machinarium.ContainsKey(_machineLayers[machine])) continue;
                 _machinarium[_machineLayers[machine]].Remove(machine);
             }
         }
