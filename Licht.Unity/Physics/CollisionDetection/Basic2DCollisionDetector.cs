@@ -10,8 +10,6 @@ namespace Licht.Unity.Physics.CollisionDetection
     public class Basic2DCollisionDetector : LichtPhysicsCollisionDetector
     {
         [field: SerializeField]
-        public bool ShouldClamp;
-        [field: SerializeField]
         public ContactFilter2D ContactFilter;
         private readonly List<Collider2D> _collisionResults = new List<Collider2D>();
 
@@ -85,12 +83,12 @@ namespace Licht.Unity.Physics.CollisionDetection
                 PhysicsObject.SetPhysicsTrigger(HitCeilingIdentifier, false, this);
             }
 
-            if (!ShouldClamp) return PhysicsObject.transform.position;
+            if (!ShouldClamp) return PhysicsObject.GetCurrentPosition();
 
             var results = Triggers;
             if (results == null || results.Length == 0 ||
-                (PhysicsObject.CalculatedSpeed.magnitude == 0 && results.All(r => !Collider.Distance(r.Collider).isOverlapped))) return PhysicsObject.transform.position;
-            var clampedPosition = PhysicsObject.transform.position;
+                (PhysicsObject.CalculatedSpeed.magnitude == 0 && results.All(r => !Collider.Distance(r.Collider).isOverlapped))) return PhysicsObject.GetCurrentPosition();
+            var clampedPosition = PhysicsObject.GetCurrentPosition();
 
             foreach (var result in results)
             {
@@ -110,13 +108,13 @@ namespace Licht.Unity.Physics.CollisionDetection
         {
             if (HitCeilingIdentifier == null) return;
 
-            var isHittingCeiling = distance.pointA.y > PhysicsObject.transform.position.y
+            var isHittingCeiling = distance.pointA.y > PhysicsObject.GetCurrentPosition().y
                                 && Vector2.Angle(distance.normal, Vector2.up) < 90;
 
             PhysicsObject.SetPhysicsTrigger(HitCeilingIdentifier, isHittingCeiling, this);
         }
 
-        private Vector3 CalculateClampVector(ColliderDistance2D distance, Collider2D target)
+        private Vector2 CalculateClampVector(ColliderDistance2D distance, Collider2D target)
         {
             Physics.TryGetCustomObjectByCollider(target, out ColliderPushOutHint hint);
 
@@ -187,7 +185,7 @@ namespace Licht.Unity.Physics.CollisionDetection
                 Clamp = new Vector2(clampedX, clampedY)
             });
 
-            return new Vector3(clampedX, clampedY);
+            return new Vector2(clampedX, clampedY);
         }
     }
 }

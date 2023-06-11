@@ -29,6 +29,10 @@ namespace Licht.Unity.Physics
         public LichtPhysicsCollisionDetector[] CollisionDetectors;
         public List<Collider2D> AdditionalColliders;
 
+        [field:Header("Rigidbody (Optional)")]
+        [field:SerializeField]
+        public Rigidbody2D Rigidbody { get; private set; }
+
         public LichtPhysics Physics { get; private set; }
         private string PhysicsFrameVar => $"LichtPhysicsObject_{gameObject.GetInstanceID()}";
 
@@ -134,6 +138,28 @@ namespace Licht.Unity.Physics
             }
         }
 
+        public void MoveTo(Vector3 position)
+        {
+            if (Rigidbody == null)
+            {
+                transform.position = position;
+            }
+            else
+            {
+                Rigidbody.velocity = (position - transform.position) * Physics.VelocityMultiplier;
+            }
+        }
+
+        public Vector2 GetCurrentPosition()
+        {
+            if (Rigidbody == null)
+            {
+                return transform.position;
+            }
+
+            return Rigidbody.position;
+        }
+
         public void CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType type)
         {
             foreach (var detector in CollisionDetectors.Where(cd => cd.DetectorType 
@@ -145,9 +171,11 @@ namespace Licht.Unity.Physics
 
                 detector.CheckCollision();
 
+                if (!detector.ShouldClamp || Rigidbody != null) continue;
+
                 var result = detector.Clamp();
                 if (type == LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate) CalculatedSpeed = result;
-                else transform.position = result;
+                else MoveTo(result);
             }
         }
     }

@@ -68,6 +68,9 @@ namespace Licht.Unity.Physics.CollisionDetection
             _collisionBlockers.Remove(source);
         }
 
+        [field:SerializeField]
+        public bool ShouldClamp { get; private set; }
+
         public bool IsBlocked => _collisionBlockers.Any();
 
         public CollisionResult[] Triggers => _frameVariables.Get(_collisionResults);

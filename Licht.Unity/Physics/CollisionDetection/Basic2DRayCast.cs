@@ -23,7 +23,6 @@ namespace Licht.Unity.Physics.CollisionDetection
         public Vector2 NormalTarget;
 
         public bool IncreaseBySpeed;
-        public bool ShouldClampSpeed;
 
         public Vector2 Offset;
 
@@ -75,7 +74,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 
         public override Vector2 Clamp()
         {
-            if (!ShouldClampSpeed) return PhysicsObject.CalculatedSpeed;
+            if (!ShouldClamp) return PhysicsObject.CalculatedSpeed;
             var results = Triggers;
             if (results == null || results.Length == 0 || PhysicsObject.CalculatedSpeed.magnitude == 0) return PhysicsObject.CalculatedSpeed;
 
@@ -83,7 +82,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 
             foreach (var result in results)
             {
-                var distance = result.Hit.point - (Vector2)PhysicsObject.transform.position;
+                var distance = result.Hit.point - PhysicsObject.GetCurrentPosition();
                 var hasXComponent = Mathf.Abs(Direction.x) > 0;
                 var hasYComponent = Mathf.Abs(Direction.y) > 0;
 

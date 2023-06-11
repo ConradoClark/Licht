@@ -9,6 +9,7 @@ using Licht.Unity.Memory;
 using Licht.Unity.Objects;
 using Licht.Unity.Physics.CollisionDetection;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using Object = UnityEngine.Object;
 using Vector3 = UnityEngine.Vector3;
 
@@ -20,6 +21,7 @@ namespace Licht.Unity.Physics
         public bool Debug;
         public float FrameMultiplier = 0.001f;
         public float PhysicsUpdateFrequency = 5 / 60f;
+        public float VelocityMultiplier = 12.5f;
         public ScriptBasicMachinery LichtPhysicsMachinery;
         public ScriptTimer ScriptTimerRef;
         private FrameVariables _frameVariables;
@@ -30,6 +32,7 @@ namespace Licht.Unity.Physics
 
         private Dictionary<Collider2D, LichtPhysicsObject> _colliderRegistry;
         private Dictionary<Collider2D, BaseActor> _actorColliderRegistry;
+        private Dictionary<LichtPhysicsObject, Vector3> _positionUpdates;
 
         public event Action<LichtPhysicsObject> OnAddPhysicsObject;
         public event Action<LichtPhysicsObject> OnRemovePhysicsObject;
@@ -86,23 +89,24 @@ namespace Licht.Unity.Physics
 
         public LichtCustomPhysicsForce GetCustomPhysicsForce(string key)
         {
-            return _customPhysicsForces.ContainsKey(key) ? _customPhysicsForces[key] : null;
+            return _customPhysicsForces.TryGetValue(key, out var force) ? force : null;
         }
 
         public void Update()
         {
-            Physics2D.SyncTransforms();
-            if (Physics2D.simulationMode == SimulationMode2D.Script){
+            //Physics2D.SyncTransforms();
+            if (Physics2D.simulationMode == SimulationMode2D.Script)
+            {
+                var updatedTime= ScriptTimerRef.Timer.UpdatedTimeInMilliseconds * 0.001f;
                 var timer = PhysicsUpdateFrequency;
-                timer -= (float) ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
 
                 // Catch up with the game time.
                 // Advance the physics simulation in portions of Time.fixedDeltaTime
                 // Note that generally, we don't want to pass variable delta to Simulate as that leads to unstable results.
-                while (timer >= 0)
+                while (timer > 0)
                 {
-                    timer -= ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
-                    Physics2D.Simulate(PhysicsUpdateFrequency);
+                    Physics2D.Simulate(Mathf.Min(updatedTime, timer));
+                    timer -= updatedTime;   
                 }
             }
 
@@ -125,14 +129,16 @@ namespace Licht.Unity.Physics
 
         public void UpdatePositions()
         {
+            var updatedTime = FrameMultiplier * ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
+
             foreach (var obj in _physicsWorld)
             {
-                obj.CalculatedSpeed = obj.Speed * FrameMultiplier * ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
+                obj.CalculatedSpeed = obj.Speed * updatedTime;
 
                 obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate);
                 obj.ImplyDirection(obj.CalculatedSpeed.normalized);
 
-                obj.transform.position += (Vector3)obj.CalculatedSpeed;
+                obj.MoveTo(obj.transform.position + (Vector3)obj.CalculatedSpeed);
             }
 
             Physics2D.SyncTransforms();
@@ -140,7 +146,6 @@ namespace Licht.Unity.Physics
             foreach (var obj in _physicsWorld)
             {
                 obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PostUpdate);
-                obj.CalculatedSpeed = obj.Speed;
             }
 
             foreach (var obj in _physicsStaticWorld)
@@ -161,6 +166,7 @@ namespace Licht.Unity.Physics
             _customPhysicsForces = new Dictionary<string, LichtCustomPhysicsForce>();
             _colliderRegistry = new Dictionary<Collider2D, LichtPhysicsObject>();
             _actorColliderRegistry = new Dictionary<Collider2D, BaseActor>();
+            _positionUpdates = new Dictionary<LichtPhysicsObject, Vector3>();
         }
 
         public void UnblockCustomPhysicsForceForObject(MonoBehaviour src, LichtPhysicsObject obj, string force)
@@ -200,16 +206,15 @@ namespace Licht.Unity.Physics
             return true;
         }
 
-        public bool TryGetCustomObjectByCollider<T>(Collider2D col, out T obj) where T:class
+        public bool TryGetCustomObjectByCollider<T>(Collider2D col, out T obj) where T : class
         {
-            if (_colliderRegistry.ContainsKey(col))
+            if (_colliderRegistry.TryGetValue(col, out var value))
             {
-                return _colliderRegistry[col].TryGetCustomObject(out obj);
+                return value.TryGetCustomObject(out obj);
             }
 
-            if (_actorColliderRegistry.ContainsKey(col))
+            if (_actorColliderRegistry.TryGetValue(col, out var actor))
             {
-                var actor = _actorColliderRegistry[col];
                 return actor.TryGetCustomObject(out obj);
             }
 

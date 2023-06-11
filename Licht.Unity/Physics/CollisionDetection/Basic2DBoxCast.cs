@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Licht.Unity.Debug;
+using Licht.Unity.Extensions;
 using Licht.Unity.Objects;
 using UnityEngine;
 
@@ -27,8 +28,6 @@ namespace Licht.Unity.Physics.CollisionDetection
 
         [field: SerializeField]
         public bool IncreaseBySpeed { get; set; }
-        [field: SerializeField]
-        public bool ShouldClampSpeed { get; set; }
 
         [field: SerializeField]
         public BoxCollider2D BoxCollider { get; set; }
@@ -50,16 +49,18 @@ namespace Licht.Unity.Physics.CollisionDetection
             var distance = IncreaseBySpeed
                 ? Distance + (PhysicsObject.CalculatedSpeed * Direction).magnitude
                 : Distance;
+            
+            var size = IncreaseBySpeed ? PhysicsObject.CalculatedSpeed * Direction : Vector2.zero;
 
             var colliderPosition = BoxCollider.transform.position + (Vector3) BoxCollider.offset;
 
-            var noHits = Physics2D.BoxCastNonAlloc((Vector2)colliderPosition, BoxCollider.size, 
-                0, Direction, _collisionResults, distance, LayerMask);
+            var noHits = Physics2D.BoxCastNonAlloc(colliderPosition, BoxCollider.size + size, 
+                0, Direction, _collisionResults, distance*0.5f, LayerMask);
 
             if (Debug)
             {
                 DebugPresets.DrawRectangle(colliderPosition, BoxCollider.size, Color.green);
-                DebugPresets.DrawRectangle(colliderPosition + (Vector3)(distance * Direction), BoxCollider.size, Color.yellow);
+                DebugPresets.DrawRectangle(colliderPosition + (Vector3)(distance * Direction), BoxCollider.size + size, Color.yellow);
                 UnityEngine.Debug.DrawLine(colliderPosition, colliderPosition + (Vector3)(distance * Direction), Color.yellow);
             }
 
@@ -90,7 +91,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 
         public override Vector2 Clamp()
         {
-            if (!ShouldClampSpeed) return PhysicsObject.CalculatedSpeed;
+            if (!ShouldClamp) return PhysicsObject.CalculatedSpeed;
             var results = Triggers;
             if (results == null || results.Length == 0 || PhysicsObject.CalculatedSpeed.magnitude == 0) return PhysicsObject.CalculatedSpeed;
 
@@ -98,15 +99,25 @@ namespace Licht.Unity.Physics.CollisionDetection
 
             foreach (var result in results)
             {
-                var distance = result.Hit.point - (Vector2) PhysicsObject.transform.position;
+                var colliderPosition = BoxCollider.transform.position + (Vector3)BoxCollider.offset;
+
+                var distance =
+                    (result.Hit.point - (Vector2)colliderPosition)
+                    .RoundToPrecision(4);
+
                 var hasXComponent = Mathf.Abs(Direction.x) > 0;
                 var hasYComponent = Mathf.Abs(Direction.y) > 0;
+
+                if (Debug)
+                {
+                    DebugPresets.DrawEllipse(result.Hit.point, Vector3.forward,Vector3.up,0.1f,0.1f,8, Color.red); DebugPresets.DrawEllipse(distance, Vector3.forward, Vector3.up, 0.05f, 0.05f, 8, Color.yellow);
+                }
 
                 targetSpeed = new Vector2(Mathf.Clamp(targetSpeed.x,
                         hasXComponent ? -Mathf.Abs(distance.x) : PhysicsObject.CalculatedSpeed.x,
                         hasXComponent ? Mathf.Abs(distance.x) : PhysicsObject.CalculatedSpeed.x),
                     Mathf.Clamp(targetSpeed.y, hasYComponent ? -Mathf.Abs(distance.y) : PhysicsObject.CalculatedSpeed.y,
-                        hasYComponent && (PhysicsObject.Sticky || Math.Sign(PhysicsObject.CalculatedSpeed.y) == Math.Sign(Direction.y)) ? Mathf.Abs(distance.y) : PhysicsObject.CalculatedSpeed.y));
+                        hasYComponent && (PhysicsObject.Sticky || Math.Sign(PhysicsObject.CalculatedSpeed.y) == Math.Sign(Direction.y)) ? Mathf.Abs(distance.y) : PhysicsObject.CalculatedSpeed.y));    
             }
 
             return targetSpeed;
