@@ -7,6 +7,7 @@ using Licht.Interfaces.Events;
 using Licht.Unity.Extensions;
 using Licht.Unity.Objects;
 using Licht.Unity.Physics;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -36,17 +37,28 @@ namespace Licht.Unity.CharacterControllers
             public float Direction;
         }
 
+        [CustomHeader("Movement")]
+        [BeginFoldout("Movement Properties")]
         public float SpeedMultiplier = 1;
         public float MaxSpeed;
-        public MovementTurnBehaviour TurnBehaviour;
-        public float MinSkidSpeed;
+        // public MovementTurnBehaviour TurnBehaviour;
+        // public float MinSkidSpeed;
+        [InspectorName("Acceleration Time (s)")]
         public float AccelerationTime;
+        [InspectorName("Deceleration Time (s)")]
         public float DecelerationTime;
         public EasingYields.EasingFunction MovementStartEasing;
         public EasingYields.EasingFunction MovementEndEasing;
+
+        [EndFoldout] [CustomHeader("Reference")]
+        [CustomLabel("The default is the associated Actor.")]
+        [CustomLabel("Select this if you want to attach this to a different Physics Object.")]
+        public bool UseCustomTarget;
+        [ShowWhen(nameof(UseCustomTarget))]
         public LichtPhysicsObject Target;
         public float LatestDirection { get; private set; } = 1f;
 
+        [CustomHeader("Input")]
         public InputActionReference AxisInput;
 
         private LichtPhysics _physics;
@@ -56,6 +68,7 @@ namespace Licht.Unity.CharacterControllers
         protected override void OnAwake()
         {
             base.OnAwake();
+            if (!UseCustomTarget) Target = Actor as LichtPhysicsObject;
             _physics = this.GetLichtPhysics();
             _input = PlayerInput.GetPlayerByIndex(0);
         }

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Licht.Impl.Orchestration;
 using Licht.Unity.Objects;
 using Licht.Unity.Pooling;
 using UnityEngine;
 
 namespace Licht.Unity.Effects
 {
-    public class ExpireByDistanceToPoint : BaseGameObject
+    public class ExpireByDistanceToPoint : BaseGameAgent
     {
         [field: SerializeField]
         public PooledComponent Poolable { get; private set; }
@@ -27,16 +28,17 @@ namespace Licht.Unity.Effects
             _effectEnded = false;
             base.OnEnable();
         }
-        private void Update()
+
+        override protected IEnumerable<IEnumerable<Action>> Handle()
         {
-            if (_effectEnded || Vector2.Distance(Reference.position, Target) < Distance)
+            if (!_effectEnded && !(Vector2.Distance(Reference.position, Target) < Distance))
             {
-                return;
+                Poolable.EndEffect();
+                _effectEnded = true;
+                yield break;
             }
 
-            Poolable.EndEffect();
-            _effectEnded = true;
+            yield return TimeYields.WaitOneFrameX;
         }
-
     }
 }

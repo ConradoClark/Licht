@@ -19,6 +19,9 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Licht.Unity\UnityPackages\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\Licht.Unity\UnityPackages\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

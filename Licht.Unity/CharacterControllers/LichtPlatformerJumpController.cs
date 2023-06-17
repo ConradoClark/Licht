@@ -6,6 +6,7 @@ using Licht.Interfaces.Events;
 using Licht.Unity.Extensions;
 using Licht.Unity.Objects;
 using Licht.Unity.Physics;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -37,20 +38,43 @@ namespace Licht.Unity.CharacterControllers
             public CustomJumpParams CustomParams;
         }
 
+        [CustomHeader("Movement")]
+        [BeginFoldout("Triggers")]
+        [CustomLabel("Triggered when the actor hits the ground.")]
         public ScriptIdentifier GroundedTrigger;
+        [CustomLabel("Triggered when the actor hits the ceiling.")]
         public ScriptIdentifier CeilingTrigger;
+        [CustomLabel("Gravity identifier in the Physics System.")]
         public ScriptIdentifier GravityIdentifier;
-        public InputActionReference JumpInput;
+        [EndFoldout]
+        [BeginFoldout("Movement Properties")]
         public float JumpSpeed;
+        [InspectorName("Acceleration Time (s)")]
         public float AccelerationTime;
+        [InspectorName("Deceleration Time (s)")]
         public float DecelerationTime;
         public EasingYields.EasingFunction MovementStartEasing;
         public EasingYields.EasingFunction MovementEndEasing;
-        public LichtPhysicsObject Target;
+        [EndFoldout]
+        [BeginFoldout("Tweaks")]
+        [CustomLabel("Input buffering when not on ground.")]
+        [InspectorName("Input Buffer Time (s)")]
         public float InputBufferTime;
+        [CustomLabel("Jump leniency buffer when leaving ground.")]
+        [InspectorName("Coyote Jump Time (s)")]
         public float CoyoteJumpTime;
-
+        [CustomLabel("Min time the jump is automatically held, in seconds.")]
+        [InspectorName("Minimum Jump Hold (s)")]
         public float MinJumpHoldInSeconds;
+        [EndFoldout]
+        [CustomHeader("Reference")]
+        [CustomLabel("The default is the associated Actor.")]
+        [CustomLabel("Select this if you want to attach this to a different Physics Object.")]
+        public bool UseCustomTarget;
+        [ShowWhen(nameof(UseCustomTarget))]
+        public LichtPhysicsObject Target;
+        [CustomHeader("Input")]
+        public InputActionReference JumpInput;
 
         private bool _minJumpDelayPassed;
 
@@ -69,6 +93,7 @@ namespace Licht.Unity.CharacterControllers
         protected override void OnAwake()
         {
             base.OnAwake();
+            if (!UseCustomTarget) Target = Actor as LichtPhysicsObject;
             _physics = this.GetLichtPhysics();
             _input = PlayerInput.GetPlayerByIndex(0);
         }

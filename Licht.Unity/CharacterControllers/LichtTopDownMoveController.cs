@@ -2,10 +2,13 @@
 using Licht.Impl.Events;
 using Licht.Impl.Orchestration;
 using Licht.Interfaces.Events;
+using Licht.Interfaces.Time;
 using Licht.Unity.Builders;
 using Licht.Unity.Extensions;
 using Licht.Unity.Objects;
 using Licht.Unity.Physics;
+using Licht.Unity.PropertyAttributes;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using Routine = System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<System.Action>>;
 using Vector2 = UnityEngine.Vector2;
@@ -14,21 +17,30 @@ namespace Licht.Unity.CharacterControllers
 {
     public class LichtTopDownMoveController : LichtMovementController
     {
+        [CustomHeader("Movement")]
+        [BeginFoldout("Movement Properties")]
+        public Vector2 LatestDirection;
         public float ChangeDirectionEventSensitivity;
         public float MaxSpeed;
+        [InspectorName("Acceleration Time (s)")]
         public float AccelerationTime;
+        [InspectorName("Deceleration Time (s)")]
         public float DecelerationTime;
         public EasingYields.EasingFunction MovementStartEasing;
         public EasingYields.EasingFunction MovementEndEasing;
+        [EndFoldout]
+        [CustomHeader("Reference")]
+        [CustomLabel("The default is the associated Actor.")]
+        [CustomLabel("Select this if you want to attach this to a different Physics Object.")]
+        public bool UseCustomTarget;
+        [ShowWhen(nameof(UseCustomTarget))]
         public LichtPhysicsObject Target;
-        public Vector2 LatestDirection;
         public bool IsMoving { get; private set; }
 
+        [CustomHeader("Input")]
         public InputActionReference HorizontalAxisInput;
         public InputActionReference VerticalAxisInput;
-        public PlayerInput PlayerInput;
-
-        public ScriptTimer TimerRef;
+        public PlayerInput PlayerInput { get; set; }
 
         private LichtPhysics _physics;
         private IEventPublisher<LichtTopDownMoveEvents, LichtTopDownMoveEventArgs> _eventPublisher;
@@ -55,6 +67,7 @@ namespace Licht.Unity.CharacterControllers
         protected override void OnAwake()
         {
             base.OnAwake();
+            if (!UseCustomTarget) Target = Actor as LichtPhysicsObject;
             _physics = this.GetLichtPhysics();
             if (PlayerInput == null)
             {
@@ -98,7 +111,7 @@ namespace Licht.Unity.CharacterControllers
                 .Over(AccelerationTime)
                 .BreakIf(() => IsBlocked || !horizontalAction.IsPressed() && !verticalAction.IsPressed(), false)
                 .Easing(MovementStartEasing)
-                .UsingTimer(TimerRef.Timer)
+                .UsingTimer(GameTimer)
                 .Build();
             foreach (var _ in lerp)
             {
@@ -121,7 +134,7 @@ namespace Licht.Unity.CharacterControllers
                 .Over(DecelerationTime)
                 .BreakIf(() => IsBlocked || horizontalAction.IsPressed() || verticalAction.IsPressed(), false)
                 .Easing(MovementEndEasing)
-                .UsingTimer(TimerRef.Timer)
+                .UsingTimer(GameTimer)
                 .Build();
 
             foreach (var _ in lerp)

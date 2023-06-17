@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Licht.Impl.Orchestration;
 using Licht.Interfaces.Time;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Objects
@@ -15,6 +16,10 @@ namespace Licht.Unity.Objects
         [field: SerializeField]
         public bool Loop { get; private set; }
 
+        [field:SerializeField]
+        public bool UseCustomTimer { get; private set; }
+
+        [field: ShowWhen(nameof(UseCustomTimer))]
         [field: SerializeField]
         public ScriptTimer TimerReference { get; private set; }
 

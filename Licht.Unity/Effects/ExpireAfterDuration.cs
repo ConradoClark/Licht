@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Effects
 {
-    public class ExpireAfterDuration : BaseGameRunner
+    public class ExpireAfterDuration : BaseGameAgent
     {
         [field: SerializeField]
         public PooledComponent Poolable { get; private set; }
