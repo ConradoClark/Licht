@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Licht.Impl.Orchestration;
 using Licht.Interfaces.Time;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Objects
@@ -10,9 +11,15 @@ namespace Licht.Unity.Objects
     public abstract class BaseGameAgent : BaseGameObject
     {
         [field: SerializeField]
-        public ScriptTimer TimerReference { get; private set; }
+        public bool UseCustomTimer { get; private set; }
 
-        public ITimer Timer => TimerReference?.Timer ?? SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer;
+        [field: ShowWhen(nameof(UseCustomTimer))]
+        [field: SerializeField]
+        public ScriptTimer TimerReference { get; private set; }
+        public ITimer Timer => UseCustomTimer
+            ? TimerReference?.Timer ??
+              SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer
+            : SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer;
 
         protected override void OnEnable()
         {

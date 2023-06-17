@@ -16,14 +16,17 @@ namespace Licht.Unity.Objects
         [field: SerializeField]
         public bool Loop { get; private set; }
 
-        [field:SerializeField]
+        [field: SerializeField]
         public bool UseCustomTimer { get; private set; }
 
         [field: ShowWhen(nameof(UseCustomTimer))]
         [field: SerializeField]
         public ScriptTimer TimerReference { get; private set; }
 
-        public ITimer Timer => TimerReference?.Timer ?? SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer;
+        public ITimer Timer => UseCustomTimer
+            ? TimerReference?.Timer ??
+              SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer
+            : SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer;
 
         protected override void OnEnable()
         {
