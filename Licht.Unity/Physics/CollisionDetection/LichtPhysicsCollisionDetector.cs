@@ -4,11 +4,13 @@ using System.Linq;
 using Licht.Unity.Extensions;
 using Licht.Unity.Memory;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Licht.Unity.Physics.CollisionDetection
 {
+
     public abstract class LichtPhysicsCollisionDetector : BaseGameObject
     {
         public enum CollisionDetectorType
@@ -16,8 +18,6 @@ namespace Licht.Unity.Physics.CollisionDetection
             PreUpdate,
             PostUpdate
         }
-
-        public Collider2D Collider;
         public virtual CollisionDetectorType DetectorType { get; protected set; }
         public LichtPhysicsObject PhysicsObject { get; private set; }
 
@@ -25,6 +25,7 @@ namespace Licht.Unity.Physics.CollisionDetection
         private FrameVariables _frameVariables;
         private FrameVariableDefinition<CollisionResult[]> _collisionResults;
         protected LichtPhysics Physics;
+        public virtual Collider2D AssociatedCollider => null;
 
         private FrameVariables GetFrameVariables()
         {
@@ -49,11 +50,9 @@ namespace Licht.Unity.Physics.CollisionDetection
                     CheckCollisionForFrame);
         }
 
-        public void AttachPhysicsObject(LichtPhysicsObject obj)
+        public virtual void AttachPhysicsObject(LichtPhysicsObject obj)
         {
             PhysicsObject = obj;
-
-            if (Collider != null) Physics.RegisterCollider(Collider, obj);
         }
 
         public void BlockCollisionDetection(Object source)
@@ -68,7 +67,8 @@ namespace Licht.Unity.Physics.CollisionDetection
             _collisionBlockers.Remove(source);
         }
 
-        [field:SerializeField]
+        [field: CustomLabel("Select if detected collisions should be solid (restrict movement)")]
+        [field: SerializeField]
         public bool ShouldClamp { get; private set; }
 
         public bool IsBlocked => _collisionBlockers.Any();
@@ -99,5 +99,20 @@ namespace Licht.Unity.Physics.CollisionDetection
                 yield return target;
             }
         }
+    }
+
+    public abstract class LichtPhysicsCollisionDetector<T> : LichtPhysicsCollisionDetector where T : Collider2D
+    {
+        [field: SerializeField]
+        public virtual T Collider { get; protected set; }
+
+        public override void AttachPhysicsObject(LichtPhysicsObject obj)
+        {
+            base.AttachPhysicsObject(obj);
+
+            if (Collider != null) Physics.RegisterCollider(Collider, obj);
+        }
+
+        public override Collider2D AssociatedCollider => Collider;
     }
 }

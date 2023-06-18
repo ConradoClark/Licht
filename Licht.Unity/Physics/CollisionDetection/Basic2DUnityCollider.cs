@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Physics.CollisionDetection
 {
-    public class Basic2DUnityCollider : LichtPhysicsCollisionDetector
+    public class Basic2DUnityCollider : LichtPhysicsCollisionDetector<Collider2D>
     {
         [field: SerializeField]
         public ScriptIdentifier TriggerIdentifier { get; set; }

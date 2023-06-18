@@ -6,6 +6,7 @@ using Licht.Unity.Extensions;
 using Licht.Unity.Memory;
 using Licht.Unity.Objects;
 using Licht.Unity.Physics.CollisionDetection;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -13,8 +14,11 @@ namespace Licht.Unity.Physics
 {
     public class LichtPhysicsObject : BaseActor
     {
-        public bool Static;
+        [CustomHeader("Properties")]
+        [CustomLabel("Ghost objects aren't affected by forces of Physics (e.g. Gravity)")]
         public bool Ghost;
+        [CustomLabel("Sticky objects tend to attach themselves to platforms when moving up.")]
+        [CustomLabel("The default Jump Controller sets this automatically as needed.")]
         public bool Sticky;
 
         [Serializable]
@@ -25,12 +29,22 @@ namespace Licht.Unity.Physics
             [HideInInspector] public Object UpdatedBy;
         }
 
+        [CustomHeader("Triggers")]
         public TriggerDefinitions[] PhysicsTriggers;
+
+        [CustomHeader("Collision")]
         public LichtPhysicsCollisionDetector[] CollisionDetectors;
+        [CustomLabel("Additional colliders attached to the Physics Object.")]
+        [CustomLabel("Attached Collision Detectors ignore collisions from AdditionalColliders.")]
         public List<Collider2D> AdditionalColliders;
 
-        [field:Header("Rigidbody (Optional)")]
+        [field:CustomHeader("Rigidbody")]
         [field:SerializeField]
+        public bool AttachToRigidbody { get; private set; }
+
+        [field:CustomLabel("Attach a Licht Physics Object to a Rigidbody if you want it to move by using its Rigidbody velocity.")]
+        [field:SerializeField]
+        [field:ShowWhen(nameof(AttachToRigidbody))]
         public Rigidbody2D Rigidbody { get; private set; }
 
         public LichtPhysics Physics { get; private set; }
@@ -140,7 +154,7 @@ namespace Licht.Unity.Physics
 
         public void MoveTo(Vector3 position)
         {
-            if (Rigidbody == null)
+            if (!AttachToRigidbody)
             {
                 transform.position = position;
             }
@@ -152,7 +166,7 @@ namespace Licht.Unity.Physics
 
         public Vector2 GetCurrentPosition()
         {
-            if (Rigidbody == null)
+            if (!AttachToRigidbody)
             {
                 return transform.position;
             }

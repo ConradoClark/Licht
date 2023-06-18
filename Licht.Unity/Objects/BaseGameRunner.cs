@@ -4,6 +4,7 @@ using System.Text;
 using Licht.Impl.Orchestration;
 using Licht.Interfaces.Time;
 using Licht.Unity.PropertyAttributes;
+using Unity.Collections;
 using UnityEngine;
 
 namespace Licht.Unity.Objects

@@ -56,15 +56,13 @@ namespace Licht.Unity.Physics
         public void AddPhysicsObject(LichtPhysicsObject obj)
         {
             OnAddPhysicsObject?.Invoke(obj);
-            if (obj.Static) _physicsStaticWorld.Add(obj);
-            else _physicsWorld.Add(obj);
+            _physicsWorld.Add(obj);
         }
 
         public void RemovePhysicsObject(LichtPhysicsObject obj)
         {
             OnRemovePhysicsObject?.Invoke(obj);
-            if (obj.Static) _physicsStaticWorld.Remove(obj);
-            else _physicsWorld.Remove(obj);
+            _physicsWorld.Remove(obj);
         }
 
         public void AddPhysicsForce(LichtPhysicsForce obj)

@@ -3,39 +3,50 @@ using System.Linq;
 using Licht.Unity.Debug;
 using Licht.Unity.Extensions;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Physics.CollisionDetection
 {
-    public class Basic2DBoxCast : LichtPhysicsCollisionDetector
+    public class Basic2DBoxCast : LichtPhysicsCollisionDetector<BoxCollider2D>
     {
-        [field:SerializeField]
+        [field: CustomLabel("Select this to see the Debug Gizmos.")]
+        [field: SerializeField]
         public bool Debug { get; set; }
+        [field: CustomLabel("Select this if collision detection should activate a Trigger.")]
         [field: SerializeField]
-        public ScriptIdentifier TriggerIdentifier { get; set; }
+        public bool SetTriggerOnCollision { get; set; }
+
+        [field:ShowWhen(nameof(SetTriggerOnCollision))]
         [field: SerializeField]
+        public ScriptIdentifier Trigger { get; set; }
+
+        [field: CustomHeader("Parameters")]
+        [field: SerializeField]
+        [field: CustomLabel("The distance of the BoxCast")]
         public float Distance { get; set; }
         [field: SerializeField]
+        [field: CustomLabel("The direction of the BoxCast")]
         public Vector2 Direction { get; set; }
         [field: SerializeField]
+        [field: CustomLabel("Filter collision by Layer Mask")]
         public LayerMask LayerMask { get; set; }
         private readonly RaycastHit2D[] _collisionResults = new RaycastHit2D[10];
 
+        [field: CustomLabel("Select this to restrict collision detection by normals.")]
         [field: SerializeField]
         public bool CheckNormals { get; set; }
+        [field:ShowWhen(nameof(CheckNormals))]
         [field: SerializeField]
         public Vector2 NormalTarget { get; set; }
 
+        [field: CustomLabel("Select this to increase the BoxCast size by the target's speed.")]
         [field: SerializeField]
         public bool IncreaseBySpeed { get; set; }
-
-        [field: SerializeField]
-        public BoxCollider2D BoxCollider { get; set; }
 
         protected override void OnAwake()
         {
             base.OnAwake();
-            Collider = BoxCollider;
             DetectorType = CollisionDetectorType.PreUpdate;
         }
 
@@ -49,29 +60,29 @@ namespace Licht.Unity.Physics.CollisionDetection
             var distance = IncreaseBySpeed
                 ? Distance + (PhysicsObject.CalculatedSpeed * Direction).magnitude
                 : Distance;
-            
+
             var size = IncreaseBySpeed ? PhysicsObject.CalculatedSpeed * Direction : Vector2.zero;
 
-            var colliderPosition = BoxCollider.transform.position + (Vector3) BoxCollider.offset;
+            var colliderPosition = Collider.transform.position + (Vector3)Collider.offset;
 
-            var noHits = Physics2D.BoxCastNonAlloc(colliderPosition, BoxCollider.size + size, 
-                0, Direction, _collisionResults, distance*0.5f, LayerMask);
+            var noHits = Physics2D.BoxCastNonAlloc(colliderPosition, Collider.size + size,
+                0, Direction, _collisionResults, distance * 0.5f, LayerMask);
 
             if (Debug)
             {
-                DebugPresets.DrawRectangle(colliderPosition, BoxCollider.size, Color.green);
-                DebugPresets.DrawRectangle(colliderPosition + (Vector3)(distance * Direction), BoxCollider.size + size, Color.yellow);
+                DebugPresets.DrawRectangle(colliderPosition, Collider.size, Color.green);
+                DebugPresets.DrawRectangle(colliderPosition + (Vector3)(distance * Direction), Collider.size + size, Color.yellow);
                 UnityEngine.Debug.DrawLine(colliderPosition, colliderPosition + (Vector3)(distance * Direction), Color.yellow);
             }
 
             if (noHits == 0)
             {
-                if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, false, this);
+                if (SetTriggerOnCollision) PhysicsObject.SetPhysicsTrigger(Trigger, false, this);
                 return Array.Empty<CollisionResult>();
             }
 
             var results = _collisionResults
-                .Where(col => col.collider != null && !PhysicsObject.CollisionDetectors.Select(c => c.Collider).Contains(col.collider)
+                .Where(col => col.collider != null && !PhysicsObject.CollisionDetectors.Select(c => c.AssociatedCollider).Contains(col.collider)
                                                    && !PhysicsObject.AdditionalColliders.Contains(col.collider)
                 && (!CheckNormals || col.normal == NormalTarget)
                 )
@@ -85,7 +96,7 @@ namespace Licht.Unity.Physics.CollisionDetection
                 })
                 .ToArray();
 
-            if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, results.Any(), this);
+            if (SetTriggerOnCollision) PhysicsObject.SetPhysicsTrigger(Trigger, results.Any(), this);
             return results;
         }
 
@@ -99,7 +110,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 
             foreach (var result in results)
             {
-                var colliderPosition = BoxCollider.transform.position + (Vector3)BoxCollider.offset;
+                var colliderPosition = Collider.transform.position + (Vector3)Collider.offset;
 
                 var distance =
                     (result.Hit.point - (Vector2)colliderPosition)
@@ -110,14 +121,14 @@ namespace Licht.Unity.Physics.CollisionDetection
 
                 if (Debug)
                 {
-                    DebugPresets.DrawEllipse(result.Hit.point, Vector3.forward,Vector3.up,0.1f,0.1f,8, Color.red); DebugPresets.DrawEllipse(distance, Vector3.forward, Vector3.up, 0.05f, 0.05f, 8, Color.yellow);
+                    DebugPresets.DrawEllipse(result.Hit.point, Vector3.forward, Vector3.up, 0.1f, 0.1f, 8, Color.red); DebugPresets.DrawEllipse(distance, Vector3.forward, Vector3.up, 0.05f, 0.05f, 8, Color.yellow);
                 }
 
                 targetSpeed = new Vector2(Mathf.Clamp(targetSpeed.x,
                         hasXComponent ? -Mathf.Abs(distance.x) : PhysicsObject.CalculatedSpeed.x,
                         hasXComponent ? Mathf.Abs(distance.x) : PhysicsObject.CalculatedSpeed.x),
                     Mathf.Clamp(targetSpeed.y, hasYComponent ? -Mathf.Abs(distance.y) : PhysicsObject.CalculatedSpeed.y,
-                        hasYComponent && (PhysicsObject.Sticky || Math.Sign(PhysicsObject.CalculatedSpeed.y) == Math.Sign(Direction.y)) ? Mathf.Abs(distance.y) : PhysicsObject.CalculatedSpeed.y));    
+                        hasYComponent && (PhysicsObject.Sticky || Math.Sign(PhysicsObject.CalculatedSpeed.y) == Math.Sign(Direction.y)) ? Mathf.Abs(distance.y) : PhysicsObject.CalculatedSpeed.y));
             }
 
             return targetSpeed;

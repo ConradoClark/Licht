@@ -3,22 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using Licht.Unity.Memory;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Physics.CollisionDetection
 {
-    public class Basic2DCollisionDetector : LichtPhysicsCollisionDetector
+    public class Basic2DCollisionDetector : LichtPhysicsCollisionDetector<Collider2D>
     {
         [field: SerializeField]
         public ContactFilter2D ContactFilter;
         private readonly List<Collider2D> _collisionResults = new List<Collider2D>();
 
+        [field: CustomHeader("Triggers")]
+        [field: CustomLabel("Select this if collision detection should activate a Trigger.")]
         [field: SerializeField]
-        public ScriptIdentifier TriggerIdentifier;
+        public bool SetTriggerOnCollision { get; set; }
+
+        [field: ShowWhen(nameof(SetTriggerOnCollision))]
+        [field: SerializeField]
+        public ScriptIdentifier Trigger;
+
+        [field: CustomLabel("Select this if hitting a ceiling should activate a Trigger.")]
+        [field: SerializeField]
+        public bool SetTriggerOnCeiling { get; set; }
+
+        [field: ShowWhen(nameof(SetTriggerOnCeiling))]
         [field: SerializeField]
         public ScriptIdentifier HitCeilingIdentifier;
 
-        [Header("Filter by Speed")]
+        [CustomHeader("Special Conditions")]
+        [BeginFoldout("Prevent Collisions by Physics Object's Direction")]
         [field: SerializeField]
         public bool PreventByGoingUp;
         [field: SerializeField]
@@ -28,7 +42,8 @@ namespace Licht.Unity.Physics.CollisionDetection
         [field: SerializeField]
         public bool PreventByGoingLeft;
 
-        [Header("Prevent Collisions by Direction")]
+        [EndFoldout]
+        [BeginFoldout("Prevent Collisions by Direction")]
         [field: SerializeField]
         public bool PreventUpClamp;
         [field: SerializeField]
@@ -49,11 +64,11 @@ namespace Licht.Unity.Physics.CollisionDetection
             var noHits = Collider.OverlapCollider(ContactFilter, _collisionResults);
             if (noHits == 0)
             {
-                if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, false, this);
+                if (SetTriggerOnCollision) PhysicsObject.SetPhysicsTrigger(Trigger, false, this);
                 return Array.Empty<CollisionResult>();
             }
 
-            var ignoredColliders = new HashSet<Collider2D>(PhysicsObject.CollisionDetectors.Select(c => c.Collider));
+            var ignoredColliders = new HashSet<Collider2D>(PhysicsObject.CollisionDetectors.Select(c => c.AssociatedCollider));
             ignoredColliders.UnionWith(PhysicsObject.AdditionalColliders);
 
             var results = _collisionResults
@@ -72,13 +87,13 @@ namespace Licht.Unity.Physics.CollisionDetection
                 })
                 .ToArray();
 
-            if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, results.Any(r => r.TriggeredHit), this);
+            if (SetTriggerOnCollision) PhysicsObject.SetPhysicsTrigger(Trigger, results.Any(r => r.TriggeredHit), this);
             return results;
         }
 
         public override Vector2 Clamp()
         {
-            if (HitCeilingIdentifier != null)
+            if (SetTriggerOnCeiling)
             {
                 PhysicsObject.SetPhysicsTrigger(HitCeilingIdentifier, false, this);
             }
@@ -106,7 +121,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 
         private void UpdateHitCeilingTrigger(ColliderDistance2D distance)
         {
-            if (HitCeilingIdentifier == null) return;
+            if (!SetTriggerOnCeiling) return;
 
             var isHittingCeiling = distance.pointA.y > PhysicsObject.GetCurrentPosition().y
                                 && Vector2.Angle(distance.normal, Vector2.up) < 90;
@@ -165,7 +180,7 @@ namespace Licht.Unity.Physics.CollisionDetection
             };
 
             var preventDown = PreventDownClamp || preventBySpeed;
-            var preventUp = PreventDownClamp || preventBySpeed;
+            var preventUp = PreventUpClamp || preventBySpeed;
 
             var clampedY = preventDown && distanceToCollide.y < 0 ? 0 :
                 preventUp && distanceToCollide.y > 0 ? 0 :
