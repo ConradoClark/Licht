@@ -24,9 +24,10 @@ namespace Licht.Unity.Physics.Forces
         [CustomHeader("Parameters")]
         public Vector2 Direction;
         public float Speed;
-        [CustomLabel("Delay until gravity is activated, upon enabling it.")]
+        [field: CustomLabel("Air time until full gravity effect.")]
         public float TimeInSecondsUntilFullEffect;
 
+        [field:CustomLabel("Delay until gravity is activated, upon enabling it.")]
         [field:SerializeField]
         public float StartDelayInSeconds { get; private set; }
 
