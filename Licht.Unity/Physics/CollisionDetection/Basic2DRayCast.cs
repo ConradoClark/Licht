@@ -3,28 +3,47 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Physics.CollisionDetection
 {
     public class Basic2DRayCast : LichtPhysicsCollisionDetector
     {
-        public ScriptIdentifier TriggerIdentifier;
+        [field: CustomLabel("Select this if collision detection should activate a Trigger.")]
+        [field: SerializeField]
+        public bool SetTriggerOnCollision { get; set; }
+
+        [field: ShowWhen(nameof(SetTriggerOnCollision))]
+        public ScriptIdentifier Trigger;
+
+        [field: CustomHeader("Parameters")]
+        [field: CustomLabel("The distance of the Ray Cast")]
         public float Distance;
+        [field: ShowWhen(nameof(SetTriggerOnCollision))]
         public float DistanceToTrigger;
 
+        [field: CustomLabel("Select this if the Ray Cast direction should be dictated by the target's speed")]
         public bool UseSpeedAsDirection;
+
+        [field:ShowWhen(nameof(UseSpeedAsDirection), true)]
         public Vector2 Direction;
 
+        [field: CustomLabel("Filter collision by Layer Mask")]
         public LayerMask LayerMask;
         private readonly RaycastHit2D[] _collisionResults = new RaycastHit2D[10];
 
-        public bool CheckNormals;
-        public Vector2 NormalTarget;
+        [field: CustomLabel("Select this to restrict collision detection by normals.")]
+        [field: SerializeField]
+        public bool CheckNormals { get; set; }
+        [field: ShowWhen(nameof(CheckNormals))]
+        [field: SerializeField]
+        public Vector2 NormalTarget { get; set; }
 
+        [field: CustomLabel("Select this to increase the Ray Cast size by the target's speed.")]
         public bool IncreaseBySpeed;
 
-        public Vector2 Offset;
+        public Vector2 RayCastOffset;
 
         protected override void OnAwake()
         {
@@ -43,13 +62,13 @@ namespace Licht.Unity.Physics.CollisionDetection
                 ? Distance + (PhysicsObject.CalculatedSpeed * Direction).magnitude
                 : Distance;
 
-            var noHits = Physics2D.RaycastNonAlloc((Vector2)transform.position + Offset,
+            var noHits = Physics2D.RaycastNonAlloc((Vector2)transform.position + RayCastOffset,
                 UseSpeedAsDirection ? PhysicsObject.CalculatedSpeed : Direction, _collisionResults,
                 distance, LayerMask);
 
             if (noHits == 0)
             {
-                if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, false, this);
+                if (SetTriggerOnCollision) PhysicsObject.SetPhysicsTrigger(Trigger, false, this);
                 return Array.Empty<CollisionResult>();
             }
 
@@ -68,7 +87,7 @@ namespace Licht.Unity.Physics.CollisionDetection
                 })
                 .ToArray();
 
-            if (TriggerIdentifier != null) PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, results.Any(t=>t.TriggeredHit), this);
+            if (SetTriggerOnCollision) PhysicsObject.SetPhysicsTrigger(Trigger, results.Any(t=>t.TriggeredHit), this);
             return results;
         }
 

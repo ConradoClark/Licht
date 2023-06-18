@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using JetBrains.Annotations;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Physics.CollisionDetection
@@ -17,10 +18,13 @@ namespace Licht.Unity.Physics.CollisionDetection
             Negative,
         }
 
-        [field:SerializeField]
+        [field: CustomLabel("Where should the collider push objects out")]
+        [field: CustomLabel("Positive: Right. Negative: Left")]
+        [field: SerializeField]
         public PushOutDirection HorizontalHintDirection { get; set; }
 
-
+        [field: CustomLabel("Where should the collider push objects out")]
+        [field: CustomLabel("Positive: Up. Negative: Down")]
         [field: SerializeField]
         public PushOutDirection VerticalHintDirection { get; set; }
     }

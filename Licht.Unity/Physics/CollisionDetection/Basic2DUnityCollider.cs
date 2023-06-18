@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Physics.CollisionDetection
 {
     public class Basic2DUnityCollider : LichtPhysicsCollisionDetector<Collider2D>
     {
+        [field: CustomLabel("Select this if collision detection should activate a Trigger.")]
         [field: SerializeField]
-        public ScriptIdentifier TriggerIdentifier { get; set; }
-        
+        public bool SetTriggerOnCollision { get; set; }
+
+        [field: ShowWhen(nameof(SetTriggerOnCollision))]
+        public ScriptIdentifier Trigger;
+
         private List<CollisionResult> _internalResults;
 
         protected override void OnAwake()
@@ -22,7 +27,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, true, this);
+            if (SetTriggerOnCollision) PhysicsObject.SetPhysicsTrigger(Trigger, true, this);
 
             var contact = collision.GetContact(0);
             _internalResults.Add(new CollisionResult
@@ -42,7 +47,7 @@ namespace Licht.Unity.Physics.CollisionDetection
 
         private void OnCollisionExit2D(Collision2D collision)
         {
-            PhysicsObject.SetPhysicsTrigger(TriggerIdentifier, false, this);
+            if (SetTriggerOnCollision) PhysicsObject.SetPhysicsTrigger(Trigger, false, this);
             var remove = _internalResults.FirstOrDefault(r => r.Collider == collision.otherCollider);
             if (remove.Collider != null) _internalResults.Remove(remove);
         }

@@ -5,17 +5,26 @@ using Licht.Impl.Orchestration;
 using Licht.Unity.Builders;
 using Licht.Unity.Extensions;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Physics.Forces
 {
     public class Gravity : LichtCustomPhysicsForce
     {
-        public ScriptIdentifier GravityIdentifier;
-        public ScriptIdentifier GroundedIdentifier;
+        [CustomLabel("Which layers are affected by Gravity.")]
         public LayerMask Affects;
+
+        [CustomHeader("Triggers")]
+        [CustomLabel("This force's identifier in the Physics System.")]
+        public ScriptIdentifier GravityIdentifier;
+        [CustomLabel("Trigger for grounded. Grounded objects aren't affected by Gravity.")]
+        public ScriptIdentifier GroundedIdentifier;
+
+        [CustomHeader("Parameters")]
         public Vector2 Direction;
         public float Speed;
+        [CustomLabel("Delay until gravity is activated, upon enabling it.")]
         public float TimeInSecondsUntilFullEffect;
 
         [field:SerializeField]
