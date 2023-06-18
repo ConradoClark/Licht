@@ -12,8 +12,8 @@ namespace Licht.Unity.Extensions
     {
         public static bool TrySpawnEffect(this ScriptPrefab prefab, Vector3 position, out IPoolableComponent effect)
         {
-            var result = SceneObject<EffectsManager>.Instance(true)
-                .GetEffect(prefab)
+            var result = SceneObject<PoolManager>.Instance(true)
+                .GetPool(prefab)
                 .TryGetFromPool(out effect);
 
             if (result)
@@ -26,8 +26,8 @@ namespace Licht.Unity.Extensions
 
         public static bool TrySpawnEffect(this ScriptPrefab prefab, Vector3 position, Action<IPoolableComponent> init, out IPoolableComponent effect)
         {
-            var result = SceneObject<EffectsManager>.Instance(true)
-                .GetEffect(prefab)
+            var result = SceneObject<PoolManager>.Instance(true)
+                .GetPool(prefab)
                 .TryGetFromPool(out effect, init);
 
             if (result)

@@ -22,7 +22,7 @@ namespace Licht.Unity.Extensions
 
         public static PrefabPool GetPoolFromEffects(this MonoBehaviour obj, ScriptPrefab prefab)
         {
-            return SceneObject<EffectsManager>.Instance(true).GetEffect(prefab);
+            return SceneObject<PoolManager>.Instance(true).GetPool(prefab);
         }
 
     }

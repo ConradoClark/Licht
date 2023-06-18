@@ -3,15 +3,30 @@ using System.Collections.Generic;
 using Licht.Impl.Orchestration;
 using Licht.Interfaces.Pooling;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Licht.Unity.Pooling
 {
+    [RequireComponent(typeof(BaseActor))]
     public class PooledComponent : BaseGameObject, IPoolableComponent
     {
-        public event Action OnEffectOver;
+        [CustomLabel("Select if this object should be activated when its pool is created.")]
         public bool ActiveOnInitialization;
+
+        [field: CustomHeader("Events")]
+        [field: SerializeField]
+        public PooledComponentUnityEvents UnityEvents;
+        public event Action OnRelease;
         private Transform _originalParent;
+
+        [Serializable]
+        public struct PooledComponentUnityEvents
+        {
+            [field:SerializeField]
+            public UnityEvent OnRelease { get; private set; }
+        }
 
         public void Initialize()
         {
@@ -23,7 +38,7 @@ namespace Licht.Unity.Pooling
         public bool IsActive { get; set; }
         public bool Deactivate()
         {
-            IsEffectOver = true;
+            Released = true;
             IsActive = false;
 
             if (this == null) return false;
@@ -33,7 +48,7 @@ namespace Licht.Unity.Pooling
 
         public bool Activate()
         {
-            IsEffectOver = false;
+            Released = false;
             gameObject.SetActive(true);
             IsActive = true;
 
@@ -46,14 +61,15 @@ namespace Licht.Unity.Pooling
         {
         }
 
-        public virtual bool IsEffectOver { get; protected set; }
+        public virtual bool Released { get; protected set; }
 
-        public virtual void EndEffect()
+        public virtual void Release()
         {
             if (this == null) return;
 
-            IsEffectOver = true;
-            OnEffectOver?.Invoke();
+            Released = true;
+            OnRelease?.Invoke();
+            UnityEvents.OnRelease?.Invoke();
             if (transform != null) transform.SetParent(_originalParent);
             Deactivate();
         }

@@ -10,21 +10,24 @@ namespace Licht.Unity.Effects
 {
     public class ExpireAfterDuration : BaseGameAgent
     {
-        [field: SerializeField]
         public PooledComponent Poolable { get; private set; }
 
         [field: SerializeField]
-        public float DurationInSeconds { get; private set; }
+        public float DurationInSeconds { get; set; }
 
-        override protected void OnEnable()
+        public override void Init()
         {
-            base.OnEnable();
+            base.Init();
+            if (Poolable == null && Actor.TryGetCustomObject<PooledComponent>(out var pooledComponent))
+            {
+                Poolable = pooledComponent;
+            }
         }
 
         override protected IEnumerable<IEnumerable<Action>> Handle()
         {
             yield return TimeYields.WaitSeconds(Timer, DurationInSeconds);
-            Poolable.EndEffect();
+            Poolable.Release();
         }
     }
 }

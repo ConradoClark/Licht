@@ -4,25 +4,40 @@ using System.Text;
 using Licht.Impl.Orchestration;
 using Licht.Unity.Objects;
 using Licht.Unity.Pooling;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Effects
 {
     public class ExpireByDistanceToPoint : BaseGameAgent
     {
-        [field: SerializeField]
         public PooledComponent Poolable { get; private set; }
 
         [field: SerializeField]
-        public Transform Reference { get; private set; }
+        [field: CustomLabel("Select this if you want to use another Transform to compare the distance.")]
+        public bool UseCustomReference { get; private set; }
+
+        [field: ShowWhen(nameof(UseCustomReference))]
+        [field: SerializeField]
+        public Transform Reference { get; set; }
 
         [field: SerializeField]
-        public Vector3 Target { get; private set; }
+        public Vector3 Target { get; set; }
 
         [field: SerializeField]
-        public float Distance { get; private set; }
+        public float Distance { get; set; }
 
         private bool _effectEnded;
+
+        public override void Init()
+        {
+            base.Init();
+            if (Poolable == null && Actor.TryGetCustomObject<PooledComponent>(out var pooledComponent))
+            {
+                Poolable = pooledComponent;
+            }
+        }
+
         override protected void OnEnable()
         {
             _effectEnded = false;
@@ -31,9 +46,10 @@ namespace Licht.Unity.Effects
 
         override protected IEnumerable<IEnumerable<Action>> Handle()
         {
-            if (!_effectEnded && !(Vector2.Distance(Reference.position, Target) < Distance))
+            var reference = UseCustomReference ? Reference : transform;
+            if (!_effectEnded && !(Vector2.Distance(reference.position, Target) < Distance))
             {
-                Poolable.EndEffect();
+                Poolable.Release();
                 _effectEnded = true;
                 yield break;
             }

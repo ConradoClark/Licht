@@ -2,6 +2,7 @@
 using Licht.Impl.Pooling;
 using Licht.Interfaces.Pooling;
 using Licht.Interfaces.Update;
+using Licht.Unity.Objects;
 using UnityEngine;
 
 namespace Licht.Unity.Pooling
@@ -52,6 +53,13 @@ namespace Licht.Unity.Pooling
             var obj = Instantiate(Prefab, transform);
             obj.name = $"{Prefab.name}#{_index}";
             _index++;
+
+            var baseGameObject = obj.GetComponent<BaseGameObject>();
+            if (baseGameObject != null)
+            {
+                baseGameObject.Init();
+            }
+
             return obj.GetComponent<T>();
         }
 

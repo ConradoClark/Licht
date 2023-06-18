@@ -15,10 +15,10 @@ namespace Licht.Unity.Objects
         {
             if (Type == PrefabType.Effect)
             {
-                var effectsManager = EffectsManager.Instance();
+                var effectsManager = PoolManager.Instance();
                 if (effectsManager == null) return;
 
-                effectsManager.AddEffect(this);
+                effectsManager.AddPool(this);
             }
         }
 
@@ -27,9 +27,9 @@ namespace Licht.Unity.Objects
         {
             get
             {
-                if (_pool == null && EffectsManager.Instance() != null)
+                if (_pool == null && PoolManager.Instance() != null)
                 {
-                    _pool = EffectsManager.Instance().GetEffect(this);
+                    _pool = PoolManager.Instance().GetPool(this);
                 }
 
                 return _pool;
