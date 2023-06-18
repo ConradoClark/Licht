@@ -4,6 +4,7 @@ using Licht.Impl.Events;
 using Licht.Impl.Orchestration;
 using Licht.Interfaces.Events;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Animation
@@ -13,10 +14,16 @@ namespace Licht.Unity.Animation
         [Serializable]
         public struct CustomAnimationEvent
         {
+            [CustomLabel("Animation Layer associated to the event.")]
             public int AnimationLayerIndex;
+            [CustomLabel("Animator State associated to the event.")]
             public string StateName;
             public string EventName;
+
+            [CustomLabel("Events are fired once per range.")]
+            [CustomLabel("Min keyframe to trigger the event.")]
             public int KeyFrameMin;
+            [CustomLabel("Max keyframe to trigger the event.")]
             public int KeyFrameMax;
 
             public override string ToString()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Licht.Impl.Orchestration;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 public class BaseAI : BaseGameObject
@@ -12,18 +13,23 @@ public class BaseAI : BaseGameObject
     {
         public string Name;
 
+        [CustomLabel("Lower number has higher priority.")]
         public int Priority;
 
+        [CustomLabel("Actions will trigger when condition is met.")]
         public BaseAICondition Condition;
         
+        [CustomLabel("Actions occur in the order they are configured.")]
         public BaseAIAction[] Actions;
 
         public bool Enabled;
     }
 
+    [CustomLabel("AI Patterns.")]
     [SerializeField]
     private AIPattern[] _patterns;
 
+    [CustomLabel("Conditions which may break AI Patterns.")]
     [SerializeField]
     private BaseAICondition[] _breakConditions;
 
