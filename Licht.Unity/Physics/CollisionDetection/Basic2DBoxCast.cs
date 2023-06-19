@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Physics.CollisionDetection
 {
+    [AddComponentMenu("L!> Collision: 2D Box Cast")]
     public class Basic2DBoxCast : LichtPhysicsCollisionDetector<BoxCollider2D>
     {
         [field: CustomLabel("Select this to see the Debug Gizmos.")]

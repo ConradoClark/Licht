@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Physics.CollisionDetection
 {
+    [AddComponentMenu("L!> Collision: Push-Out Hint")]
     public class ColliderPushOutHint : BaseGameObject
     {
         [Serializable]

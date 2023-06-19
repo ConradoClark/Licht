@@ -12,6 +12,7 @@ using UnityEngine.InputSystem;
 
 namespace Licht.Unity.CharacterControllers
 {
+    [AddComponentMenu("L!> Controllers: Platformer2D Jump")]
     public class LichtPlatformerJumpController : LichtMovementController
     {
         public enum LichtPlatformerJumpEvents

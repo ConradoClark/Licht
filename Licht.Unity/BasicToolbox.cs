@@ -4,6 +4,7 @@ using System.Linq;
 using Licht.Impl.Events;
 using Licht.Interfaces.Update;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,7 +17,9 @@ namespace Licht.Unity
     [RequireComponent(typeof(PlayerInput))]
     public class BasicToolbox : SceneObject<BasicToolbox>
     {
+        [CustomLabel("Tries to follow a specific frame rate. 0 means unrestricted frame rate.")]
         public int TargetFrameRate;
+        [CustomLabel("Timers, Machinery, Physics, and all global runners go here.")]
         public List<ScriptValue> ScriptableObjects;
         private IUpdateable[] _updateableScriptableObjects;
         private ICanInitialize[] _initializableScriptableObjects;

@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Physics.CollisionDetection
 {
+    [AddComponentMenu("L!> Collision: Unity Collider")]
     public class Basic2DUnityCollider : LichtPhysicsCollisionDetector<Collider2D>
     {
         [field: CustomLabel("Select this if collision detection should activate a Trigger.")]

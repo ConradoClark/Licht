@@ -10,6 +10,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Physics.Forces
 {
+    [AddComponentMenu("L!> Forces: Gravity")]
     public class Gravity : LichtCustomPhysicsForce
     {
         [CustomLabel("Which layers are affected by Gravity.")]

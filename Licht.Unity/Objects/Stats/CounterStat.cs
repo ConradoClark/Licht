@@ -3,6 +3,7 @@ using Licht.Unity.Objects;
 using Licht.Unity.Objects.Stats;
 using UnityEngine;
 
+[AddComponentMenu("L!> Counters: Int Stat")]
 public class CounterStat : BaseGameObject
 {
     private int _value;

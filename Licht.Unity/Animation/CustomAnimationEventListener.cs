@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Animation
 {
+    [AddComponentMenu("L!> Animation: Event Listener")]
     public class CustomAnimationEventListener : BaseGameObject
     {
         [Serializable]

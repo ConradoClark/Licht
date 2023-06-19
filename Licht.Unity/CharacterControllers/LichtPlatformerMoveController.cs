@@ -13,6 +13,7 @@ using UnityEngine.InputSystem;
 
 namespace Licht.Unity.CharacterControllers
 {
+    [AddComponentMenu("L!> Controllers: Platformer2D Move")]
     public class LichtPlatformerMoveController : LichtMovementController
     {
         public enum MovementTurnBehaviour

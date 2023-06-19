@@ -8,9 +8,10 @@ using UnityEngine;
 
 namespace Licht.Unity.Effects
 {
+    [AddComponentMenu("L!> Pooling: Expire After Duration")]
     public class ExpireAfterDuration : BaseGameAgent
     {
-        public PooledComponent Poolable { get; private set; }
+        public PooledObject Poolable { get; private set; }
 
         [field: SerializeField]
         public float DurationInSeconds { get; set; }
@@ -18,7 +19,7 @@ namespace Licht.Unity.Effects
         public override void Init()
         {
             base.Init();
-            if (Poolable == null && Actor.TryGetCustomObject<PooledComponent>(out var pooledComponent))
+            if (Poolable == null && Actor.TryGetCustomObject<PooledObject>(out var pooledComponent))
             {
                 Poolable = pooledComponent;
             }

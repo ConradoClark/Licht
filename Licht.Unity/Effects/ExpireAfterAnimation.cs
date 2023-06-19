@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Effects
 {
+    [AddComponentMenu("L!> Pooling: Expire After Animation")]
     public class ExpireAfterAnimation : BaseGameAgent
     {
         [field: SerializeField]
@@ -29,12 +30,12 @@ namespace Licht.Unity.Effects
         [field: SerializeField]
         public bool CheckTransition { get; set; }
 
-        public PooledComponent Poolable { get; private set; }
+        public PooledObject Poolable { get; private set; }
 
         public override void Init()
         {
             base.Init();
-            if (Poolable == null && Actor.TryGetCustomObject<PooledComponent>(out var pooledComponent))
+            if (Poolable == null && Actor.TryGetCustomObject<PooledObject>(out var pooledComponent))
             {
                 Poolable = pooledComponent;
             }

@@ -9,9 +9,10 @@ using UnityEngine;
 
 namespace Licht.Unity.Effects
 {
+    [AddComponentMenu("L!> Pooling: Expire By Distance (Point)")]
     public class ExpireByDistanceToPoint : BaseGameAgent
     {
-        public PooledComponent Poolable { get; private set; }
+        public PooledObject Poolable { get; private set; }
 
         [field: SerializeField]
         [field: CustomLabel("Select this if you want to use another Transform to compare the distance.")]
@@ -32,7 +33,7 @@ namespace Licht.Unity.Effects
         public override void Init()
         {
             base.Init();
-            if (Poolable == null && Actor.TryGetCustomObject<PooledComponent>(out var pooledComponent))
+            if (Poolable == null && Actor.TryGetCustomObject<PooledObject>(out var pooledComponent))
             {
                 Poolable = pooledComponent;
             }

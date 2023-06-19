@@ -4,6 +4,7 @@ using Licht.Unity.Objects;
 using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
+[AddComponentMenu("L!> Animation: TopDown2D Animator")]
 public class TopDownControllerAnimator : BaseGameObject
 {
     [field:SerializeField]

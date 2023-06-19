@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 namespace Licht.Unity.UI.UIActions
 {
+    [AddComponentMenu("L!> UI Action: Change Scene")]
     public class UIChangeSceneAction : UIAction
     {
         public delegate IEnumerable<IEnumerable<Action>> ChangeSceneDelegate();

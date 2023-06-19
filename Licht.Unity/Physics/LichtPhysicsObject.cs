@@ -12,6 +12,7 @@ using Object = UnityEngine.Object;
 
 namespace Licht.Unity.Physics
 {
+    [AddComponentMenu("L!> Physics: 2D Physics Object")]
     public class LichtPhysicsObject : BaseActor
     {
         [CustomHeader("Properties")]

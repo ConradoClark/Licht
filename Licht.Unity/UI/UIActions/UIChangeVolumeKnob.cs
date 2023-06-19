@@ -3,23 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using Licht.Impl.Orchestration;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 
 namespace Licht.Unity.UI.Options
 {
+    [AddComponentMenu("L!> UI Action: Volume Knob")]
     public class UIChangeVolumeKnob : UIAction
     {
+        [BeginFoldout("Audio Settings")]
         public AudioSource TestAudio;
         public AudioMixerGroup Mixer;
-        public SpriteRenderer Gauge;
-        public SpriteRenderer ShadowGauge;
-
-        public PlayerInput PlayerInput;
-        public InputActionReference KnobControl;
-
         public string VolumeParam;
+        [EndFoldout]
+        [BeginFoldout("Input")]
+        [CustomLabel("Select this if you need to specify a particular PlayerInput")]
+        public bool UseCustomPlayerInput;
+        [ShowWhen(nameof(UseCustomPlayerInput))]
+        public PlayerInput PlayerInput;
+        [CustomLabel("Input Axis to control the knob")]
+        public InputActionReference AxisKnobControl;
+        [EndFoldout]
+        [BeginFoldout("Visuals")]
+        [CustomLabel("A tiled sprite representing the volume gauge.")]
+        public SpriteRenderer Gauge;
+        [CustomLabel("A tiled sprite representing the border of the volume gauge.")]
+        public SpriteRenderer ShadowGauge;
+        [CustomLabel("The volume gauge size at max volume.")]
         public float GaugeLevelSize;
         public int SelectedLevel { get; private set; }
 
@@ -56,6 +68,7 @@ namespace Licht.Unity.UI.Options
 
         public override void OnInit()
         {
+            if (!UseCustomPlayerInput) PlayerInput = PlayerInput.GetPlayerByIndex(0);
             ShadowGauge.size = new Vector2((VolumeLevels ?? DefaultVolumeLevels).Keys.Max() * GaugeLevelSize,
                 ShadowGauge.size.y);
             DefaultMachinery.AddBasicMachine(HandleKnob());
@@ -63,7 +76,7 @@ namespace Licht.Unity.UI.Options
 
         private IEnumerable<IEnumerable<Action>> HandleKnob()
         {
-            var action = PlayerInput.actions[KnobControl.action.name];
+            var action = PlayerInput.actions[AxisKnobControl.action.name];
 
             while (isActiveAndEnabled)
             {

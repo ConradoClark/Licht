@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Licht.Impl.Orchestration;
+using UnityEngine;
 
 namespace Licht.Unity.AI.BasicAIActions
 {
+    [AddComponentMenu("L!> AI Action: Do Nothing")]
     public class AIAction_DoNothing : BaseAIAction
     {
         public float TimeInSeconds;

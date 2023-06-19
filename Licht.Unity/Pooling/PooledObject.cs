@@ -9,8 +9,9 @@ using UnityEngine.Events;
 
 namespace Licht.Unity.Pooling
 {
+    [AddComponentMenu("L!> Pooling: Pooled Object")]
     [RequireComponent(typeof(BaseActor))]
-    public class PooledComponent : BaseGameObject, IPoolableComponent
+    public class PooledObject : BaseGameObject, IPoolableComponent
     {
         [CustomLabel("Select if this object should be activated when its pool is created.")]
         public bool ActiveOnInitialization;

@@ -15,6 +15,7 @@ using Vector2 = UnityEngine.Vector2;
 
 namespace Licht.Unity.CharacterControllers
 {
+    [AddComponentMenu("L!> Controllers: TopDown2D Move")]
     public class LichtTopDownMoveController : LichtMovementController
     {
         [CustomHeader("Movement")]

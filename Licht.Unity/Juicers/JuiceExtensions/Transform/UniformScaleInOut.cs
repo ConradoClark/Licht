@@ -4,19 +4,24 @@ using System.Text;
 using Licht.Impl.Orchestration;
 using Licht.Unity.Builders;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Juicers.JuiceExtensions.Transform
 {
-    [AddComponentMenu("JUICE_UniformScaleInOut")]
+    [AddComponentMenu("L!> Juicers: Uniform Scale (In/Out)")]
     public class UniformScaleInOut : BaseGameRunner
     {
+        [field: CustomLabel("A sprite Transformer is required to use this juicer.")]
         [field: SerializeField]
         public Transformer SpriteTransformer { get; private set; }
 
+        [field: BeginFoldout("Parameters")]
+        [field: CustomLabel("Select this if an initial value should be forced before scaling.")]
         [field: SerializeField]
         public bool ShouldSetInitialValue { get; private set; }
 
+        [field: ShowWhen(nameof(ShouldSetInitialValue))]
         [field: SerializeField]
         public Vector2 InitialScale { get; private set; }
 

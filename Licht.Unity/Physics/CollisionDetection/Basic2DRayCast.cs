@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Physics.CollisionDetection
 {
+    [AddComponentMenu("L!> Collision: 2D Ray Cast")]
     public class Basic2DRayCast : LichtPhysicsCollisionDetector
     {
         [field: CustomLabel("Select this if collision detection should activate a Trigger.")]

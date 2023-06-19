@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Physics.CollisionDetection
 {
+    [AddComponentMenu("L!> Collision: 2D Default")]
     public class Basic2DCollisionDetector : LichtPhysicsCollisionDetector<Collider2D>
     {
         [field: SerializeField]

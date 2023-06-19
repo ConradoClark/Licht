@@ -4,16 +4,20 @@ using System.Text;
 using Licht.Impl.Orchestration;
 using Licht.Unity.Extensions;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Juicers.JuiceExtensions.SpriteRenderer
 {
-    [AddComponentMenu("JUICE_Blink")]
+    [AddComponentMenu("L!> Juicers: Sprite Blink")]
     public class Blink : BaseGameRunner
     {
-        [field:SerializeField]
+        [field: CustomLabel("Blink target")]
+        [field: SerializeField]
         public UnityEngine.SpriteRenderer SpriteRenderer { get; private set; }
 
+        [field: BeginFoldout("Parameters")]
+        [field: CustomLabel("Total Blink Duration, in seconds")]
         [field: SerializeField]
         public float TimeInSeconds { get; private set; }
 

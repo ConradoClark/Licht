@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace Licht.Unity.Objects
 {
+    [AddComponentMenu("L!> Defaults: Mouse Inputs")]
     public class DefaultMouseInputs : MonoBehaviour
     {
         [field:SerializeField]

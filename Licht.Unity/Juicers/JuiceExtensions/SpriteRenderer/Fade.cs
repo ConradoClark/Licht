@@ -4,16 +4,19 @@ using System.Text;
 using Licht.Impl.Orchestration;
 using Licht.Unity.Extensions;
 using Licht.Unity.Objects;
+using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
 namespace Licht.Unity.Juicers.JuiceExtensions.SpriteRenderer
 {
-    [AddComponentMenu("JUICE_Fade")]
+    [AddComponentMenu("L!> Juicers: Fade")]
     public class Fade : BaseGameRunner
     {
+        [field: CustomLabel("Fade target")]
         [field:SerializeField]
         public UnityEngine.SpriteRenderer SpriteRenderer { get; private set; }
 
+        [field:BeginFoldout("Parameters")]
         [field: SerializeField]
         public float InitialAlpha { get; private set; }
 
