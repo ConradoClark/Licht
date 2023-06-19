@@ -8,11 +8,12 @@ using Licht.Unity.Objects;
 using Licht.Unity.Physics;
 using Licht.Unity.PropertyAttributes;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 namespace Licht.Unity.CharacterControllers
 {
-    [AddComponentMenu("L!> Controllers: Platformer2D Jump")]
+    [AddComponentMenu("L. Controllers: Platformer2D Jump")]
     public class LichtPlatformerJumpController : LichtMovementController
     {
         public enum LichtPlatformerJumpEvents
@@ -37,6 +38,13 @@ namespace Licht.Unity.CharacterControllers
         {
             public LichtPlatformerJumpController Source;
             public CustomJumpParams CustomParams;
+        }
+
+        [Serializable]
+        public struct LichtPlatformerJumpControllerUnityEvents
+        {
+            public UnityEvent<LichtPlatformerJumpEventArgs> OnJumpStart;
+            public UnityEvent<LichtPlatformerJumpEventArgs> OnJumpEnd;
         }
 
         [CustomHeader("Movement")]
@@ -76,6 +84,9 @@ namespace Licht.Unity.CharacterControllers
         public LichtPhysicsObject Target;
         [CustomHeader("Input")]
         public InputActionReference JumpInput;
+        [field:CustomHeader("Events")]
+        [field:SerializeField]
+        public LichtPlatformerJumpControllerUnityEvents UnityEvents { get; private set; }
 
         private bool _minJumpDelayPassed;
 
@@ -143,6 +154,7 @@ namespace Licht.Unity.CharacterControllers
 
             _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpStart, eventObject);
             OnJumpStart?.Invoke(eventObject);
+            UnityEvents.OnJumpStart?.Invoke(eventObject);
 
             _physics.BlockCustomPhysicsForceForObject(this, Target, GravityIdentifier.name);
             yield return TimeYields.WaitOneFrameX;
@@ -179,6 +191,7 @@ namespace Licht.Unity.CharacterControllers
             _physics.UnblockCustomPhysicsForceForObject(this, Target, GravityIdentifier.name);
             _eventPublisher.PublishEvent(LichtPlatformerJumpEvents.OnJumpEnd, eventObject);
             OnJumpEnd?.Invoke(eventObject);
+            UnityEvents.OnJumpEnd?.Invoke(eventObject);
         }
 
         private bool IsGrounded()

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Juicers.JuiceExtensions.Sequence
 {
-    [AddComponentMenu("L!> Runner: RunAllCombined")]
+    [AddComponentMenu("L. Runner: RunAllCombined")]
     public class RunAllCombined : BaseGameRunner
     {
         [field: SerializeField]

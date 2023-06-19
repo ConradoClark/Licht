@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Licht.Unity.AI.BasicAIConditions
 {
-    [AddComponentMenu("L!> AI Condition: Or")]
+    [AddComponentMenu("L. AI Condition: Or")]
     public class AICondition_Or : BaseAICondition
     {
         [CustomLabel("Logical OR amongst selected conditions.")]

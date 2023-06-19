@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Objects
 {
-    [AddComponentMenu("L!> Objects: Base Actor")]
+    [AddComponentMenu("L. Objects: Base Actor")]
     public class BaseActor : BaseGameObject
     {
         private Dictionary<Type, object> _customObjects;

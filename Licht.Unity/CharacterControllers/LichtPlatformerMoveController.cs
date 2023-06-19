@@ -9,11 +9,12 @@ using Licht.Unity.Objects;
 using Licht.Unity.Physics;
 using Licht.Unity.PropertyAttributes;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 namespace Licht.Unity.CharacterControllers
 {
-    [AddComponentMenu("L!> Controllers: Platformer2D Move")]
+    [AddComponentMenu("L. Controllers: Platformer2D Move")]
     public class LichtPlatformerMoveController : LichtMovementController
     {
         public enum MovementTurnBehaviour
@@ -36,6 +37,14 @@ namespace Licht.Unity.CharacterControllers
         {
             public LichtPlatformerMoveController Source;
             public float Direction;
+        }
+
+        public struct LichtPlatformerMoveControllerUnityEvents
+        {
+            public UnityEvent<LichtPlatformerMoveEventArgs> OnStartMoving;
+            public UnityEvent<LichtPlatformerMoveEventArgs> OnStopMoving;
+            public UnityEvent<LichtPlatformerMoveEventArgs> OnTopSpeed;
+            public UnityEvent<LichtPlatformerMoveEventArgs> OnTurn;
         }
 
         [CustomHeader("Movement")]
@@ -65,6 +74,8 @@ namespace Licht.Unity.CharacterControllers
         private LichtPhysics _physics;
         private PlayerInput _input;
         private IEventPublisher<LichtPlatformerMoveEvents, LichtPlatformerMoveEventArgs> _eventPublisher;
+        [field:CustomHeader("Events")]
+        public LichtPlatformerMoveControllerUnityEvents UnityEvents { get; private set; }
 
         protected override void OnAwake()
         {
@@ -136,6 +147,7 @@ namespace Licht.Unity.CharacterControllers
 
                 eventObj.Direction = axisSign;
                 _eventPublisher.PublishEvent(LichtPlatformerMoveEvents.OnStartMoving, eventObj);
+                UnityEvents.OnStartMoving?.Invoke(eventObj);
 
                 yield return StartMovement(axisInput, axisSign, changedAxis).AsCoroutine();
 
@@ -143,11 +155,13 @@ namespace Licht.Unity.CharacterControllers
                 {
                     eventObj.Direction = -axisSign;
                     _eventPublisher.PublishEvent(LichtPlatformerMoveEvents.OnTurn, eventObj);
+                    UnityEvents.OnTurn?.Invoke(eventObj);
                 }
 
                 if (axisInput.IsPressed() && !IsBlocked && !changedAxis())
                 {
                     _eventPublisher.PublishEvent(LichtPlatformerMoveEvents.OnTopSpeed, eventObj);
+                    UnityEvents.OnTopSpeed?.Invoke(eventObj);
                 }
 
                 while (axisInput.IsPressed() && !IsBlocked && !changedAxis())
@@ -156,7 +170,11 @@ namespace Licht.Unity.CharacterControllers
                     yield return TimeYields.WaitOneFrameX;
                 }
 
-                if (!changedAxis()) _eventPublisher.PublishEvent(LichtPlatformerMoveEvents.OnStopMoving, eventObj);
+                if (!changedAxis())
+                {
+                    _eventPublisher.PublishEvent(LichtPlatformerMoveEvents.OnStopMoving, eventObj);
+                    UnityEvents.OnStopMoving?.Invoke(eventObj);
+                }
 
                 yield return EndMovement(axisInput, changedAxis).AsCoroutine();
             }

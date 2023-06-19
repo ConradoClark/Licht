@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Licht.Unity.UI
 {
-    [AddComponentMenu("L!> UI: Clickable Action")]
+    [AddComponentMenu("L. UI: Clickable Action")]
     public class UIClickableAction : BaseGameObject
     {
         [field:CustomLabel("The following action will become clickable:")]

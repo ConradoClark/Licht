@@ -9,7 +9,7 @@ using UnityEngine.Events;
 
 namespace Licht.Unity.Pooling
 {
-    [AddComponentMenu("L!> Pooling: Pooled Object")]
+    [AddComponentMenu("L. Pooling: Pooled Object")]
     [RequireComponent(typeof(BaseActor))]
     public class PooledObject : BaseGameObject, IPoolableComponent
     {

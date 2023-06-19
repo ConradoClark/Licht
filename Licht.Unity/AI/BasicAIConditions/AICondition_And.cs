@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Licht.Unity.AI.BasicAIConditions
 {
-    [AddComponentMenu("L!> AI Condition: And")]
+    [AddComponentMenu("L. AI Condition: And")]
     public class AICondition_And : BaseAICondition
     {
         [CustomLabel("Logical AND amongst selected conditions.")]

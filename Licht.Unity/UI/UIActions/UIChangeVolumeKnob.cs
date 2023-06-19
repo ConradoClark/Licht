@@ -10,7 +10,7 @@ using UnityEngine.InputSystem;
 
 namespace Licht.Unity.UI.Options
 {
-    [AddComponentMenu("L!> UI Action: Volume Knob")]
+    [AddComponentMenu("L. UI Action: Volume Knob")]
     public class UIChangeVolumeKnob : UIAction
     {
         [BeginFoldout("Audio Settings")]

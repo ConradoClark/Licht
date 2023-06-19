@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Effects
 {
-    [AddComponentMenu("L!> Pooling: Expire After Animation")]
+    [AddComponentMenu("L. Pooling: Expire After Animation")]
     public class ExpireAfterAnimation : BaseGameAgent
     {
         [field: SerializeField]

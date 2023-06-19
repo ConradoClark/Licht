@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Effects
 {
-    [AddComponentMenu("L!> Pooling: Expire After Duration")]
+    [AddComponentMenu("L. Pooling: Expire After Duration")]
     public class ExpireAfterDuration : BaseGameAgent
     {
         public PooledObject Poolable { get; private set; }

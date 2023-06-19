@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Juicers.JuiceExtensions.SpriteRenderer
 {
-    [AddComponentMenu("L!> Juicers: FadeShaderFloat")]
+    [AddComponentMenu("L. Juicers: FadeShaderFloat")]
     public class FadeShaderPropertyFloat : BaseGameRunner
     {
         [field: CustomLabel("Fade target")]

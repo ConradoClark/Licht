@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 
 namespace Licht.Unity.UI
 {
-    [AddComponentMenu("L!> UI: Menu Context")]
+    [AddComponentMenu("L. UI: Menu Context")]
     public class UIMenuContext : BaseGameObject
     {
         public enum UIDirection

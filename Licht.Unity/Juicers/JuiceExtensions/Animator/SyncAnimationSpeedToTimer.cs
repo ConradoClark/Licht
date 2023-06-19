@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Juicers.JuiceExtensions.Animator
 {
-    [AddComponentMenu("L!> Juicers: Sync AnimSpeed to Timer")]
+    [AddComponentMenu("L. Juicers: Sync AnimSpeed to Timer")]
     public class SyncAnimationSpeedToTimer : BaseGameRunner
     {
         [field:SerializeField]

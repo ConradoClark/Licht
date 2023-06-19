@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Licht.Unity.AI.BasicAIConditions
 {
-    [AddComponentMenu("L!> AI Condition: Negate")]
+    [AddComponentMenu("L. AI Condition: Negate")]
     public class AICondition_Negate : BaseAICondition
     {
         [CustomLabel("Returns the opposite of the result of this condition.")]

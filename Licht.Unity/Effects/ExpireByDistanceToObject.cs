@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Effects
 {
-    [AddComponentMenu("L!> Pooling: Expire By Distance (Obj)")]
+    [AddComponentMenu("L. Pooling: Expire By Distance (Obj)")]
     public class ExpireByDistanceToObject : BaseGameAgent
     {
         public PooledObject Poolable { get; private set; }

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Juicers.JuiceExtensions.Sequence
 {
-    [AddComponentMenu("L!> Runner: LinearSequence")]
+    [AddComponentMenu("L. Runner: LinearSequence")]
     public class LinearSequence : BaseGameRunner
     {
         [field:SerializeField]

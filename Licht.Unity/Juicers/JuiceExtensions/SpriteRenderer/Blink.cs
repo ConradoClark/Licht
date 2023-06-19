@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Juicers.JuiceExtensions.SpriteRenderer
 {
-    [AddComponentMenu("L!> Juicers: Sprite Blink")]
+    [AddComponentMenu("L. Juicers: Sprite Blink")]
     public class Blink : BaseGameRunner
     {
         [field: CustomLabel("Blink target")]

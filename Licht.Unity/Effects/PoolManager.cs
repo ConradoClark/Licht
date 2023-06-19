@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Effects
 {
-    [AddComponentMenu("L!> Pooling: Pool Manager")]
+    [AddComponentMenu("L. Pooling: Pool Manager")]
     [DefaultExecutionOrder(-1)]
     public class PoolManager : SceneObject<PoolManager>
     {

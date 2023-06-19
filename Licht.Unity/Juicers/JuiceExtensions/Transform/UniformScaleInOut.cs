@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Juicers.JuiceExtensions.Transform
 {
-    [AddComponentMenu("L!> Juicers: Uniform Scale (In/Out)")]
+    [AddComponentMenu("L. Juicers: Uniform Scale (In/Out)")]
     public class UniformScaleInOut : BaseGameRunner
     {
         [field: CustomLabel("A sprite Transformer is required to use this juicer.")]
