@@ -10,6 +10,7 @@ using UnityEngine.InputSystem;
 
 namespace Licht.Unity
 {
+    [AddComponentMenu("L. Toolbox")]
     [DefaultExecutionOrder(-2000)]
     [RequireComponent(typeof(DefaultGameTimer))]
     [RequireComponent(typeof(DefaultUITimer))]

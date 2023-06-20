@@ -69,7 +69,9 @@ namespace Licht.Unity.Physics.CollisionDetection
                 return Array.Empty<CollisionResult>();
             }
 
-            var ignoredColliders = new HashSet<Collider2D>(PhysicsObject.CollisionDetectors.Select(c => c.AssociatedCollider));
+            var ignoredColliders = new HashSet<Collider2D>(
+                PhysicsObject.CollisionDetectors.Select(c => c.AssociatedCollider)
+                    .Where(c => c != null));
             ignoredColliders.UnionWith(PhysicsObject.AdditionalColliders);
 
             var results = _collisionResults
