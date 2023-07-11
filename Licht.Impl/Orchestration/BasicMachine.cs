@@ -10,7 +10,9 @@ namespace Licht.Impl.Orchestration
     public class BasicMachine : MachineBase
     {
         private bool _started;
-        private readonly IEnumerator<Action> _actionEnumerator;
+        private IEnumerator<Action> _actionEnumerator;
+        private readonly Lazy<IEnumerator<Action>> _actionEnumeratorLazy;
+        private readonly bool _lazy;
         private readonly Func<bool> _breakCondition;
         private readonly string _callerName;
 
@@ -35,12 +37,24 @@ namespace Licht.Impl.Orchestration
             _callerName = callerName;
         }
 
+        public BasicMachine(Func<IEnumerable<IEnumerable<Action>>> steps, Func<bool> breakCondition = null, string callerName = "")
+        {
+            _actionEnumeratorLazy = new Lazy<IEnumerator<Action>>(() => steps().SelectMany(s => s).GetEnumerator());
+            _lazy = true;
+            _breakCondition = breakCondition;
+            _callerName = callerName;
+        }
+
         public override MachineStepResult RunStep()
         {
             try
             {
                 if (!_started)
                 {
+                    if (_lazy)
+                    {
+                        _actionEnumerator = _actionEnumeratorLazy.Value;
+                    }
                     _actionEnumerator.MoveNext();
                     _started = true;
                 }
@@ -57,7 +71,7 @@ namespace Licht.Impl.Orchestration
 
         public override void Cleanup()
         {
-            _actionEnumerator.Dispose();
+            _actionEnumerator?.Dispose();
         }
     }
 }

@@ -75,7 +75,7 @@ namespace Licht.Unity.Pooling
             Deactivate();
         }
 
-        public MonoBehaviour Component => this;
+        public BaseActor Component => Actor;
         public IPool Pool { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
 using JetBrains.Annotations;
+using Licht.Interfaces.Orchestration;
 using Licht.Interfaces.Time;
 
 namespace Licht.Impl.Orchestration
@@ -73,9 +74,45 @@ namespace Licht.Impl.Orchestration
             return routine.SelectMany(action => action);
         }
 
+        public static IMachine AsMachine(this Func<IEnumerable<IEnumerable<Action>>> routineFunc)
+        {
+            return new BasicMachine(routineFunc);
+        }
+
+        public static IEnumerable<Action> AsCoroutine(this IMachine machine)
+        {
+            MachineStepResult result;
+            do
+            {
+                result = machine.RunStep();
+                yield return TimeYields.WaitOneFrame;
+            } while (result != MachineStepResult.Done);
+        }
+
         public static IEnumerable<Action> AsEnumerable(this Action action)
         {
             return Enumerable.Repeat(action, 1);
+        }
+
+        public static IEnumerable<Action> CombineAll(this IEnumerable<IEnumerable<Action>> targets)
+        {
+            var enumerators = targets.Select(t => t.GetEnumerator()).ToArray();
+
+            bool anyTrue;
+            do
+            {
+                anyTrue = false;
+                foreach (var e in enumerators)
+                {
+                    anyTrue |= e.MoveNext();
+                }
+                yield return TimeYields.WaitOneFrame;
+            } while (anyTrue);
+
+            foreach (var enumerator in enumerators)
+            {
+                enumerator?.Dispose();
+            }
         }
 
         public static IEnumerable<Action> Combine(this IEnumerable<Action> source, IEnumerable<Action> target)

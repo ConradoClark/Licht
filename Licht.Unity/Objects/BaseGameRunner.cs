@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Licht.Impl.Orchestration;
+using Licht.Interfaces.Orchestration;
 using Licht.Interfaces.Time;
 using Licht.Unity.PropertyAttributes;
-using Unity.Collections;
 using UnityEngine;
 
 namespace Licht.Unity.Objects
@@ -41,6 +40,8 @@ namespace Licht.Unity.Objects
 
         protected abstract IEnumerable<IEnumerable<Action>> Handle();
 
-        public IEnumerable<IEnumerable<Action>> AsMachine() => Handle();
+        public Func<IEnumerable<IEnumerable<Action>>> GetHandler => Handle;
+
+        public IMachine AsMachine() => new Func<IEnumerable<IEnumerable<Action>>>(Handle).AsMachine();
     }
 }

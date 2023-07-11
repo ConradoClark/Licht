@@ -6,7 +6,7 @@ using Licht.Unity.Objects;
 using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 
-public class BaseAI : BaseGameObject
+public class BaseAI : BaseGameRunner
 {
     [Serializable]
     public struct AIPattern
@@ -18,57 +18,83 @@ public class BaseAI : BaseGameObject
 
         [CustomLabel("Actions will trigger when condition is met.")]
         public BaseAICondition Condition;
-        
+
         [CustomLabel("Actions occur in the order they are configured.")]
         public BaseAIAction[] Actions;
 
         public bool Enabled;
     }
 
-    [CustomLabel("AI Patterns.")]
-    [SerializeField]
+    [CustomLabel("AI Patterns.")] [SerializeField]
     private AIPattern[] _patterns;
 
-    [CustomLabel("Conditions which may break AI Patterns.")]
-    [SerializeField]
+    [CustomLabel("Conditions which may break AI Patterns.")] [SerializeField]
     private BaseAICondition[] _breakConditions;
 
-    protected override void OnEnable()
+    protected override IEnumerable<IEnumerable<Action>> Handle()
     {
-        base.OnEnable();
-        DefaultMachinery.AddBasicMachine(RunAI());
-    }
-
-    protected override void OnAwake()
-    {
-        base.OnAwake();
-    }
-
-    private IEnumerable<IEnumerable<Action>> RunAI()
-    {
-        while (ComponentEnabled)
+        var foundPattern = false;
+        foreach (var pattern in _patterns
+                     .Where(pat => pat.Enabled && pat.Condition.ComponentEnabled)
+                     .OrderBy(pat => pat.Priority).ToArray())
         {
-            var foundPattern = false;
-            foreach (var pattern in _patterns
-                         .Where(pat => pat.Enabled && pat.Condition.ComponentEnabled)
-                         .OrderBy(pat => pat.Priority).ToArray())
+            if (!pattern.Condition.CheckCondition()) continue;
+            foundPattern = true;
+
+            foreach (var action in pattern.Actions)
             {
-                if (!pattern.Condition.CheckCondition()) continue;
-                foundPattern = true;
-
-                foreach (var action in pattern.Actions)
-                {
-                    yield return action.Execute(() =>
-                        !pattern.Enabled || !pattern.Condition.ComponentEnabled ||
-                        _breakConditions.Any(cond=>cond.CheckCondition())
-                    ).AsCoroutine();
-                    if (!pattern.Enabled || !pattern.Condition.ComponentEnabled) break;
-                }
-
-                break;
+                action.Prepare();
             }
 
-            if (!foundPattern) yield return TimeYields.WaitOneFrameX;
+            foreach (var action in pattern.Actions)
+            {
+                yield return action.Execute(() =>
+                    !pattern.Enabled || !pattern.Condition.ComponentEnabled ||
+                    _breakConditions.Any(cond => cond.CheckCondition())
+                ).AsCoroutine();
+                if (!pattern.Enabled || !pattern.Condition.ComponentEnabled) break;
+            }
+
+            break;
         }
+
+        if (!foundPattern) yield return TimeYields.WaitOneFrameX;
+    }
+
+    public AIPattern? ChoosePattern()
+    {
+        foreach (var pattern in _patterns
+                     .Where(pat => pat.Enabled && (pat.Condition.ComponentEnabled || pat.Condition.enabled))
+                     .OrderBy(pat => pat.Priority).ToArray())
+        {
+            if (!pattern.Condition.CheckCondition()) continue;
+
+            foreach (var action in pattern.Actions)
+            {
+                action.Prepare();
+            }
+
+            return pattern;
+        }
+
+        return null;
+    }
+
+    public IEnumerable<IEnumerable<Action>> RunPattern(AIPattern pattern)
+    {
+
+        foreach (var action in pattern.Actions)
+        {
+            yield return action.Execute(() =>
+                !pattern.Enabled || !pattern.Condition.ComponentEnabled ||
+                _breakConditions.Any(cond => cond.CheckCondition())
+            ).AsCoroutine();
+            if (!pattern.Enabled || !pattern.Condition.ComponentEnabled) break;
+        }
+    }
+
+    public void SetPatterns(AIPattern[] patterns)
+    {
+        _patterns = patterns;
     }
 }

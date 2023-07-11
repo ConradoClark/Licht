@@ -31,13 +31,16 @@ namespace Licht.Unity.Objects
             _customObjects.Remove(typeof(T));
         }
 
-        public bool TryGetCustomObject<T>(out T obj) where T : class
+        public bool TryGetCustomObject<T>(out T obj, bool includeParent=true) where T : class
         {
             _customObjects ??= new Dictionary<Type, object>();
             if (!_customObjects.ContainsKey(typeof(T)))
             {
                 obj = default;
-                return false;
+                if (!includeParent || transform.parent == null) return false;
+
+                var parentActor = transform.parent.GetComponentInParent<BaseActor>();
+                return parentActor != null && parentActor.TryGetCustomObject(out obj, true);
             }
 
             obj = _customObjects[typeof(T)] as T;

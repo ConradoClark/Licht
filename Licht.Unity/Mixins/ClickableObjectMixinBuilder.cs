@@ -13,13 +13,15 @@ namespace Licht.Unity.Mixins
         private PlayerInput _playerInput;
         private readonly InputActionReference _mousePosInput;
         private readonly InputActionReference _mouseClickInput;
+        private BoxCollider2D _renderTextureCollider;
+        private Camera _portalCamera;
         
         public ClickableObjectMixinBuilder(MonoBehaviour sourceObject, InputActionReference mousePosInput = null, 
             InputActionReference mouseClickInput = null, bool rightClick = false) : base(sourceObject)
         {
             _mousePosInput = mousePosInput ?? SceneObject<DefaultMouseInputs>.Instance()?.MousePos;
-            _mouseClickInput = mouseClickInput ?? rightClick ? SceneObject<DefaultMouseInputs>.Instance()?.MouseRightClick 
-                : SceneObject<DefaultMouseInputs>.Instance()?.MouseLeftClick;
+            _mouseClickInput = mouseClickInput ?? (rightClick ? SceneObject<DefaultMouseInputs>.Instance()?.MouseRightClick 
+                : SceneObject<DefaultMouseInputs>.Instance()?.MouseLeftClick);
             _playerInput = PlayerInput.GetPlayerByIndex(0);
             _collider = SourceObject?.GetComponent<Collider2D>();
             _camera = SceneObject<UICamera>.Instance()?.Camera ?? Camera.main;
@@ -43,11 +45,18 @@ namespace Licht.Unity.Mixins
             return this;
         }
 
+        public ClickableObjectMixinBuilder WithRenderTexture(BoxCollider2D renderTextureCollider, Camera portalCamera)
+        {
+            _renderTextureCollider = renderTextureCollider;
+            _portalCamera = portalCamera;
+            return this;
+        }
+
         public override ClickableObjectMixin Build()
         {
             return new ClickableObjectMixin(SourceObject, SceneObject<FrameVariables>.FindOrCreate("frameVars"), 
                 Timer, DefaultMachinery, _collider, _mouseClickInput, _mousePosInput,
-                _playerInput, _camera);
+                _playerInput, _renderTextureCollider, _portalCamera, _camera);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Licht.Impl.Pooling;
 using Licht.Interfaces.Pooling;
 using Licht.Interfaces.Update;
@@ -50,17 +51,36 @@ namespace Licht.Unity.Pooling
         
         public T Instantiate()
         {
-            var obj = Instantiate(Prefab, transform);
+            var obj = InstantiateInactive(Prefab, transform);
             obj.name = $"{Prefab.name}#{_index}";
             _index++;
 
-            var baseGameObject = obj.GetComponent<BaseGameObject>();
-            if (baseGameObject != null)
+            var baseObjects = obj.GetComponents<BaseGameObject>()
+                .Concat(obj.GetComponentsInChildren<BaseGameObject>(true)).ToArray();
+
+            foreach (var baseObj in baseObjects)
             {
-                baseGameObject.Init();
+                baseObj.Init();
             }
 
             return obj.GetComponent<T>();
+        }
+
+        public static GameObject InstantiateInactive(GameObject original, Transform parent = null)
+        {
+            if (!original.activeSelf)
+            {
+                return Instantiate(original, parent);
+            }
+
+            var inactiveObj = new GameObject(string.Empty);
+            inactiveObj.SetActive(false);
+
+            var obj = Instantiate(original, inactiveObj.transform);
+            obj.SetActive(false);
+            obj.transform.SetParent(parent);
+            Destroy(inactiveObj);
+            return obj;
         }
 
         public T[] GetObjectsInUse()

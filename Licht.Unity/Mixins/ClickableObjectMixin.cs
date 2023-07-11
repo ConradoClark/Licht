@@ -19,6 +19,8 @@ namespace Licht.Unity.Mixins
         private readonly InputAction _mousePosInput;
         private readonly Collider2D _collider;
         private readonly Camera _camera;
+        private readonly BoxCollider2D _renderTextureCollider;
+        private readonly Camera _portalCamera;
 
         public ClickableObjectMixin(MonoBehaviour sourceObject,
             FrameVariables frameVariables,
@@ -28,6 +30,8 @@ namespace Licht.Unity.Mixins
             InputActionReference clickInput,
             InputActionReference mousePosInput,
             PlayerInput playerInput,
+            BoxCollider2D renderTextureCollider,
+            Camera portalCamera,
             Camera camera) : base(sourceObject, frameVariables, timer, defaultMachinery)
         {
             _sourceObject = sourceObject;
@@ -36,6 +40,8 @@ namespace Licht.Unity.Mixins
             _clickAction = playerInput.actions[clickInput.action.name];
             _collider = collider;
             _camera = camera;
+            _renderTextureCollider = renderTextureCollider;
+            _portalCamera = portalCamera;
             _mousePosInput = playerInput.actions[mousePosInput.action.name];
         }
 
@@ -117,7 +123,22 @@ namespace Licht.Unity.Mixins
 
         private bool CheckHover()
         {
-            var pos = _camera.ScreenToWorldPoint(_mousePosInput.ReadValue<Vector2>());
+            var pos = (Vector2)_camera.ScreenToWorldPoint(_mousePosInput.ReadValue<Vector2>());
+
+            if (_renderTextureCollider == null) return _collider.OverlapPoint(pos);
+
+            if (!_renderTextureCollider.OverlapPoint(pos)) return false;
+
+            var bounds = _renderTextureCollider.bounds;
+            var rectMinPosition = bounds.min;
+            var rectWidth = bounds.size.x;
+            var rectHeight = bounds.size.y;
+
+            var relativePosition = pos - (Vector2)rectMinPosition;
+            var normalizedPosition = new Vector2(relativePosition.x / rectWidth, relativePosition.y / rectHeight);
+            normalizedPosition = new Vector2(Mathf.Clamp01(normalizedPosition.x), Mathf.Clamp01(normalizedPosition.y));
+
+            pos = _portalCamera.ViewportToWorldPoint(normalizedPosition);
             return _collider.OverlapPoint(pos);
         }
 
