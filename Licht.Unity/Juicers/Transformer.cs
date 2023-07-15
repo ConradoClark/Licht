@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Licht.Unity.Objects;
 using UnityEngine;
 
+[AddComponentMenu("L. Sprite: Sprite Transformer")]
 public class Transformer : BaseGameObject
 {
     [field: SerializeField]

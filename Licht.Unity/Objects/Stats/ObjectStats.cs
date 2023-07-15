@@ -25,7 +25,6 @@ namespace Licht.Unity.Objects.Stats
         public DictAccessor<float> Floats { get; private set; }
         public DictAccessor<string> Strings { get; private set; }
 
-
         private void OnEnable()
         {
             if (IntStats != null)
@@ -110,6 +109,21 @@ namespace Licht.Unity.Objects.Stats
                 _dict.Add(index, obj);
                 return true;
             }
+        }
+
+        public void AddToIntStat(string stat, int value)
+        {
+            Ints[stat] += value;
+        }
+        
+        public void SubtractFromIntStat(string stat, int value)
+        {
+            Ints[stat] -= value;
+        }
+        
+        public void SetIntStat(string stat, int value)
+        {
+            Ints[stat] = value;
         }
     }
 }

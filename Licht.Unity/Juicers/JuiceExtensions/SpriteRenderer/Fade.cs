@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Licht.Unity.Juicers.JuiceExtensions.SpriteRenderer
 {
-    [AddComponentMenu("L. Juicers: Fade")]
+    [AddComponentMenu("L. Runner: Fade")]
     public class Fade : BaseGameRunner
     {
         [field: CustomLabel("Fade target")]
