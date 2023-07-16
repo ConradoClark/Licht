@@ -165,6 +165,18 @@ namespace Licht.Unity.Physics
             }
         }
 
+        public void Move(float velocityMultiplier)
+        {
+            if (!AttachToRigidbody)
+            {
+                transform.position += (Vector3) CalculatedSpeed;
+            }
+            else
+            {
+                Rigidbody.velocity = Speed * velocityMultiplier;
+            }   
+        }
+
         public Vector2 GetCurrentPosition()
         {
             if (!AttachToRigidbody)
@@ -186,7 +198,7 @@ namespace Licht.Unity.Physics
 
                 detector.CheckCollision();
 
-                if (!detector.ShouldClamp || Rigidbody != null) continue;
+                if (!detector.ShouldClamp || AttachToRigidbody) continue;
 
                 var result = detector.Clamp();
                 if (type == LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate) CalculatedSpeed = result;

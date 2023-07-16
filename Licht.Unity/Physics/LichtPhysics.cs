@@ -21,7 +21,7 @@ namespace Licht.Unity.Physics
         public bool Debug;
         public float FrameMultiplier = 0.001f;
         public float PhysicsUpdateFrequency = 5 / 60f;
-        public float VelocityMultiplier = 12.5f;
+        public float VelocityMultiplier = 10f;
         public ScriptBasicMachinery LichtPhysicsMachinery;
         public ScriptTimer ScriptTimerRef;
         private FrameVariables _frameVariables;
@@ -136,7 +136,7 @@ namespace Licht.Unity.Physics
                 obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate);
                 obj.ImplyDirection(obj.CalculatedSpeed.normalized);
 
-                obj.MoveTo(obj.transform.position + (Vector3)obj.CalculatedSpeed);
+                obj.Move(updatedTime * VelocityMultiplier);
             }
 
             Physics2D.SyncTransforms();

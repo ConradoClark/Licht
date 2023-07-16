@@ -9,6 +9,7 @@ namespace Licht.Unity.Objects
     {
         private static T _storedObject;
         private static readonly Dictionary<string, T> NamedObjects = new Dictionary<string, T>();
+        // ReSharper disable once StaticMemberInGenericType
         private static bool _notFound;
         static SceneObject()
         {

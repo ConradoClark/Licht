@@ -17,8 +17,7 @@ namespace Licht.Unity.Objects
         [field: SerializeField]
         public ScriptTimer TimerReference { get; private set; }
         public ITimer Timer => UseCustomTimer
-            ? TimerReference?.Timer ??
-              SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer
+            ? TimerReference != null ? TimerReference.Timer : SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer
             : SceneObject<DefaultGameTimer>.Instance().TimerRef.Timer;
 
         protected override void OnEnable()
