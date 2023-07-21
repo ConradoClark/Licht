@@ -25,6 +25,7 @@ namespace Licht.Unity.Physics
         public ScriptBasicMachinery LichtPhysicsMachinery;
         public ScriptTimer ScriptTimerRef;
         private FrameVariables _frameVariables;
+        private FixedUpdateVariables _fixedUpdateVariables;
         private List<LichtPhysicsObject> _physicsWorld;
         private List<LichtPhysicsObject> _physicsStaticWorld;
         private List<LichtPhysicsForce> _physicsForces;
@@ -45,6 +46,16 @@ namespace Licht.Unity.Physics
             if (_frameVariables != null) return _frameVariables;
             var obj = new GameObject("frameVars");
             return _frameVariables = obj.AddComponent<FrameVariables>();
+        }
+        
+        public FixedUpdateVariables GetFixedUpdateVariables()
+        {
+            if (_fixedUpdateVariables != null) return _fixedUpdateVariables;
+            _fixedUpdateVariables = FindObjectOfType<FixedUpdateVariables>();
+
+            if (_fixedUpdateVariables != null) return _fixedUpdateVariables;
+            var obj = new GameObject("fixedFrameVars");
+            return _fixedUpdateVariables = obj.AddComponent<FixedUpdateVariables>();
         }
 
         public IEnumerable<LichtPhysicsObject> GetDynamicObjectsByLayerMask(LayerMask mask)
@@ -127,9 +138,10 @@ namespace Licht.Unity.Physics
 
         public void UpdatePositions()
         {
+            var fakePhysicsWorld  = _physicsWorld.Where(p => !p.AttachToRigidbody).ToArray();
             var updatedTime = FrameMultiplier * ScriptTimerRef.Timer.UpdatedTimeInMilliseconds;
 
-            foreach (var obj in _physicsWorld)
+            foreach (var obj in fakePhysicsWorld)
             {
                 obj.CalculatedSpeed = obj.Speed * updatedTime;
 
@@ -141,7 +153,7 @@ namespace Licht.Unity.Physics
 
             Physics2D.SyncTransforms();
 
-            foreach (var obj in _physicsWorld)
+            foreach (var obj in fakePhysicsWorld)
             {
                 obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PostUpdate);
             }
@@ -149,6 +161,27 @@ namespace Licht.Unity.Physics
             foreach (var obj in _physicsStaticWorld)
             {
                 obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate);
+                obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PostUpdate);
+            }
+        }
+        
+        public void FixedUpdatePositions()
+        {
+            var physicsRigidBodyWorld = _physicsWorld.Where(p => p.AttachToRigidbody).ToArray();
+            var updatedTime = UnityEngine.Time.fixedDeltaTime * ScriptTimerRef.Timer.Multiplier;
+
+            foreach (var obj in physicsRigidBodyWorld)
+            {
+                obj.CalculatedSpeed = obj.Speed * updatedTime;
+
+                obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate);
+                obj.ImplyDirection(obj.CalculatedSpeed.normalized);
+
+                obj.Move(updatedTime * VelocityMultiplier);
+            }
+
+            foreach (var obj in physicsRigidBodyWorld)
+            {
                 obj.CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType.PostUpdate);
             }
         }

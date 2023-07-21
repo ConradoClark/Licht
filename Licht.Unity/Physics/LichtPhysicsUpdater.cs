@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Licht.Unity.Physics
 {
     [CreateAssetMenu(fileName = "LichtPhysicsUpdater", menuName = "Licht/Physics/LichtPhysicsUpdater", order = 1)]
-    public class LichtPhysicsUpdater : ScriptValue, ICanInitialize, IUpdateable
+    public class LichtPhysicsUpdater : ScriptValue, ICanInitialize,IUpdateable, IFixedUpdateable
     {
         private FrameVariables _frameVariables;
         private LichtPhysics _physics;
@@ -38,6 +38,15 @@ namespace Licht.Unity.Physics
         {
             _frameVariables = GetFrameVariables();
             _physics = this.GetLichtPhysics();
+        }
+
+        public void FixedUpdate()
+        {
+            _physics.FixedUpdatePositions();
+            if (_physics.Debug)
+            {
+                IsUpdating = true;
+            }
         }
     }
 }

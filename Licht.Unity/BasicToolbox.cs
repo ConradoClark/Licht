@@ -4,6 +4,7 @@ using System.Linq;
 using Licht.Impl.Events;
 using Licht.Interfaces.Update;
 using Licht.Unity.Objects;
+using Licht.Unity.Physics;
 using Licht.Unity.PropertyAttributes;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -23,6 +24,7 @@ namespace Licht.Unity
         [CustomLabel("Timers, Machinery, Physics, and all global runners go here.")]
         public List<ScriptValue> ScriptableObjects;
         private IUpdateable[] _updateableScriptableObjects;
+        private IFixedUpdateable[] _fixedUpdateableScriptableObjects;
         private ICanInitialize[] _initializableScriptableObjects;
 
         protected void Awake()
@@ -52,11 +54,21 @@ namespace Licht.Unity
             }
         }
 
+        protected void FixedUpdate()
+        {
+            foreach (var scriptableObject in _fixedUpdateableScriptableObjects)
+            {
+                scriptableObject.FixedUpdate();
+            }
+        }
+
         protected void OnEnable()
         {
             _updateableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<IUpdateable>().ToArray();
             _initializableScriptableObjects = ScriptableObjects.Select(obj => obj.Value).OfType<ICanInitialize>().ToArray();
-
+            _fixedUpdateableScriptableObjects =
+                ScriptableObjects.Select(obj => obj.Value).OfType<IFixedUpdateable>().ToArray();
+            
             foreach (var obj in _initializableScriptableObjects)
             {
                 obj.Initialize();

@@ -15,9 +15,9 @@ namespace Licht.Unity.Physics
     [AddComponentMenu("L. Physics: 2D Physics Object")]
     public class LichtPhysicsObject : BaseActor
     {
-        [CustomHeader("Properties")]
-        [CustomLabel("Ghost objects aren't affected by forces of Physics (e.g. Gravity)")]
+        [CustomHeader("Properties")] [CustomLabel("Ghost objects aren't affected by forces of Physics (e.g. Gravity)")]
         public bool Ghost;
+
         [CustomLabel("Sticky objects tend to attach themselves to platforms when moving up.")]
         [CustomLabel("The default Jump Controller sets this automatically as needed.")]
         public bool Sticky;
@@ -30,22 +30,23 @@ namespace Licht.Unity.Physics
             [HideInInspector] public Object UpdatedBy;
         }
 
-        [CustomHeader("Triggers")]
-        public TriggerDefinitions[] PhysicsTriggers;
+        [CustomHeader("Triggers")] public TriggerDefinitions[] PhysicsTriggers;
 
-        [CustomHeader("Collision")]
-        public LichtPhysicsCollisionDetector[] CollisionDetectors;
+        [CustomHeader("Collision")] public LichtPhysicsCollisionDetector[] CollisionDetectors;
+
         [CustomLabel("Additional colliders attached to the Physics Object.")]
         [CustomLabel("Attached Collision Detectors ignore collisions from AdditionalColliders.")]
         public List<Collider2D> AdditionalColliders;
 
-        [field:CustomHeader("Rigidbody")]
-        [field:SerializeField]
+        [field: CustomHeader("Rigidbody")]
+        [field: SerializeField]
         public bool AttachToRigidbody { get; private set; }
 
-        [field:CustomLabel("Attach a Licht Physics Object to a Rigidbody if you want it to move by using its Rigidbody velocity.")]
-        [field:SerializeField]
-        [field:ShowWhen(nameof(AttachToRigidbody))]
+        [field:
+            CustomLabel(
+                "Attach a Licht Physics Object to a Rigidbody if you want it to move by using its Rigidbody velocity.")]
+        [field: SerializeField]
+        [field: ShowWhen(nameof(AttachToRigidbody))]
         public Rigidbody2D Rigidbody { get; private set; }
 
         public LichtPhysics Physics { get; private set; }
@@ -77,12 +78,22 @@ namespace Licht.Unity.Physics
         {
             get
             {
-                return Physics.GetFrameVariables()
-                    .Get(new FrameVariableDefinition<Vector2>(PhysicsFrameVar, () => Vector2.zero));
+                return AttachToRigidbody
+                    ? Physics.GetFixedUpdateVariables()
+                        .Get(new FrameVariableDefinition<Vector2>(PhysicsFrameVar, () => Vector2.zero))
+                    : Physics.GetFrameVariables()
+                        .Get(new FrameVariableDefinition<Vector2>(PhysicsFrameVar, () => Vector2.zero));
             }
             set
             {
-                Physics.GetFrameVariables().Set(PhysicsFrameVar, value);
+                if (AttachToRigidbody)
+                {
+                    Physics.GetFixedUpdateVariables().Set(PhysicsFrameVar,value);
+                }
+                else
+                {
+                    Physics.GetFrameVariables().Set(PhysicsFrameVar, value);
+                }
                 _latestSpeed.Current = value;
                 if (value != Vector2.zero)
                 {
@@ -128,7 +139,8 @@ namespace Licht.Unity.Physics
 
         public void ImplyDirection(Vector2 direction)
         {
-            _latestDirection.Current = new Vector2(Mathf.Abs(direction.x) > 0 ? direction.x : _latestDirection.Current.x,
+            _latestDirection.Current = new Vector2(
+                Mathf.Abs(direction.x) > 0 ? direction.x : _latestDirection.Current.x,
                 Mathf.Abs(direction.y) > 0 ? direction.y : _latestDirection.Current.y);
         }
 
@@ -169,12 +181,12 @@ namespace Licht.Unity.Physics
         {
             if (!AttachToRigidbody)
             {
-                transform.position += (Vector3) CalculatedSpeed;
+                transform.position += (Vector3)CalculatedSpeed;
             }
             else
             {
                 Rigidbody.velocity = Speed * velocityMultiplier;
-            }   
+            }
         }
 
         public Vector2 GetCurrentPosition()
@@ -189,7 +201,7 @@ namespace Licht.Unity.Physics
 
         public void CheckCollision(LichtPhysicsCollisionDetector.CollisionDetectorType type)
         {
-            foreach (var detector in CollisionDetectors.Where(cd => cd.DetectorType 
+            foreach (var detector in CollisionDetectors.Where(cd => cd.DetectorType
                                                                     == type))
             {
                 if (!detector.ComponentEnabled) continue;
