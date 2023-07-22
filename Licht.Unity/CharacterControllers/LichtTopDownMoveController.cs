@@ -29,6 +29,9 @@ namespace Licht.Unity.CharacterControllers
         public float DecelerationTime;
         public EasingYields.EasingFunction MovementStartEasing;
         public EasingYields.EasingFunction MovementEndEasing;
+
+        [field: SerializeField] public float TurnSpeedPerSecond { get; private set; } = 0.5f;
+        
         [EndFoldout]
         [CustomHeader("Reference")]
         [CustomLabel("The default is the associated Actor.")]
@@ -154,7 +157,7 @@ namespace Licht.Unity.CharacterControllers
                     .normalized;
 
                 CheckChangeDirectionEvent(dir);
-                LatestDirection = dir;
+                LatestDirection = Vector2.Lerp(LatestDirection, dir, TurnSpeedPerSecond * .166666666666667f);
 
                 Target.ApplySpeed(LatestDirection * MaxSpeed);
                 yield return TimeYields.WaitOneFrameX;

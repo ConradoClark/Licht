@@ -7,7 +7,7 @@ namespace Licht.Impl.Generation
 {
     public class WeightedDice<TValue> : IGenerator<int, TValue> where TValue : IWeighted<float>
     {
-        private readonly IReadOnlyList<TValue> _values;
+        private IReadOnlyList<TValue> _values;
         private readonly IGenerator<int, float> _floatGenerator;
         private readonly List<TValue> _pickedValues;
         private readonly bool _repeatValues;
@@ -21,6 +21,11 @@ namespace Licht.Impl.Generation
         }
         public int Seed { get; set; }
 
+        public void SetPossibleValues(IEnumerable<TValue> values)
+        {
+            _values = values.ToArray();
+        }
+        
         public TValue Generate()
         {
             var validValues = _values.Where(w => w.Weight > 0).ToArray();
