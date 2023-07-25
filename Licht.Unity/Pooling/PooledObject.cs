@@ -74,6 +74,11 @@ namespace Licht.Unity.Pooling
             if (transform != null) transform.SetParent(_originalParent);
             Deactivate();
         }
+        
+        public bool TryGetCustomObject<T>(out T obj, bool includeParent=true) where T : class
+        {
+            return Actor.TryGetCustomObject(out obj);
+        }
 
         public BaseActor Component => Actor;
         public IPool Pool { get; set; }
