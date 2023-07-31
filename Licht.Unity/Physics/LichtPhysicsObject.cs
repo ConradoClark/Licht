@@ -210,7 +210,8 @@ namespace Licht.Unity.Physics
 
                 detector.CheckCollision();
 
-                if (!detector.ShouldClamp || AttachToRigidbody) continue;
+                if (!detector.ShouldClamp || 
+                    (AttachToRigidbody && type == LichtPhysicsCollisionDetector.CollisionDetectorType.PostUpdate)) continue;
 
                 var result = detector.Clamp();
                 if (type == LichtPhysicsCollisionDetector.CollisionDetectorType.PreUpdate) CalculatedSpeed = result;
